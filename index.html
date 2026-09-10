@@ -6,13 +6,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="수댕로그">
+<meta name="apple-mobile-web-app-title" content="수딩로그">
 <meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#F1F3EF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#12140F" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB+0lEQVR42u3dsXECUQxFUaPZNtwIrgOKdB9uBDdCSkBAwH70tOdkODHSXDN8MOzpdjl/wTNlBYgDcSAOxIE4EAfiQByIA3GAOBAH4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOBAH4kAciANxIA7EgTgQB+IAcSAOxIE4EAfiQByIA3EgDhAH4kAc7GHb+xd8//493vy//lh6yj5r5SRPf0LbfdbKSfSRtc9aPIk+gvZZ6yfRR8o+nVYQB+JAHIiDj9q63aGjvaLaed7qvKnxJ97m81bnTc3uo/+81XxTU/uImLf6b2peHynzOq0gDsSBOBAH4kAciANxIA7EAeLgdVvQffVpBo8ciANxIA7EgThAHIgDcSAOxIE4EAfiYJCkt+zHfFdHyv8eeORAHIgDcSAOxIE4EAfiQByIA8RBWByvvKM26RvyU+atiH3Nu3ZCxLzVf19Tr6rRf95qvq/Z11tpPu+W8vd0nD48IcVpBXEgDsQB+8VxtFc8O5xo9thnfWQeZUTss9bPo4yUfdbieZQRtM/T7XK2dJxWEAfiQByIA3EgDsSBOBAHiANxIA7EgTgQB+JAHIgDcYA4EAfiQByIA3EgDsSBOBAH4gBxIA7EgTgQB+JAHIgDcSAOEAfiQByIA3EgDsSBOBAH4gBxIA7EwdvdAfJbd8dXP2miAAAAAElFTkSuQmCC">
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB+0lEQVR42u3dsXECUQxFUaPZNtwIrgOKdB9uBDdCSkBAwH70tOdkODHSXDN8MOzpdjl/wTNlBYgDcSAOxIE4EAfiQByIA3GAOBAH4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOBAH4kAciANxIA7EgTgQB+IAcSAOxIE4EAfiQByIA3EgDhAH4kAc7GHb+xd8//493vy//lh6yj5r5SRPf0LbfdbKSfSRtc9aPIk+gvZZ6yfRR8o+nVYQB+JAHIiDj9q63aGjvaLaed7qvKnxJ97m81bnTc3uo/+81XxTU/uImLf6b2peHynzOq0gDsSBOBAH4kAciANxIA7EAeLgdVvQffVpBo8ciANxIA7EgThAHIgDcSAOxIE4EAfiYJCkt+zHfFdHyv8eeORAHIgDcSAOxIE4EAfiQByIA8RBWByvvKM26RvyU+atiH3Nu3ZCxLzVf19Tr6rRf95qvq/Z11tpPu+W8vd0nD48IcVpBXEgDsQB+8VxtFc8O5xo9thnfWQeZUTss9bPo4yUfdbieZQRtM/T7XK2dJxWEAfiQByIA3EgDsSBOBAHiANxIA7EgTgQB+JAHIgDcYA4EAfiQByIA3EgDsSBOBAH4gBxIA7EgTgQB+JAHIgDcSAOEAfiQByIA3EgDsSBOBAH4gBxIA7EwdvdAfJbd8dXP2miAAAAAElFTkSuQmCC">
-<title>수댕로그</title>
+<title>수딩로그</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
   :root{
@@ -444,9 +444,8 @@
     font-size:13px;cursor:pointer;padding:4px 0;margin-bottom:10px;}
 
   /* 영양제 칩 끌어서 순서 바꾸기 */
-  #suppChipRow .chip{touch-action:none;user-select:none;-webkit-user-select:none;}
-  #suppChipRow .chip.dragging{box-shadow:var(--shadow-2);position:relative;z-index:5;
-    cursor:grabbing;border-color:var(--accent);opacity:.95;}
+  /* 영양제 칩은 탭으로만 켜고 끈다 (드래그는 스크롤과 충돌해서 뺐다) */
+  #suppChipRow .chip{user-select:none;-webkit-user-select:none;}
 
   /* ---------- 하루 기록: 운동 방식 선택 · 세트 실패 · 메모 ---------- */
   .mode-seg{display:inline-flex;gap:3px;background:var(--surface-2);padding:3px;border-radius:9px;margin:10px 0 4px;}
@@ -569,8 +568,8 @@
   <header class="topbar">
     <div class="topbar-row">
       <div class="wordmark">
-        <span class="mark">수댕로그</span>
-        <span class="sub">SUDAENG LOG</span>
+        <span class="mark">수딩로그</span>
+        <span class="sub">SOODING LOG</span>
       </div>
       <div class="week-strip" id="weekStrip"></div>
     </div>
@@ -810,7 +809,7 @@
 
 <script>
 /* =========================================================
-   수댕로그 — data
+   수딩로그 — data
    ========================================================= */
 const PARTS = {
   chest:{label:'가슴', color:'var(--p-chest)'},
@@ -823,8 +822,9 @@ const PARTS = {
 };
 const PART_ORDER = ['chest','back','shoulder','arm','leg','core','cardio'];
 
+// 자주 챙기는 것부터 앞에 둔다.
 const COMMON_SUPPLEMENTS = [
-  '종합비타민','비타민C','비타민D','오메가3','마그네슘','크레아틴',
+  '크레아틴','비타민C','마그네슘','비타민D','종합비타민','오메가3',
   '간 영양제','유산균','아연','콜라겐','철분','프로틴',
 ];
 
@@ -2050,109 +2050,15 @@ function renderDayIfOpen(ds){
 }
 
 function saveSuppOrder(){ lsSave(); }
-// 저장된 순서를 먼저 놓고, 새로 생긴 항목은 뒤에 붙인다.
+// 기본 목록 순서 그대로 놓고, 직접 추가한 것은 뒤에 붙인다.
+// (예전에 끌어서 저장해 둔 순서가 남아 있어도 무시한다 — 드래그 기능은 없앴다.)
 function orderedSupplements(){
-  const all = [
+  return [
     ...COMMON_SUPPLEMENTS.map(n=>({key:n, label:n})),
     ...state.supplements.map(x=>({key:x.id, label:x.name})),
   ];
-  const byKey = Object.fromEntries(all.map(x=>[x.key,x]));
-  const out = [];
-  state.suppOrder.forEach(k=>{ if(byKey[k]){ out.push(byKey[k]); delete byKey[k]; } });
-  all.forEach(x=>{ if(byKey[x.key]) out.push(x); });
-  return out;
 }
-/* 칩을 끌어서 순서 바꾸기.
-   iOS 사파리는 HTML5 드래그를 지원하지 않아 포인터 이벤트로 직접 구현한다.
-   요령은 두 가지다.
-     1) 끌리는 칩은 항상 손가락 아래에 붙어 있어야 한다.
-        칩이 DOM 안에서 자리를 옮기면 레이아웃 위치가 바뀌므로, 매 프레임
-        변형을 잠깐 지우고 실제 위치를 다시 재서 그만큼 보정한다.
-     2) 자리 판정은 손가락 밑 요소가 아니라 다른 칩들의 '중심'과 비교한다.
-        같은 줄에서 가장 가까운 칩을 찾아 그 앞/뒤로 꽂는다 → 칸이 딱 열리며 스냅된다. */
-function makeChipsSortable(wrap){
-  let drag = null;
-
-  const chipsExcept = el => [...wrap.querySelectorAll('[data-supp]')].filter(c=>c!==el);
-
-  const moveTo = (chip, x, y)=>{
-    const others = chipsExcept(chip);
-    if(!others.length) return;
-    let best = null, bestDist = Infinity;
-    others.forEach(c=>{
-      const r = c.getBoundingClientRect();
-      const cx = r.left + r.width/2, cy = r.top + r.height/2;
-      // 같은 줄(세로로 칩 높이 안쪽)에 있는 것만 후보로 본다
-      if(Math.abs(cy - y) > r.height * 0.9) return;
-      const d = Math.abs(cx - x);
-      if(d < bestDist){ bestDist = d; best = {el:c, cx}; }
-    });
-    if(!best){                       // 줄이 안 맞으면 세로로 가장 가까운 줄로
-      others.forEach(c=>{
-        const r = c.getBoundingClientRect();
-        const d = Math.abs(r.top + r.height/2 - y);
-        if(d < bestDist){ bestDist = d; best = {el:c, cx:r.left + r.width/2}; }
-      });
-    }
-    if(!best) return;
-    const after = x > best.cx;
-    const ref = after ? best.el.nextSibling : best.el;
-    if(ref === chip) return;
-    if(after && best.el.nextSibling === chip) return;
-    wrap.insertBefore(chip, after ? best.el.nextSibling : best.el);
-  };
-
-  const follow = (chip, ev)=>{
-    chip.style.transform = '';                      // 지금 레이아웃 위치를 재려고 잠깐 해제
-    const base = chip.getBoundingClientRect();
-    const dx = ev.clientX - drag.startX - (base.left - drag.originLeft);
-    const dy = ev.clientY - drag.startY - (base.top - drag.originTop);
-    chip.style.transform = `translate(${dx}px, ${dy}px)`;
-  };
-
-  wrap.querySelectorAll('[data-supp]').forEach(chip=>{
-    chip.addEventListener('pointerdown', ev=>{
-      if(ev.button != null && ev.button !== 0) return;
-      const r = chip.getBoundingClientRect();
-      drag = {el:chip, startX:ev.clientX, startY:ev.clientY,
-              originLeft:r.left, originTop:r.top, moved:false, pid:ev.pointerId};
-    });
-
-    chip.addEventListener('pointermove', ev=>{
-      if(!drag || drag.el!==chip) return;
-      if(!drag.moved){
-        if(Math.hypot(ev.clientX-drag.startX, ev.clientY-drag.startY) < 8) return;
-        drag.moved = true;
-        chip.classList.add('dragging');
-        try{ chip.setPointerCapture(drag.pid); }catch(e){}
-      }
-      ev.preventDefault();
-      moveTo(chip, ev.clientX, ev.clientY);
-      follow(chip, ev);
-    });
-
-    const end = ()=>{
-      if(!drag || drag.el!==chip) return;
-      const wasDrag = drag.moved;
-      chip.classList.remove('dragging');
-      chip.style.transform = '';
-      drag = null;
-      if(wasDrag){
-        chip._justDragged = true;                  // 뒤따라오는 click 이 켜기/끄기 되지 않게
-        setTimeout(()=>{ chip._justDragged = false; }, 0);
-        state.suppOrder = [...wrap.querySelectorAll('[data-supp]')].map(c=>c.dataset.supp);
-        saveSuppOrder();
-        showToast('순서를 바꿨어요');
-      }
-    };
-    chip.addEventListener('pointerup', end);
-    chip.addEventListener('pointercancel', end);
-    chip.addEventListener('click', ev=>{
-      if(chip._justDragged){ ev.preventDefault(); ev.stopImmediatePropagation(); }
-    }, true);
-  });
-}
-
+/* 영양제 칩 — 탭으로 켜고 끈다. 순서는 기본 목록 순서로 고정. */
 function renderSupplementChips(){
   const body = document.getElementById('daySheetBody');
   const wrap = body && body.querySelector('#suppChipRow');
@@ -2160,7 +2066,7 @@ function renderSupplementChips(){
   const log = getLog(state.selectedDate);
   const chips = orderedSupplements().map(x=>{
     const on = log.supplementsTaken.includes(x.key);
-    return `<span class="chip ${on?'on':''}" data-supp="${x.key}" title="끌어서 순서를 바꿀 수 있어요">${x.label}</span>`;
+    return `<span class="chip ${on?'on':''}" data-supp="${x.key}">${x.label}</span>`;
   }).join('');
   wrap.innerHTML = chips + `<span class="chip add-chip" id="suppAddChip">기타 (직접 입력)</span>`;
   wrap.querySelectorAll('[data-supp]').forEach(el=>{
@@ -2173,7 +2079,6 @@ function renderSupplementChips(){
       el.classList.toggle('on');
     });
   });
-  makeChipsSortable(wrap);
   const addChip = wrap.querySelector('#suppAddChip');
   if(addChip) addChip.addEventListener('click', ()=>{
     const nameBox = body.querySelector('#suppNewBox');
