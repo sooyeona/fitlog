@@ -6,13 +6,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="핏로그">
+<meta name="apple-mobile-web-app-title" content="수댕로그">
 <meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#F1F3EF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#12140F" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB+0lEQVR42u3dsXECUQxFUaPZNtwIrgOKdB9uBDdCSkBAwH70tOdkODHSXDN8MOzpdjl/wTNlBYgDcSAOxIE4EAfiQByIA3GAOBAH4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOBAH4kAciANxIA7EgTgQB+IAcSAOxIE4EAfiQByIA3EgDhAH4kAc7GHb+xd8//493vy//lh6yj5r5SRPf0LbfdbKSfSRtc9aPIk+gvZZ6yfRR8o+nVYQB+JAHIiDj9q63aGjvaLaed7qvKnxJ97m81bnTc3uo/+81XxTU/uImLf6b2peHynzOq0gDsSBOBAH4kAciANxIA7EAeLgdVvQffVpBo8ciANxIA7EgThAHIgDcSAOxIE4EAfiYJCkt+zHfFdHyv8eeORAHIgDcSAOxIE4EAfiQByIA8RBWByvvKM26RvyU+atiH3Nu3ZCxLzVf19Tr6rRf95qvq/Z11tpPu+W8vd0nD48IcVpBXEgDsQB+8VxtFc8O5xo9thnfWQeZUTss9bPo4yUfdbieZQRtM/T7XK2dJxWEAfiQByIA3EgDsSBOBAHiANxIA7EgTgQB+JAHIgDcYA4EAfiQByIA3EgDsSBOBAH4gBxIA7EgTgQB+JAHIgDcSAOEAfiQByIA3EgDsSBOBAH4gBxIA7EwdvdAfJbd8dXP2miAAAAAElFTkSuQmCC">
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB+0lEQVR42u3dsXECUQxFUaPZNtwIrgOKdB9uBDdCSkBAwH70tOdkODHSXDN8MOzpdjl/wTNlBYgDcSAOxIE4EAfiQByIA3GAOBAH4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOBAH4kAciANxIA7EgTgQB+IAcSAOxIE4EAfiQByIA3EgDhAH4kAc7GHb+xd8//493vy//lh6yj5r5SRPf0LbfdbKSfSRtc9aPIk+gvZZ6yfRR8o+nVYQB+JAHIiDj9q63aGjvaLaed7qvKnxJ97m81bnTc3uo/+81XxTU/uImLf6b2peHynzOq0gDsSBOBAH4kAciANxIA7EAeLgdVvQffVpBo8ciANxIA7EgThAHIgDcSAOxIE4EAfiYJCkt+zHfFdHyv8eeORAHIgDcSAOxIE4EAfiQByIA8RBWByvvKM26RvyU+atiH3Nu3ZCxLzVf19Tr6rRf95qvq/Z11tpPu+W8vd0nD48IcVpBXEgDsQB+8VxtFc8O5xo9thnfWQeZUTss9bPo4yUfdbieZQRtM/T7XK2dJxWEAfiQByIA3EgDsSBOBAHiANxIA7EgTgQB+JAHIgDcYA4EAfiQByIA3EgDsSBOBAH4gBxIA7EgTgQB+JAHIgDcSAOEAfiQByIA3EgDsSBOBAH4gBxIA7EwdvdAfJbd8dXP2miAAAAAElFTkSuQmCC">
-<title>핏로그</title>
+<title>수댕로그</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
   :root{
@@ -95,6 +95,15 @@
 
   *{box-sizing:border-box;}
   [hidden]{display:none !important;}
+  /* 어떤 이유로든 가로로 넘치더라도 화면이 옆으로 밀리지 않게 막는다 */
+  html,body{max-width:100%;overflow-x:hidden;}
+  .app{overflow-x:clip;}
+  .tabs{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  @media (max-width:420px){
+    .app{padding-left:14px;padding-right:14px;}
+    .topbar h1,.cal-head h2{font-size:clamp(20px,7vw,30px);}
+    .tab-btn{padding:9px 13px;font-size:13.5px;}
+  }
   body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);}
   h1,h2,h3{font-family:var(--font-display);font-weight:400;letter-spacing:.01em;text-wrap:balance;}
   button{font-family:inherit;}
@@ -367,6 +376,30 @@
   .pt-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
   .pt-actions button{flex:1;min-width:130px;}
 
+  /* ---------- 선생님 루틴 ---------- */
+  .rt-card{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 15px;
+    border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface);
+    cursor:pointer;font-family:inherit;color:var(--text);margin-bottom:9px;}
+  .rt-card:hover{border-color:var(--accent);}
+  .rt-card .mid{flex:1;min-width:0;}
+  .rt-card .nm{display:block;font-size:14.5px;font-weight:700;}
+  .rt-card .meta{display:block;font-size:12px;color:var(--text-faint);margin-top:3px;}
+  .rt-card .chev{color:var(--text-faint);font-size:18px;flex:none;}
+  .rt-item{border:1px solid var(--line);border-radius:var(--radius-md);padding:13px 15px;margin-bottom:10px;background:var(--surface);}
+  .rt-item .hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .rt-item .nm{font-size:14.5px;font-weight:700;}
+  .rt-item .sum{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);}
+  .rt-item .steps{font-size:12.5px;color:var(--text-muted);line-height:1.7;margin-top:8px;white-space:pre-wrap;}
+  .rt-item .warn{font-size:12px;color:var(--supp);margin-top:6px;}
+  .rt-item select{margin-top:8px;}
+  .rt-back{border:none;background:transparent;color:var(--text-muted);font-family:inherit;
+    font-size:13px;cursor:pointer;padding:4px 0;margin-bottom:10px;}
+
+  /* 영양제 칩 끌어서 순서 바꾸기 */
+  #suppChipRow .chip{touch-action:none;user-select:none;-webkit-user-select:none;}
+  #suppChipRow .chip.dragging{opacity:.9;transform-origin:center;box-shadow:var(--shadow-2);
+    position:relative;z-index:5;cursor:grabbing;}
+
   /* ---------- 하루 기록: 운동 방식 선택 · 세트 실패 · 메모 ---------- */
   .mode-seg{display:inline-flex;gap:3px;background:var(--surface-2);padding:3px;border-radius:9px;margin:10px 0 4px;}
   .mode-seg button{border:none;background:transparent;padding:6px 12px;border-radius:7px;font-family:inherit;
@@ -459,7 +492,7 @@
   html{-webkit-text-size-adjust:100%;}
   body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);
        -webkit-tap-highlight-color:transparent;overscroll-behavior-y:contain;}
-  input,select,textarea,button{font-size:16px;}  /* iOS 자동 확대 방지 */
+  input,select,textarea{font-size:16px;}  /* iOS 입력 시 자동 확대 방지 (버튼은 제외 — 폭이 불필요하게 늘어남) */
   .ib-hist,.ex-ref{-webkit-overflow-scrolling:touch;}
 
   /* ---- 실제 동작 이미지(GIF) 스테이지 ---- */
@@ -488,8 +521,8 @@
   <header class="topbar">
     <div class="topbar-row">
       <div class="wordmark">
-        <span class="mark">핏로그</span>
-        <span class="sub">FITLOG</span>
+        <span class="mark">수댕로그</span>
+        <span class="sub">SUDAENG LOG</span>
       </div>
       <div class="week-strip" id="weekStrip"></div>
     </div>
@@ -587,14 +620,21 @@
       <button class="close-btn" id="pickerClose">✕</button>
     </div>
     <div class="sheet-body">
-      <div class="picker-search">
-        <input type="text" id="pickerSearch" placeholder="운동 이름 검색">
+      <div class="ex-tabs">
+        <button class="ex-tab active" data-picktab="pick">운동 고르기</button>
+        <button class="ex-tab" data-picktab="routine">선생님 루틴 <span class="cnt" id="pickRoutineCnt" hidden></span></button>
       </div>
-      <div class="picker-list" id="pickerList"></div>
-      <button class="pick-btn" id="pickerAddEx" style="margin-top:4px">+ 목록에 없는 운동 직접 추가하기</button>
-      <div class="picker-done">
-        <button class="primary-btn" id="pickerDone">선택 완료</button>
+      <div id="pickPanePick">
+        <div class="picker-search">
+          <input type="text" id="pickerSearch" placeholder="운동 이름 검색">
+        </div>
+        <div class="picker-list" id="pickerList"></div>
+        <button class="pick-btn" id="pickerAddEx" style="margin-top:4px">+ 목록에 없는 운동 직접 추가하기</button>
+        <div class="picker-done">
+          <button class="primary-btn" id="pickerDone">선택 완료</button>
+        </div>
       </div>
+      <div id="pickPaneRoutine" hidden></div>
     </div>
   </div>
 </div>
@@ -629,6 +669,17 @@
       <button class="close-btn" id="exClose">✕</button>
     </div>
     <div class="sheet-body" id="exBody"></div>
+  </div>
+</div>
+
+<!-- 선생님 루틴 붙여넣기 모달 -->
+<div class="overlay" id="routineOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h3 id="routineTitle">선생님 루틴 등록</h3>
+      <button class="close-btn" id="routineClose">✕</button>
+    </div>
+    <div class="sheet-body" id="routineBody"></div>
   </div>
 </div>
 
@@ -698,7 +749,7 @@
 
 <script>
 /* =========================================================
-   핏로그 — data
+   수댕로그 — data
    ========================================================= */
 const PARTS = {
   chest:{label:'가슴', color:'var(--p-chest)'},
@@ -1072,6 +1123,140 @@ async function deletePtPlan(exId, planId){
   lsSave();
 }
 
+/* =========================================================
+   선생님 루틴 — 카톡으로 받은 루틴 원문을 통째로 붙여넣어 저장한다.
+   운동 하나짜리 기록(ptPlans)과 달리, 루틴은 여러 운동을 묶은 하나의 기록이다.
+   ========================================================= */
+function routinesSorted(){
+  return (state.ptRoutines||[]).slice().sort((a,b)=> a.date<b.date ? 1 : (a.date>b.date ? -1 : 0));
+}
+function routineById(id){ return (state.ptRoutines||[]).find(r=>r.id===id) || null; }
+async function saveRoutine(r){
+  const list = (state.ptRoutines||[]).filter(x=>x.id!==r.id);
+  list.push(r);
+  state.ptRoutines = list;
+  lsSave();
+}
+async function deleteRoutine(id){
+  state.ptRoutines = (state.ptRoutines||[]).filter(r=>r.id!==id);
+  lsSave();
+}
+
+/* ---- 한 줄에서 무게·횟수·세트수 읽기 ----
+   "2.5kg x 15번", "빈봉 x 12번", "10kg 15회 3세트", "20 x 12 x 3" 등.
+   횟수가 없으면 세트가 아니라 설명으로 본다("무게는 33kg 고정" 같은 줄). */
+function parseSetLine(line){
+  const t = String(line||'').replace(/^[-–•*]\s*/, '').trim();
+  if(!t) return null;
+  let weight = null, reps = null, count = 1;
+  if(/빈\s*봉|맨몸|bodyweight/i.test(t)) weight = '빈봉';
+  const mW = t.match(/(\d+(?:\.\d+)?)\s*(?:kg|KG|Kg|킬로|㎏)/);
+  if(mW) weight = mW[1];
+  const mR = t.match(/(\d+)\s*(?:번|회|개|reps?)/i);
+  if(mR) reps = mR[1];
+  const mS = t.match(/(\d+)\s*(?:세트|셋트|sets?)/i);
+  if(mS) count = Math.min(30, Math.max(1, parseInt(mS[1],10)));
+  if(reps === null){
+    const mX = t.match(/(\d+(?:\.\d+)?)\s*[x×*]\s*(\d+)(?:\s*[x×*]\s*(\d+))?/i);
+    if(mX){
+      if(weight === null) weight = mX[1];
+      reps = mX[2];
+      if(mX[3]) count = Math.min(30, Math.max(1, parseInt(mX[3],10)));
+    }
+  }
+  if(reps === null) return null;         // 횟수가 없으면 세트로 치지 않는다
+  return {weight, reps, count};
+}
+
+/* ---- 루틴 원문 전체를 운동 블록으로 쪼개기 ---- */
+function parseRoutineText(text){
+  const lines = String(text||'').split(/\r?\n/);
+  let name = '', items = [], cur = null, sawBlankAfterFirst = false, firstHeader = true;
+  const pushCur = ()=>{ if(cur) items.push(cur); cur = null; };
+
+  for(let i=0;i<lines.length;i++){
+    const raw = lines[i];
+    const t = raw.trim();
+    if(!t) continue;
+    // 세트를 먼저 본다. "2.5kg x 15번"의 소수점을 목록 번호로 오인하면 안 되므로
+    // 번호 매김은 점 뒤에 숫자가 오지 않는 경우만 인정한다.
+    const set = parseSetLine(t);
+    if(!set && /^\d{1,2}\s*[.)](?!\d)/.test(t)){     // "1. ..." 준비/수행 설명
+      if(cur) cur.steps.push(t.replace(/^\d{1,2}\s*[.)]\s*/, ''));
+      continue;
+    }
+    if(set && cur){                                  // 세트 줄 ('-' 유무 상관없이)
+      for(let k=0;k<set.count;k++) cur.sets.push({weight:set.weight ?? '', reps:set.reps ?? ''});
+      continue;
+    }
+    if(/^[-–•*]\s*/.test(t)){                        // 세트가 아닌 '-' 줄 = 메모
+      if(cur) cur.notes.push(t.replace(/^[-–•*]\s*/, ''));
+      continue;
+    }
+    // 남은 건 제목 줄
+    if(firstHeader){
+      firstHeader = false;
+      const next = (lines[i+1]||'').trim();
+      if(!next || /루틴/.test(t)){ name = t; sawBlankAfterFirst = true; continue; }
+    }
+    pushCur();
+    cur = {rawName:t, exId:null, sets:[], steps:[], notes:[]};
+  }
+  pushCur();
+
+  // 블록 뒤처리: "무게 33kg 고정" + "15개씩 ... 총 5세트" 처럼 나눠 적힌 경우 합쳐준다
+  items.forEach(it=>{
+    const noteText = it.notes.join(' ');
+    const fixedW = noteText.match(/(\d+(?:\.\d+)?)\s*(?:kg|킬로|㎏)/);
+    if(!it.sets.length){
+      const r = noteText.match(/(\d+)\s*(?:개|회|번)/);
+      const c = noteText.match(/(\d+)\s*(?:세트|셋트)/);
+      if(r && c){
+        const n = Math.min(30, Math.max(1, parseInt(c[1],10)));
+        for(let k=0;k<n;k++) it.sets.push({weight: fixedW? fixedW[1] : '', reps: r[1]});
+      }
+    }else if(fixedW){
+      it.sets = it.sets.map(x=> x.weight===''? {...x, weight:fixedW[1]} : x);
+    }
+    it.exId = matchExerciseByName(it.rawName);
+  });
+
+  if(!name) name = '선생님 루틴';
+  return {name, items};
+}
+
+/* ---- 루틴에 적힌 운동 이름을 도감 항목에 붙이기 ---- */
+function normName(x){ return String(x||'').toLowerCase().replace(/[\s()\[\]·.,/-]/g,''); }
+function matchExerciseByName(raw){
+  const n = normName(raw);
+  if(!n) return null;
+  const pool = [];
+  allExercises().forEach(e=>{
+    pool.push([normName(e.name), e.id]);
+    (e.alias||[]).forEach(a=>pool.push([normName(a), e.id]));
+    if(typeof EX_EN!=='undefined' && EX_EN[e.id]) pool.push([normName(EX_EN[e.id]), e.id]);
+  });
+  for(const [k,id] of pool) if(k===n) return id;
+  const long = pool.filter(([k])=>k.length>=3).sort((a,b)=>b[0].length-a[0].length);
+  for(const [k,id] of long) if(n.startsWith(k) || k.startsWith(n)) return id;
+  for(const [k,id] of long) if(n.includes(k) || k.includes(n)) return id;
+  return null;
+}
+function routineSummary(r){
+  const n = r.items.length;
+  const sets = r.items.reduce((a,x)=>a+x.sets.length,0);
+  return `운동 ${n}개 · 총 ${sets}세트`;
+}
+function itemSummary(it){
+  if(!it.sets.length) return '세트 지정 없음';
+  const g = {};
+  it.sets.forEach(x=>{ const k=`${x.weight||'-'}|${x.reps||'-'}`; g[k]=(g[k]||0)+1; });
+  return Object.entries(g).map(([k,c])=>{
+    const [w,rp]=k.split('|');
+    return `${w!=='-'? (w==='빈봉'?'빈봉 ':w+'kg ') : ''}${rp!=='-'? rp+'회':''} ×${c}`.trim();
+  }).join(' · ');
+}
+
 /* ---- 외부 레퍼런스 검색용 영문 운동명 ----
    실제 시범 영상/GIF은 원 저작자 사이트에서 바로 보도록 링크로 연결한다.
    (외부 이미지는 아티팩트 보안정책상 페이지 안에 표시할 수 없고,
@@ -1131,6 +1316,32 @@ const EX_GIF = {
   'hs-iso-row':FP+'2022/02/Plate-Loaded-Seated-Row.gif',
   'hs-iso-wide-pulldown':FP+'2021/05/Front-Pulldown.gif',
   'hs-iso-shoulder-press':FP+'2022/04/Plate-Loaded-Shoulder-Press.gif',
+  'bent-over-lateral':FP+'2021/02/Bent-Over-Lateral-Raise.gif',
+  'calf-raise':FP+'2021/06/Standing-Calf-Raise.gif',
+  'chest-fly':FP+'2021/02/Pec-Deck-Fly.gif',
+  'concentration-curl':FP+'2021/02/Concentration-Curl.gif',
+  'crunch':FP+'2015/11/Crunch.gif',
+  'deadlift-machine':FP+'2021/06/Trap-Bar-Deadlift.gif',
+  'dips':FP+'2021/06/Chest-Dips.gif',
+  'face-pull':FP+'2021/02/Face-Pull.gif',
+  'front-raise':FP+'2021/02/Dumbbell-Front-Raise.gif',
+  'good-morning':FP+'2021/02/Barbell-Good-Morning.gif',
+  'hammer-curl':FP+'2021/02/Hammer-Curl.gif',
+  'hanging-leg-raise':FP+'2021/05/Captains-Chair-Leg-Raise.gif',
+  'hip-abduction':FP+'2022/04/Lever-Side-Hip-Abduction.gif',
+  'hip-thrust':FP+'2021/02/Barbell-Hip-Thrust.gif',
+  'leg-curl':FP+'2021/02/Leg-Curl.gif',
+  'lunge':FP+'2023/07/bodyweight-lunges.gif',
+  'mountain-climber':FP+'2021/02/Mountain-climber.gif',
+  'one-arm-dumbbell-row':FP+'2021/02/Dumbbell-Row.gif',
+  'overhead-press':FP+'2021/07/Barbell-Standing-Military-Press.gif',
+  'russian-twist':FP+'2021/02/Russian-Twist.gif',
+  'side-plank':FP+'2021/02/Side-Plank-1-360x360.png',
+  'skull-crusher':FP+'2021/06/Dumbbell-Skull-Crusher.gif',
+  'squat-free':FP+'2021/02/BARBELL-SQUAT.gif',
+  'tricep-kickback':FP+'2021/02/Bent-Over-Triceps-Kickback.gif',
+  'tricep-pushdown':FP+'2021/02/Pushdown.gif',
+  'upright-row':FP+'2021/02/barbell-uprightrow.gif',
 };
 function exImgUrl(id){
   const custom = state.exImages && state.exImages[id];
@@ -1238,6 +1449,8 @@ const state = {
   exImages:{},       // 운동 id -> 직접 지정한 이미지 URL
   favorites:new Set(DEFAULT_FAVS), // 즐겨찾기 = '내가 자주 하는 운동' (사용자가 넣고 뺄 수 있음)
   ptPlans:{},        // 운동 id -> [선생님 운동법 기록]
+  ptRoutines:[],     // 선생님이 보내준 루틴 묶음
+  suppOrder:[],      // 영양제 칩 순서 (직접 끌어서 바꾼 순서)
   draft:null,        // 열려 있는 하루 기록의 편집 중 사본 (저장 눌러야 반영)
   draftDate:null,
   dirty:false,
@@ -1247,6 +1460,12 @@ const state = {
   pickerSelection:new Set(),
 };
 
+// 운동으로 '기록됐다'고 볼 수 있는가 — 종류만 눌러둔 건 기록이 아니다.
+function workoutLogged(log){
+  const w = log && log.workout;
+  if(!w || !w.type || w.type==='none') return false;
+  return !!(w.durationMin || w.memo || (Array.isArray(w.exercises) && w.exercises.length));
+}
 function pad2(n){return String(n).padStart(2,'0');}
 function fmtDate(d){return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;}
 function todayStr(){return fmtDate(new Date());}
@@ -1344,6 +1563,8 @@ function lsSave(){
     customExercises: state.customExercises,
     exImages: state.exImages,
     ptPlans: state.ptPlans,
+    ptRoutines: state.ptRoutines,
+    suppOrder: state.suppOrder,
     favorites: [...state.favorites],
     savedAt: new Date().toISOString(),
   };
@@ -1389,6 +1610,8 @@ async function initDb(){
     state.customExercises = Array.isArray(saved.customExercises)? saved.customExercises : [];
     state.exImages = (saved.exImages && typeof saved.exImages==='object')? saved.exImages : {};
     state.ptPlans = (saved.ptPlans && typeof saved.ptPlans==='object')? saved.ptPlans : {};
+    state.ptRoutines = Array.isArray(saved.ptRoutines)? saved.ptRoutines : [];
+    state.suppOrder = Array.isArray(saved.suppOrder)? saved.suppOrder : [];
     if(Array.isArray(saved.favorites)) state.favorites = new Set(saved.favorites);
   }else{
     // 첫 실행: 아티팩트 버전에 들어 있던 인바디 기록을 그대로 옮겨온다
@@ -1431,6 +1654,8 @@ function importData(text, mode){
   (data.customExercises||[]).forEach(e=>{ if(e && e.id && !state.customExercises.some(x=>x.id===e.id)) state.customExercises.push(e); });
   Object.assign(state.exImages, data.exImages||{});
   Object.assign(state.ptPlans, data.ptPlans||{});
+  (data.ptRoutines||[]).forEach(r=>{ if(r && r.id && !state.ptRoutines.some(x=>x.id===r.id)) state.ptRoutines.push(r); });
+  if(Array.isArray(data.suppOrder) && data.suppOrder.length) state.suppOrder = data.suppOrder;
   if(Array.isArray(data.favorites)) state.favorites = new Set(data.favorites);
   lsSave();
   renderCalendar(); renderLibrary(); renderSupplementChips();
@@ -1504,7 +1729,7 @@ function renderWeekStrip(){
   for(let i=0;i<7;i++){
     const d=new Date(start); d.setDate(start.getDate()+i);
     const log=state.logs[fmtDate(d)];
-    if(log && log.workout && log.workout.type!=='none') workouts++;
+    if(workoutLogged(log)) workouts++;
     if(log && log.water && log.water.ml>0){ waterSum+=log.water.ml; waterDays++; }
   }
   const avgWater = waterDays? Math.round(waterSum/waterDays):0;
@@ -1536,15 +1761,10 @@ function renderCalendar(){
     let dots='';
     let mins='';
     if(log){
-      if(log.workout && log.workout.type && log.workout.type!=='none'){
-        // 종류만 눌러둔 상태(운동·시간·메모 없음)는 속이 빈 점으로 구분해서,
-        // 실수로 누른 게 완료한 운동처럼 보이지 않게 한다.
+      // 종류만 눌러둔 날은 아무 표시도 하지 않는다 (실수로 누른 게 기록처럼 보이면 안 됨)
+      if(workoutLogged(log)){
         const w = log.workout;
-        const filled = !!(w.durationMin || w.memo || (w.exercises && w.exercises.length));
-        const c = w.type==='pt' ? 'var(--pt)' : 'var(--accent)';
-        dots += filled
-          ? `<i class="dot" style="background:${c}"></i>`
-          : `<i class="dot" style="background:transparent;box-shadow:inset 0 0 0 1.5px ${c}"></i>`;
+        dots += `<i class="dot" style="background:${w.type==='pt' ? 'var(--pt)' : 'var(--accent)'}"></i>`;
         if(w.durationMin) mins=w.durationMin+'분';
       }
       const d = log.diet;
@@ -1635,20 +1855,81 @@ function renderDayIfOpen(ds){
   }
 }
 
+function saveSuppOrder(){ lsSave(); }
+// 저장된 순서를 먼저 놓고, 새로 생긴 항목은 뒤에 붙인다.
+function orderedSupplements(){
+  const all = [
+    ...COMMON_SUPPLEMENTS.map(n=>({key:n, label:n})),
+    ...state.supplements.map(x=>({key:x.id, label:x.name})),
+  ];
+  const byKey = Object.fromEntries(all.map(x=>[x.key,x]));
+  const out = [];
+  state.suppOrder.forEach(k=>{ if(byKey[k]){ out.push(byKey[k]); delete byKey[k]; } });
+  all.forEach(x=>{ if(byKey[x.key]) out.push(x); });
+  return out;
+}
+/* 칩을 끌어서 순서 바꾸기. iOS 사파리는 HTML5 드래그를 지원하지 않아
+   포인터 이벤트로 직접 구현한다. 8px 넘게 움직여야 드래그로 치므로
+   그냥 탭했을 때의 켜기/끄기는 그대로 동작한다. */
+function makeChipsSortable(wrap){
+  let drag = null;
+  wrap.querySelectorAll('[data-supp]').forEach(chip=>{
+    chip.addEventListener('pointerdown', ev=>{
+      if(ev.button != null && ev.button !== 0) return;
+      drag = {el:chip, x:ev.clientX, y:ev.clientY, moved:false};
+      chip.setPointerCapture(ev.pointerId);
+    });
+    chip.addEventListener('pointermove', ev=>{
+      if(!drag || drag.el!==chip) return;
+      if(!drag.moved){
+        if(Math.hypot(ev.clientX-drag.x, ev.clientY-drag.y) < 8) return;
+        drag.moved = true;
+        chip.classList.add('dragging');
+      }
+      chip.style.transform = `translate(${ev.clientX-drag.x}px, ${ev.clientY-drag.y}px)`;
+      chip.style.pointerEvents = 'none';
+      const over = document.elementFromPoint(ev.clientX, ev.clientY);
+      chip.style.pointerEvents = '';
+      const target = over && over.closest && over.closest('[data-supp]');
+      if(target && target!==chip && wrap.contains(target)){
+        const chips = [...wrap.querySelectorAll('[data-supp]')];
+        const from = chips.indexOf(chip), to = chips.indexOf(target);
+        target[from < to ? 'after' : 'before'](chip);
+        drag.x = ev.clientX; drag.y = ev.clientY;
+        chip.style.transform = '';
+      }
+    });
+    const finish = ev=>{
+      if(!drag || drag.el!==chip) return;
+      const wasDrag = drag.moved;
+      chip.classList.remove('dragging');
+      chip.style.transform = '';
+      drag = null;
+      if(wasDrag){
+        state.suppOrder = [...wrap.querySelectorAll('[data-supp]')].map(c=>c.dataset.supp);
+        saveSuppOrder();
+        if(typeof lsSave === 'function') lsSave();
+        ev.preventDefault(); ev.stopPropagation();
+        showToast('순서를 바꿨어요');
+      }
+    };
+    chip.addEventListener('pointerup', finish);
+    chip.addEventListener('pointercancel', ()=>{ if(drag&&drag.el===chip){ chip.classList.remove('dragging'); chip.style.transform=''; drag=null; } });
+    // 드래그로 끝난 경우 켜기/끄기가 같이 일어나지 않게
+    chip.addEventListener('click', ev=>{ if(chip.dataset.justDragged==='1'){ chip.dataset.justDragged=''; ev.stopPropagation(); } }, true);
+  });
+}
+
 function renderSupplementChips(){
   const body = document.getElementById('daySheetBody');
   const wrap = body && body.querySelector('#suppChipRow');
   if(!wrap || !state.selectedDate) return;
   const log = getLog(state.selectedDate);
-  const commonChips = COMMON_SUPPLEMENTS.map(name=>{
-    const on = log.supplementsTaken.includes(name);
-    return `<span class="chip ${on?'on':''}" data-supp="${name}">${name}</span>`;
+  const chips = orderedSupplements().map(x=>{
+    const on = log.supplementsTaken.includes(x.key);
+    return `<span class="chip ${on?'on':''}" data-supp="${x.key}" title="끌어서 순서를 바꿀 수 있어요">${x.label}</span>`;
   }).join('');
-  const customChips = state.supplements.map(s=>{
-    const on = log.supplementsTaken.includes(s.id);
-    return `<span class="chip ${on?'on':''}" data-supp="${s.id}">${s.name}</span>`;
-  }).join('');
-  wrap.innerHTML = commonChips + customChips + `<span class="chip add-chip" id="suppAddChip">기타 (직접 입력)</span>`;
+  wrap.innerHTML = chips + `<span class="chip add-chip" id="suppAddChip">기타 (직접 입력)</span>`;
   wrap.querySelectorAll('[data-supp]').forEach(el=>{
     el.addEventListener('click', ()=>{
       const id = el.dataset.supp;
@@ -1659,6 +1940,7 @@ function renderSupplementChips(){
       el.classList.toggle('on');
     });
   });
+  makeChipsSortable(wrap);
   const addChip = wrap.querySelector('#suppAddChip');
   if(addChip) addChip.addEventListener('click', ()=>{
     const nameBox = body.querySelector('#suppNewBox');
@@ -1993,6 +2275,11 @@ function wireExerciseCards(ds, body){
 function openPicker(ds){
   state.pickerSelection = new Set(getLog(ds).workout.exercises.map(e=>e.id));
   document.getElementById('pickerSearch').value='';
+  routineView = null;
+  document.querySelectorAll('[data-picktab]').forEach(b=>b.classList.toggle('active', b.dataset.picktab==='pick'));
+  document.getElementById('pickPanePick').hidden = false;
+  document.getElementById('pickPaneRoutine').hidden = true;
+  renderPickerRoutinePane();
   renderPickerList('');
   document.getElementById('pickerOverlay').classList.add('open');
   document.getElementById('pickerOverlay').dataset.forDate = ds;
@@ -2009,6 +2296,159 @@ document.getElementById('pickerDone').addEventListener('click', ()=>{
   queueSave(ds, {workout:{...cur.workout, exercises:list}}, {refresh:true});
   closePicker();
 });
+
+/* =========================================================
+   선생님 루틴 UI — 운동 선택 모달의 두 번째 탭 + 붙여넣기 등록 모달
+   ========================================================= */
+let routineView = null;   // 목록에서 하나를 열면 그 id
+
+function renderPickerRoutinePane(){
+  const pane = document.getElementById('pickPaneRoutine');
+  const cnt = document.getElementById('pickRoutineCnt');
+  const list = routinesSorted();
+  if(cnt){ cnt.textContent = list.length || ''; cnt.hidden = !list.length; }
+
+  if(routineView){
+    const r = routineById(routineView);
+    if(!r){ routineView = null; return renderPickerRoutinePane(); }
+    pane.innerHTML = `
+      <button class="rt-back" id="rtBack">‹ 루틴 목록으로</button>
+      <div style="font-family:var(--font-display);font-size:22px">${r.name}</div>
+      <div style="font-size:12px;color:var(--text-faint);font-family:var(--font-mono);margin:2px 0 16px">${r.date} · ${routineSummary(r)}</div>
+      ${r.items.map((it,i)=>{
+        const ex = it.exId ? getEx(it.exId) : null;
+        return `<div class="rt-item">
+          <div class="hd"><span class="nm">${it.rawName}</span><span class="sum">${itemSummary(it)}</span></div>
+          ${ex ? `<div style="font-size:12px;color:var(--text-faint);margin-top:4px">→ 도감의 <b>${ex.name}</b>에 연결됨</div>`
+               : `<div class="warn">도감에서 못 찾은 운동이에요. 아래에서 골라주세요.</div>`}
+          <select data-rtmap="${i}">
+            <option value="">${ex? '연결 바꾸기…' : '운동 고르기…'}</option>
+            ${allExercises().map(e=>`<option value="${e.id}" ${e.id===it.exId?'selected':''}>${e.name}</option>`).join('')}
+          </select>
+          ${it.steps.length? `<div class="steps">${it.steps.map((x,j)=>`${j+1}. ${x}`).join('\n').replace(/</g,'&lt;')}</div>`:''}
+          ${it.notes.length? `<div class="steps" style="color:var(--text-faint)">${it.notes.join('\n').replace(/</g,'&lt;')}</div>`:''}
+        </div>`;
+      }).join('')}
+      <div class="pt-actions">
+        <button class="primary-btn" id="rtApply">이 루틴으로 오늘 기록 채우기</button>
+        <button class="ghost-btn" id="rtEdit">수정</button>
+        <button class="ghost-btn" id="rtDel" style="border-color:var(--supp);color:var(--supp);flex:0 0 auto;min-width:0;padding:0 14px">삭제</button>
+      </div>`;
+    pane.querySelector('#rtBack').addEventListener('click', ()=>{ routineView=null; renderPickerRoutinePane(); });
+    pane.querySelectorAll('[data-rtmap]').forEach(sel=>{
+      sel.addEventListener('change', async ()=>{
+        const i = Number(sel.dataset.rtmap);
+        const cur = routineById(routineView);
+        cur.items[i].exId = sel.value || null;
+        await saveRoutine({...cur});
+        renderPickerRoutinePane();
+      });
+    });
+    pane.querySelector('#rtApply').addEventListener('click', ()=>applyRoutineToDay(r));
+    pane.querySelector('#rtEdit').addEventListener('click', ()=>openRoutineEditor(r));
+    pane.querySelector('#rtDel').addEventListener('click', async ()=>{
+      await deleteRoutine(r.id); routineView=null; renderPickerRoutinePane(); showToast('루틴을 삭제했어요');
+    });
+    return;
+  }
+
+  pane.innerHTML = (list.length
+    ? list.map(r=>`<button class="rt-card" data-rtopen="${r.id}">
+        <span class="mid"><span class="nm">${r.name}</span><span class="meta">${r.date} · ${routineSummary(r)}</span></span>
+        <span class="chev">›</span></button>`).join('')
+    : `<div class="pt-empty">아직 등록한 선생님 루틴이 없어요.<br>카톡으로 받은 루틴을 그대로 붙여넣으면
+        운동별로 무게·횟수·세트를 나눠서 정리해둘게요.</div>`)
+    + `<button class="pick-btn" id="rtNew" style="margin-top:10px">+ 선생님 루틴 붙여넣기</button>`;
+  pane.querySelectorAll('[data-rtopen]').forEach(b=>b.addEventListener('click', ()=>{
+    routineView = b.dataset.rtopen; renderPickerRoutinePane();
+  }));
+  pane.querySelector('#rtNew').addEventListener('click', ()=>openRoutineEditor(null));
+}
+
+/* ---- 루틴을 그날 운동 기록으로 옮기기 ---- */
+function applyRoutineToDay(r){
+  const ds = document.getElementById('pickerOverlay').dataset.forDate || state.draftDate || todayStr();
+  const mapped = r.items.filter(it=>it.exId);
+  if(!mapped.length){ showToast('연결된 운동이 없어요. 먼저 운동을 골라주세요'); return; }
+  const cur = getLog(ds);
+  const existing = Object.fromEntries(cur.workout.exercises.map(e=>[e.id,e]));
+  const list = mapped.map(it=>{
+    const prev = existing[it.exId] || {};
+    return {
+      id: it.exId, mode:'pt', ptPlanId:null, routineId:r.id, note: prev.note||'',
+      warmupSets: prev.warmupSets || [],
+      workSets: it.sets.length ? it.sets.map(x=>({reps:x.reps||'', weight:x.weight||'', failed:false, failReason:''}))
+                               : [emptySet()],
+    };
+  });
+  const keep = cur.workout.exercises.filter(e=>!mapped.some(it=>it.exId===e.id));
+  queueSave(ds, {workout:{...cur.workout,
+    type: cur.workout.type==='none' ? 'personal' : cur.workout.type,
+    exercises:[...keep, ...list]}}, {refresh:true});
+  closePicker();
+  showToast(`${mapped.length}개 운동을 채웠어요 · 저장을 눌러주세요`);
+}
+
+/* ---- 붙여넣기 등록/수정 ---- */
+function openRoutineEditor(existing){
+  const body = document.getElementById('routineBody');
+  document.getElementById('routineTitle').textContent = existing ? '선생님 루틴 수정' : '선생님 루틴 등록';
+  body.innerHTML = `
+    <div class="field-row"><label>받은 날짜</label><input type="date" id="rtDate" value="${existing? existing.date : todayStr()}"></div>
+    <div class="field-row" style="margin-top:10px"><label>루틴 이름</label><input type="text" id="rtName" placeholder="예: 개인운동 상체 루틴" value="${existing? existing.name.replace(/"/g,'&quot;') : ''}"></div>
+    <h4 style="margin:18px 0 6px;font-size:14px">받은 내용 그대로 붙여넣기</h4>
+    <textarea id="rtRaw" rows="10" placeholder="개인운동 상체 루틴&#10;&#10;빨간색 인클라인 프레스&#10;1. 손잡이 기준 좌석은 겨드랑이 바로 아래&#10;- 2.5kg x 15번&#10;- 2.5kg x 12번&#10;&#10;빨간색 로우&#10;...">${existing? (existing.raw||'').replace(/</g,'&lt;') : ''}</textarea>
+    <div class="pt-parse-preview" id="rtPreview"></div>
+    <div class="pt-actions">
+      <button class="primary-btn" id="rtSave">저장</button>
+      <button class="ghost-btn" id="rtCancel">취소</button>
+    </div>`;
+  const raw = body.querySelector('#rtRaw'), prev = body.querySelector('#rtPreview');
+  const refresh = ()=>{
+    const r = parseRoutineText(raw.value);
+    if(!r.items.length){ prev.textContent = '아직 운동을 찾지 못했어요. 운동 이름을 한 줄에 하나씩 적고, 그 아래에 세트를 적어주세요.'; return; }
+    prev.innerHTML = `<b>${r.items.length}개 운동</b>으로 정리돼요<br>` + r.items.map(it=>{
+      const ex = it.exId ? getEx(it.exId) : null;
+      return `· ${it.rawName} — ${itemSummary(it)}${ex? '' : ' <span style="color:var(--supp)">(도감 연결 필요)</span>'}`;
+    }).join('<br>');
+    if(!body.querySelector('#rtName').value && r.name) body.querySelector('#rtName').placeholder = r.name;
+  };
+  raw.addEventListener('input', refresh); refresh();
+  body.querySelector('#rtCancel').addEventListener('click', closeRoutineEditor);
+  body.querySelector('#rtSave').addEventListener('click', async ()=>{
+    const text = raw.value.trim();
+    if(!text){ showToast('내용을 붙여넣어 주세요'); return; }
+    const parsed = parseRoutineText(text);
+    if(!parsed.items.length){ showToast('운동을 찾지 못했어요'); return; }
+    const r = {
+      id: (existing && existing.id) || 'rt-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),
+      name: body.querySelector('#rtName').value.trim() || parsed.name,
+      date: body.querySelector('#rtDate').value || todayStr(),
+      raw: text, items: parsed.items, updatedAt: new Date().toISOString(),
+    };
+    await saveRoutine(r);
+    closeRoutineEditor();
+    routineView = r.id;
+    renderPickerRoutinePane();
+    showToast('루틴을 저장했어요');
+  });
+  document.getElementById('routineOverlay').classList.add('open');
+}
+function closeRoutineEditor(){ document.getElementById('routineOverlay').classList.remove('open'); }
+document.getElementById('routineClose').addEventListener('click', closeRoutineEditor);
+document.getElementById('routineOverlay').addEventListener('click', e=>{ if(e.target.id==='routineOverlay') closeRoutineEditor(); });
+
+// 선택 모달 탭 전환
+document.querySelectorAll('[data-picktab]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const which = btn.dataset.picktab;
+    document.querySelectorAll('[data-picktab]').forEach(b=>b.classList.toggle('active', b===btn));
+    document.getElementById('pickPanePick').hidden = which!=='pick';
+    document.getElementById('pickPaneRoutine').hidden = which!=='routine';
+    if(which==='routine') renderPickerRoutinePane();
+  });
+});
+
 function renderPickerList(query){
   const q = query.trim().toLowerCase();
   const list = document.getElementById('pickerList');
@@ -2884,6 +3324,15 @@ renderPartFilters();
 renderLibrary();
 renderCalendar();
 initDb();
+</script>
+<script>
+  /* 오프라인 지원 — sw.js 를 같은 폴더에 함께 올려야 동작한다.
+     없으면 조용히 넘어가고, 앱은 평소대로 인터넷으로 열린다. */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
 </script>
 </body>
 </html>
