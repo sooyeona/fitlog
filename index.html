@@ -30,6 +30,7 @@
     --pt:#7C6FE0;            /* PT session */
     --diet:#CE9A2A;          /* meals */
     --water:#1F8A79;         /* water / recovery */
+    --protein:#A8641E;       /* protein */
     --supp:#C1587A;          /* supplements */
     --inbody:#3B7DD8;        /* InBody */
 
@@ -67,6 +68,7 @@
       --pt:#9C8FFF;
       --diet:#F0BF4C;
       --water:#34C2A6;
+      --protein:#E0A15C;
       --supp:#E28098;
       --inbody:#5B9EF2;
       --shadow-1:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
@@ -88,6 +90,7 @@
     --pt:#9C8FFF;
     --diet:#F0BF4C;
     --water:#34C2A6;
+    --protein:#E0A15C;
     --supp:#E28098;
     --inbody:#5B9EF2;
     --shadow-1:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
@@ -181,7 +184,10 @@
   .sheet-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line);flex:none;}
   .sheet-head h3{margin:0;font-size:20px;}
   .sheet-head .save-status{font-size:11px;color:var(--text-faint);font-family:var(--font-mono);}
-  .sheet-body{padding:20px 22px 28px;overflow-y:auto;}
+  .sheet-body{padding:20px 22px 28px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+  /* 시트가 열려 있는 동안 뒤 화면은 스크롤되지 않게 고정한다.
+     iOS 는 overflow:hidden 만으로는 안 막혀서 위치를 고정하고 스크롤값을 기억해 둔다. */
+  body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;}
   .close-btn{width:32px;height:32px;border-radius:50%;border:none;background:var(--surface-2);color:var(--text);cursor:pointer;font-size:15px;flex:none;}
 
   .section{border-top:1px solid var(--line);padding:18px 0;}
@@ -189,6 +195,31 @@
   .section-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
   .section-head .dot{width:9px;height:9px;}
   .section-head h4{margin:0;font-size:14px;font-weight:700;letter-spacing:.01em;}
+  .sec-edit{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--text-muted);
+    border-radius:8px;padding:5px 11px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;}
+  .sec-edit:hover{border-color:var(--accent);color:var(--accent);}
+
+  /* 저장된 뒤 보이는 요약 */
+  .sum-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .sum-kind{font-size:11.5px;font-weight:700;color:var(--on-accent);border-radius:999px;padding:3px 10px;}
+  .sum-dur{font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted);}
+  .sum-ex{margin-bottom:12px;}
+  .sum-ex + .sum-ex{border-top:1px solid var(--line);padding-top:11px;}
+  .sum-ex-name{font-size:14px;font-weight:700;margin-bottom:5px;}
+  .sum-tag{font-size:10px;font-weight:700;background:var(--accent);color:var(--on-accent);border-radius:999px;padding:1px 6px;vertical-align:1px;}
+  .sum-sets{display:flex;flex-direction:column;gap:2px;}
+  .sum-set{display:flex;align-items:baseline;gap:9px;font-size:13px;}
+  .sum-set .n{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);width:38px;flex:none;}
+  .sum-set .v{font-family:var(--font-mono);}
+  .sum-set.failed .v{color:var(--supp);text-decoration:line-through;}
+  .sum-set .fx{font-size:11.5px;color:var(--supp);}
+  .sum-note{font-size:12.5px;color:var(--text-muted);margin-top:6px;line-height:1.6;}
+  .sum-empty{font-size:13px;color:var(--text-faint);}
+  .sum-meals{display:flex;flex-direction:column;gap:6px;}
+  .sum-meal{display:flex;align-items:baseline;gap:10px;font-size:13.5px;}
+  .sum-meal .lab{color:var(--text-muted);width:46px;flex:none;font-size:12.5px;}
+  .sum-meal .tm{font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);width:42px;flex:none;}
+  .sum-meal .tx{flex:1;min-width:0;}
 
   .segmented{display:flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:2px;}
   .segmented button{flex:1;border:none;background:transparent;padding:8px 6px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;}
@@ -214,6 +245,7 @@
   .water-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
   .water-btn{border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;}
   .water-btn:hover{border-color:var(--water);color:var(--water);}
+  .prot-row .water-btn:hover{border-color:var(--protein);color:var(--protein);}
   .water-total{font-family:var(--font-mono);font-size:20px;font-weight:600;margin-left:auto;}
   .water-bar{height:8px;border-radius:5px;background:var(--surface-2);overflow:hidden;margin-top:10px;}
   .water-bar>i{display:block;height:100%;background:var(--water);border-radius:5px;transition:width .25s;}
@@ -570,6 +602,7 @@
         <span><i class="dot" style="background:var(--accent)"></i>개인운동</span>
         <span><i class="dot" style="background:var(--pt)"></i>PT</span>
         <span><i class="dot" style="background:var(--diet)"></i>식단</span>
+        <span><i class="dot" style="background:var(--protein)"></i>단백질</span>
         <span><i class="dot" style="background:var(--water)"></i>물</span>
         <span><i class="dot" style="background:var(--supp)"></i>영양제</span>
         <span><i class="dot" style="background:var(--inbody)"></i>인바디</span>
@@ -1567,6 +1600,7 @@ const state = {
   ptPlans:{},        // 운동 id -> [선생님 운동법 기록]
   ptRoutines:[],     // 선생님이 보내준 루틴 묶음
   suppOrder:[],      // 영양제 칩 순서 (직접 끌어서 바꾼 순서)
+  sectionEdit:{},    // 하루 기록에서 펼쳐서 편집 중인 구역 (기본은 요약 보기)
   draft:null,        // 열려 있는 하루 기록의 편집 중 사본 (저장 눌러야 반영)
   draftDate:null,
   dirty:false,
@@ -1589,7 +1623,7 @@ function emptyMeal(){ return {text:'', time:''}; }
 function emptyLog(date){
   return {date, workout:{type:'none',durationMin:'',exercises:[],memo:''},
            diet:{breakfast:emptyMeal(), lunch:emptyMeal(), dinner:emptyMeal(), snacks:[], memo:''},
-           water:{ml:0,goal:2000}, supplementsTaken:[],
+           water:{ml:0,goal:2000}, protein:{g:0}, supplementsTaken:[],
            inbody:null};
 }
 // 예전 저장본은 끼니가 문자열이고 간식이 하나였다. 새 구조로 올려준다.
@@ -1636,6 +1670,7 @@ function normalizeLog(raw, date){
     workout: {type: w.type||'none', durationMin: w.durationMin??'', memo: w.memo??'', exercises},
     diet: normalizeDiet(raw.diet),
     water: {...base.water, ...(raw.water||{})},
+    protein: {g: Number(raw.protein && raw.protein.g) || 0},
     supplementsTaken: Array.isArray(raw.supplementsTaken) ? raw.supplementsTaken : [],
     inbody: (raw.inbody && typeof raw.inbody==='object') ? raw.inbody : null,
   };
@@ -1834,6 +1869,31 @@ function showToast(msg){
 }
 
 /* =========================================================
+   바텀시트가 열리면 뒤 화면 스크롤 잠그기
+   ========================================================= */
+let scrollLockY = 0;
+function updateBodyScrollLock(){
+  const anyOpen = document.querySelector('.overlay.open') != null;
+  const locked = document.body.classList.contains('modal-open');
+  if(anyOpen && !locked){
+    scrollLockY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.body.style.top = `-${scrollLockY}px`;
+    document.body.classList.add('modal-open');
+  }else if(!anyOpen && locked){
+    document.body.classList.remove('modal-open');
+    document.body.style.top = '';
+    window.scrollTo(0, scrollLockY);
+  }
+}
+// 시트를 여닫는 곳이 여러 군데라, 각 호출부를 고치는 대신 class 변화를 지켜본다
+(function watchOverlays(){
+  const obs = new MutationObserver(updateBodyScrollLock);
+  document.querySelectorAll('.overlay').forEach(el=>
+    obs.observe(el, {attributes:true, attributeFilter:['class']}));
+  updateBodyScrollLock();
+})();
+
+/* =========================================================
    calendar
    ========================================================= */
 const DOW_KEYS=['sun','mon','tue','wed','thu','fri','sat'];
@@ -1890,6 +1950,7 @@ function renderCalendar(){
         (Array.isArray(d.snacks) && d.snacks.some(sn=>sn && sn.text)) ||
         (typeof d.breakfast==='string' && (d.breakfast||d.lunch||d.dinner||d.snack)));
       if(hasDiet) marks.push({c:'var(--diet)', t:'식단'});
+      if(log.protein && log.protein.g>0) marks.push({c:'var(--protein)', t:'단백질'});
       if(log.water && log.water.ml>0) marks.push({c:'var(--water)', t:'물'});
       if(log.supplementsTaken && log.supplementsTaken.length) marks.push({c:'var(--supp)', t:'영양제'});
       if(log.inbody) marks.push({c:'var(--inbody)', t:'인바디'});
@@ -1934,6 +1995,7 @@ function openDay(ds){
   // 저장 전 편집 사본을 만든다. 이 사본을 고치는 동안 달력과 저장된 기록은 그대로다.
   state.draftDate = ds;
   state.draft = JSON.parse(JSON.stringify(normalizeLog(state.logs[ds], ds)));
+  state.sectionEdit = {};   // 열 때는 요약부터 보여준다
   const [y,mo,d] = ds.split('-').map(Number);
   const dow = ['일','월','화','수','목','금','토'][new Date(y,mo-1,d).getDay()];
   document.getElementById('dayTitle').textContent = `${mo}월 ${d}일 (${dow})`;
@@ -1958,6 +2020,8 @@ function saveDay(opts={}){
   state.logs[ds] = data;
   persist(ds, data);
   markDirty(false);
+  state.sectionEdit = {};        // 저장 후에는 요약으로 접는다
+  renderDayIfOpen(ds);
   renderCalendar();
   if(!opts.silent) showToast('저장했어요');
 }
@@ -2118,14 +2182,82 @@ function renderSupplementChips(){
   });
 }
 
+/* 기록이 있는 구역은 기본으로 요약만 보여주고, '편집'을 눌러야 입력칸이 펼쳐진다.
+   입력칸이 화면을 다 잡아먹지 않게 하기 위한 것. */
+function hasWorkoutContent(log){
+  const w = log.workout;
+  return !!(w && w.type && w.type!=='none' &&
+    (w.durationMin || w.memo || (w.exercises && w.exercises.length)));
+}
+function hasDietContent(log){
+  const d = log.diet;
+  return !!(d && ((d.breakfast&&d.breakfast.text) || (d.lunch&&d.lunch.text) ||
+    (d.dinner&&d.dinner.text) || (d.snacks||[]).some(x=>x&&x.text)));
+}
+function isEditing(key, hasContent){
+  const v = state.sectionEdit[key];
+  return v === undefined ? !hasContent : v;   // 내용이 없으면 바로 편집 상태
+}
+function sectionHeadHtml(color, title, key, hasContent, editing){
+  const btn = hasContent
+    ? `<button class="sec-edit" data-secedit="${key}">${editing ? '접기' : '편집'}</button>`
+    : '';
+  return `<div class="section-head"><i class="dot" style="background:${color}"></i><h4>${title}</h4>${btn}</div>`;
+}
+function setLineText(x){
+  const w = x.weight===''||x.weight==null ? '' : (x.weight==='빈봉' ? '빈봉' : x.weight+'kg');
+  const r = x.reps===''||x.reps==null ? '' : x.reps+'회';
+  return [r, w].filter(Boolean).join(' × ') || '—';
+}
+function workoutSummaryHtml(log){
+  const w = log.workout;
+  const kind = w.type==='pt' ? 'PT' : '개인운동';
+  const head = `<div class="sum-top"><span class="sum-kind" style="background:${w.type==='pt'?'var(--pt)':'var(--accent)'}">${kind}</span>${
+    w.durationMin ? `<span class="sum-dur">${w.durationMin}분</span>` : ''}</div>`;
+  const exs = (w.exercises||[]).map(en=>{
+    const ex = getEx(en.id);
+    if(!ex) return '';
+    const rows = []
+      .concat((en.warmupSets||[]).map((x,i)=>({n:'W'+(i+1), x})))
+      .concat((en.workSets||[]).map((x,i)=>({n:(i+1)+'세트', x})))
+      .filter(r=> r.x.reps!=='' || r.x.weight!=='' || r.x.failed);
+    return `<div class="sum-ex">
+      <div class="sum-ex-name">${ex.name}${en.mode==='pt'? ` <span class="sum-tag">선생님</span>`:''}</div>
+      ${rows.length ? `<div class="sum-sets">${rows.map(r=>
+        `<div class="sum-set${r.x.failed?' failed':''}"><span class="n">${r.n}</span><span class="v">${setLineText(r.x)}</span>${
+          r.x.failed ? `<span class="fx">실패${r.x.failReason? ' · '+r.x.failReason.replace(/</g,'&lt;') : ''}</span>` : ''}</div>`
+      ).join('')}</div>` : `<div class="sum-empty">세트 기록 없음</div>`}
+      ${en.note ? `<div class="sum-note">${en.note.replace(/</g,'&lt;')}</div>` : ''}
+    </div>`;
+  }).join('');
+  return head + (exs || `<div class="sum-empty">선택한 운동 없음</div>`)
+    + (w.memo ? `<div class="sum-note">메모 · ${w.memo.replace(/</g,'&lt;')}</div>` : '');
+}
+function dietSummaryHtml(log){
+  const d = log.diet;
+  const rows = [['아침',d.breakfast],['점심',d.lunch],['저녁',d.dinner]]
+    .concat((d.snacks||[]).map((sn,i)=>[`간식${(d.snacks.length>1)?' '+(i+1):''}`, sn]))
+    .filter(([,m])=> m && m.text);
+  if(!rows.length) return `<div class="sum-empty">기록 없음</div>`;
+  return `<div class="sum-meals">${rows.map(([lab,m])=>
+    `<div class="sum-meal"><span class="lab">${lab}</span><span class="tm">${m.time||''}</span><span class="tx">${m.text.replace(/</g,'&lt;')}</span></div>`
+  ).join('')}</div>`;
+}
+
 function renderDaySheet(ds){
   const log = getLog(ds);
   const body = document.getElementById('daySheetBody');
   const waterPct = Math.min(100, Math.round((log.water.ml/log.water.goal)*100));
+  const wHas = hasWorkoutContent(log), dHas = hasDietContent(log);
+  const wEdit = isEditing('workout', wHas), dEdit = isEditing('diet', dHas);
+  // 편집 중이면 그 상태를 붙잡아 둔다 — 운동을 추가해 내용이 생겼다고 도중에 접히면 안 된다
+  if(wEdit) state.sectionEdit.workout = true;
+  if(dEdit) state.sectionEdit.diet = true;
 
   body.innerHTML = `
     <div class="section">
-      <div class="section-head"><i class="dot" style="background:var(--accent)"></i><h4>운동</h4></div>
+      ${sectionHeadHtml('var(--accent)','운동','workout', wHas, wEdit)}
+      ${!wEdit ? workoutSummaryHtml(log) : `
       <div class="segmented" id="wtSeg">
         <button data-v="none" class="${log.workout.type==='none'?'active':''}">안 함</button>
         <button data-v="personal" class="${log.workout.type==='personal'?'active':''}">개인운동</button>
@@ -2144,11 +2276,12 @@ function renderDaySheet(ds){
           <label>메모</label>
           <input type="text" id="wtMemo" placeholder="컨디션, 특이사항 등" value="${log.workout.memo||''}">
         </div>
-      </div>
+      </div>`}
     </div>
 
     <div class="section">
-      <div class="section-head"><i class="dot" style="background:var(--diet)"></i><h4>식단</h4></div>
+      ${sectionHeadHtml('var(--diet)','식단','diet', dHas, dEdit)}
+      ${!dEdit ? dietSummaryHtml(log) : `
       ${[['breakfast','아침'],['lunch','점심'],['dinner','저녁']].map(([k,lab])=>`
       <div class="meal-row">
         <label>${lab}</label>
@@ -2162,7 +2295,7 @@ function renderDaySheet(ds){
         <input type="text" class="snack-text" data-idx="${i}" placeholder="무엇을 드셨나요?" value="${(sn.text||'').replace(/"/g,'&quot;')}">
         <button class="snack-del" data-snackdel="${i}" aria-label="간식 삭제">✕</button>
       </div>`).join('')}
-      <button class="add-line-btn" id="addSnack">+ 간식 추가</button>
+      <button class="add-line-btn" id="addSnack">+ 간식 추가</button>`}
     </div>
 
     <div class="section">
@@ -2172,6 +2305,18 @@ function renderDaySheet(ds){
         <input type="text" id="suppNewInput" placeholder="영양제 이름을 직접 입력 (예: 밀크씨슬)">
         <button class="pick-btn" style="width:auto;white-space:nowrap" id="suppNewConfirm">추가</button>
       </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><i class="dot" style="background:var(--protein)"></i><h4>단백질</h4></div>
+      <div class="water-row prot-row">
+        <button class="water-btn prot-btn" data-g="1">+1g</button>
+        <button class="water-btn prot-btn" data-g="5">+5g</button>
+        <button class="water-btn prot-btn" data-g="10">+10g</button>
+        <button class="water-btn prot-btn" data-g="20">+20g</button>
+        <span class="water-total"${log.protein.g? ' style="color:var(--protein)"':''}>${log.protein.g}<span style="font-size:12px;color:var(--text-faint)"> g</span></span>
+      </div>
+      <div class="water-goal">쉐이크·프로틴바 등 따로 챙겨 먹은 양${log.protein.g? ` · <a href="#" id="protReset" style="color:var(--text-faint)">초기화</a>` : ''}</div>
     </div>
 
     <div class="section">
@@ -2197,6 +2342,15 @@ function renderDaySheet(ds){
       </div>
     </div>
   `;
+
+  // 구역 펼치기 / 접기
+  body.querySelectorAll('[data-secedit]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const k = btn.dataset.secedit;
+      state.sectionEdit[k] = !isEditing(k, k==='workout' ? hasWorkoutContent(log) : hasDietContent(log));
+      renderDaySheet(ds);
+    });
+  });
 
   // 운동 세그먼트
   body.querySelectorAll('#wtSeg button').forEach(btn=>{
@@ -2252,8 +2406,21 @@ function renderDaySheet(ds){
     if(v){ addSupplement(v, ds); inp.value=''; body.querySelector('#suppNewBox').style.display='none'; }
   });
 
+  // 단백질
+  body.querySelectorAll('.prot-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const cur = getLog(ds);
+      queueSave(ds, {protein:{g: (cur.protein.g||0) + Number(btn.dataset.g)}}, {refresh:true});
+    });
+  });
+  const protReset = body.querySelector('#protReset');
+  if(protReset) protReset.addEventListener('click', e=>{
+    e.preventDefault();
+    queueSave(ds, {protein:{g:0}}, {refresh:true});
+  });
+
   // 물
-  body.querySelectorAll('.water-btn').forEach(btn=>{
+  body.querySelectorAll('.water-btn:not(.prot-btn)').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const cur = getLog(ds);
       queueSave(ds, {water:{...cur.water, ml:cur.water.ml+Number(btn.dataset.ml)}}, {refresh:true});
