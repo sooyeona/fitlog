@@ -409,6 +409,14 @@
     border-radius:999px;padding:1px 6px;font-weight:700;}
 
   /* ---------- 선생님 운동법 ---------- */
+  .pt-near{margin-top:14px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--surface-2);}
+  .pt-near .hd{font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:8px;}
+  .pt-near .ft{font-size:11.5px;color:var(--text-faint);margin-top:8px;line-height:1.5;}
+  .pt-near-row{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+    padding:10px 12px;margin-top:6px;border:1px solid var(--line);border-radius:10px;
+    background:var(--surface);color:var(--text);font-family:inherit;font-size:13.5px;
+    font-weight:600;text-align:left;cursor:pointer;}
+  .pt-near-row .cnt{flex:none;font-size:11px;font-family:var(--font-mono);color:var(--accent);}
   .pt-datebar{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
   .pt-datebar select{flex:1;min-width:150px;}
   .pt-empty{font-size:13px;color:var(--text-faint);line-height:1.7;padding:18px;background:var(--surface-2);border-radius:var(--radius-md);}
@@ -1144,6 +1152,39 @@ function ptPlansFor(exId){
 function latestPtPlan(exId){ return ptPlansFor(exId)[0] || null; }
 function ptPlanById(exId, planId){ return (state.ptPlans[exId]||[]).find(p=>p.id===planId) || null; }
 function hasPtPlan(exId){ return !!(state.ptPlans[exId] && state.ptPlans[exId].length); }
+/* 선생님 루틴 안에서 이 운동이 나온 자리를 모두 찾는다.
+   루틴을 붙여넣으면 운동마다 도감 id(exId)가 붙으므로, 운동 상세의 '선생님 추천' 탭에서도
+   그 운동이 어느 루틴에 어떤 세트로 들어 있었는지 보여줄 수 있다. */
+function routineHitsFor(exId){
+  const out = [];
+  (state.ptRoutines||[]).forEach(r=>{
+    (r.items||[]).forEach((it,i)=>{ if(it.exId===exId) out.push({r, it, i}); });
+  });
+  return out.sort((a,b)=> a.r.date<b.r.date ? 1 : (a.r.date>b.r.date ? -1 : 0));
+}
+// 선생님 자료(직접 입력 + 루틴)가 이 운동에 몇 건 있는지
+function ptRecordCount(exId){ return ptPlansFor(exId).length + routineHitsFor(exId).length; }
+
+/* 같은 동작인데 머신이 달라서 이름이 갈리는 경우가 많다
+   (예: '인클라인 프레스 (빨간 머신)' vs '인클라인 체스트프레스 머신 (일반형)').
+   선생님 자료가 없는 운동을 열었을 때, 자료가 있는 비슷한 운동을 짚어준다. */
+const NAME_STOPWORDS = new Set(['머신','일반형','빨간','바벨','덤벨','케이블','스미스','운동']);
+function nameTokens(name){
+  return String(name||'').replace(/[()]/g,' ').split(/\s+/)
+    .map(t=>t.trim()).filter(t=>t.length>=2 && !NAME_STOPWORDS.has(t));
+}
+function relatedPtExercises(e){
+  const mine = new Set(nameTokens(e.name));
+  return allExercises()
+    .filter(x=>x.id!==e.id && ptRecordCount(x.id)>0)
+    .map(x=>{
+      const shared = nameTokens(x.name).filter(t=>mine.has(t));
+      return {ex:x, score: shared.length*2 + (x.part===e.part ? 1 : 0), shared};
+    })
+    .filter(x=>x.score>=1)
+    .sort((a,b)=> b.score-a.score)
+    .slice(0,3);
+}
 
 /* 선생님이 보내준 글을 그대로 붙여넣으면 무게·횟수·세트로 나눠 담는다.
    "인클라인 20kg 12회 4세트", "랫풀다운 25 x 10 x 3", "3세트 12회 20킬로" 같은 표현을 읽는다.
@@ -1209,14 +1250,21 @@ function routinesSorted(){
   return (state.ptRoutines||[]).slice().sort((a,b)=> a.date<b.date ? 1 : (a.date>b.date ? -1 : 0));
 }
 function routineById(id){ return (state.ptRoutines||[]).find(r=>r.id===id) || null; }
+// 루틴이 바뀌면 도감의 '쌤 N' 배지도 같이 달라진다 → 뒤에 있는 목록을 다시 그린다.
+function refreshLibraryBadges(){
+  const lib = document.getElementById('view-library');
+  if(lib && lib.classList.contains('active')){ try{ renderLibrary(); }catch(e){} }
+}
 async function saveRoutine(r){
   const list = (state.ptRoutines||[]).filter(x=>x.id!==r.id);
   list.push(r);
   state.ptRoutines = list;
+  refreshLibraryBadges();
   lsSave();
 }
 async function deleteRoutine(id){
   state.ptRoutines = (state.ptRoutines||[]).filter(r=>r.id!==id);
+  refreshLibraryBadges();
   lsSave();
 }
 
@@ -2831,7 +2879,7 @@ function exRow(e){
       <span class="ex-row-name">${e.name}${e.custom?' <small>(직접 추가)</small>':''}</span>
       <span class="ex-row-meta"><b style="color:${color}">${e.equip}</b> · ${e.muscle}</span>
     </span>
-    ${hasPtPlan(e.id)? `<span class="rec-badge pt">쌤 ${ptPlansFor(e.id).length}</span>`:''}
+    ${ptRecordCount(e.id)? `<span class="rec-badge pt">쌤 ${ptRecordCount(e.id)}</span>`:''}
     ${logged? `<span class="anim-badge" title="기록 있음"><i class="pulse" style="background:var(--diet)"></i>기록</span>`:''}
     ${favBtnHtml(e.id)}
     <span class="ex-row-chevron">›</span>
@@ -2874,14 +2922,67 @@ function ptSetsHtml(sets){
       <span class="v">${x.weight? x.weight+'kg' : '체중'}${x.reps? ' × '+x.reps+'회' : ''}</span>
     </div>`).join('');
 }
+// 루틴에서 온 몫을 카드로 그린다 (읽기 전용 — 고치는 건 루틴 쪽에서)
+function routineHitsHtml(hits){
+  if(!hits.length) return '';
+  return `<h4 style="margin:4px 0 8px;font-size:14px">선생님 루틴에서 온 것</h4>` +
+    hits.map(({r,it})=>`<div class="rt-item">
+      <div class="hd"><span class="nm">${r.name}</span><span class="sum">${itemSummary(it)}</span></div>
+      <div style="font-size:12px;color:var(--text-faint);margin-top:4px">${r.date? r.date+' · ' : ''}루틴 원문에는 <b>${it.rawName}</b>(으)로 적혀 있었어요</div>
+      ${it.steps.length? `<div class="steps">${it.steps.map((x,j)=>`${j+1}. ${x}`).join('\n').replace(/</g,'&lt;')}</div>`:''}
+      ${it.notes.length? `<div class="steps" style="color:var(--text-faint)">${it.notes.join('\n').replace(/</g,'&lt;')}</div>`:''}
+      <div class="pt-actions" style="margin-top:10px">
+        <button class="primary-btn" data-rtitemapply="${r.id}">이 운동만 오늘 기록에 넣기</button>
+        <button class="ghost-btn" data-rtopen="${r.id}">루틴 전체 보기</button>
+      </div>
+    </div>`).join('');
+}
+function wireRoutineHits(pane, e){
+  pane.querySelectorAll('[data-rtitemapply]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const r = routineById(btn.dataset.rtitemapply);
+      const it = r && (r.items||[]).find(x=>x.exId===e.id);
+      if(!it) return;
+      applyPtPlanToDay(e.id, {id:null, sets:it.sets||[]});
+    });
+  });
+  pane.querySelectorAll('[data-rtopen]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById('exOverlay').classList.remove('open');
+      switchTab('library');
+      routineView = btn.dataset.rtopen;
+      document.getElementById('routineListOverlay').classList.add('open');
+      renderPickerRoutinePane();
+    });
+  });
+}
 function renderPtPane(e){
   const pane = document.getElementById('exPanePt');
   const plans = ptPlansFor(e.id);
-  if(!ptView.editing && !plans.length){
-    pane.innerHTML = `<div class="pt-empty">아직 선생님이 알려준 운동법이 없어요.<br>
+  const hits = routineHitsFor(e.id);
+  if(!ptView.editing && !plans.length && !hits.length){
+    const near = relatedPtExercises(e);
+    pane.innerHTML = `<div class="pt-empty"><b>${e.name}</b>에는 아직 선생님 자료가 없어요.<br>
       받은 내용을 그대로 붙여넣으면 무게·횟수·세트로 나눠서 정리해둘게요.</div>
+      ${near.length ? `<div class="pt-near">
+        <div class="hd">혹시 이 운동을 찾으셨나요?</div>
+        ${near.map(({ex,shared})=>`<button class="pt-near-row" data-gotoex="${ex.id}">
+          <span class="nm">${ex.name}</span>
+          <span class="cnt">쌤 ${ptRecordCount(ex.id)}</span>
+        </button>`).join('')}
+        <div class="ft">같은 동작이라도 머신이 다르면 도감에서 다른 운동이에요.</div>
+      </div>` : ''}
       <div class="pt-actions"><button class="primary-btn" id="ptNew">+ 선생님 운동법 입력</button></div>`;
     pane.querySelector('#ptNew').addEventListener('click', ()=>{ ptView={exId:e.id, planId:null, editing:true}; renderPtPane(e); });
+    pane.querySelectorAll('[data-gotoex]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        ptView = {exId:null, planId:null, editing:false};
+        openExerciseDetail(btn.dataset.gotoex);
+        // 바로 선생님 추천 탭을 펼쳐준다
+        const t = document.querySelector('#exBody .ex-tab[data-extab=pt]');
+        if(t) t.click();
+      });
+    });
     return;
   }
   if(ptView.editing){
@@ -2926,9 +3027,18 @@ function renderPtPane(e){
     });
     return;
   }
+  if(!plans.length){
+    // 루틴에서만 나온 운동 — 직접 입력한 운동법은 아직 없다
+    pane.innerHTML = routineHitsHtml(hits) + `
+      <div class="pt-actions"><button class="ghost-btn" id="ptNew">+ 선생님 운동법 따로 입력</button></div>`;
+    pane.querySelector('#ptNew').addEventListener('click', ()=>{ ptView={exId:e.id, planId:null, editing:true}; renderPtPane(e); });
+    wireRoutineHits(pane, e);
+    return;
+  }
   const cur = ptPlanById(e.id, ptView.planId) || plans[0];
   ptView.planId = cur.id;
-  pane.innerHTML = `
+  pane.innerHTML = routineHitsHtml(hits) + `
+    ${hits.length? '<h4 style="margin:18px 0 8px;font-size:14px">따로 입력해 둔 운동법</h4>':''}
     <div class="pt-datebar">
       <select id="ptPlanSel">${plans.map(pl=>`<option value="${pl.id}" ${pl.id===cur.id?'selected':''}>${pl.date}${pl===plans[0]?' (최신)':''} · ${ptPlanSummary(pl)||'설명만'}</option>`).join('')}</select>
       <button class="ghost-btn" style="width:auto;padding:9px 14px" id="ptNew">+ 새로</button>
@@ -2954,11 +3064,12 @@ function renderPtPane(e){
     renderPtPane(e); renderExTabCount(e);
     showToast('삭제했어요');
   });
+  wireRoutineHits(pane, e);
 }
 function renderExTabCount(e){
   const el = document.getElementById('exTabPtCnt');
   if(!el) return;
-  const n = ptPlansFor(e.id).length;
+  const n = ptRecordCount(e.id);
   el.textContent = n || '';
   el.hidden = !n;
 }
@@ -2982,7 +3093,7 @@ function openExerciseDetail(id){
   document.getElementById('exTitle').textContent = e.name;
   const color = PARTS[e.part].color;
   const body = document.getElementById('exBody');
-  const ptCount = ptPlansFor(e.id).length;
+  const ptCount = ptRecordCount(e.id);
   body.innerHTML = `
     <div class="ex-tabs">
       <button class="ex-tab active" data-extab="basic">기본 운동법</button>
