@@ -1,0 +1,2890 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="핏로그">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#F1F3EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12140F" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB+0lEQVR42u3dsXECUQxFUaPZNtwIrgOKdB9uBDdCSkBAwH70tOdkODHSXDN8MOzpdjl/wTNlBYgDcSAOxIE4EAfiQByIA3GAOBAH4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOBAH4kAciANxIA7EgTgQB+IAcSAOxIE4EAfiQByIA3EgDhAH4kAc7GHb+xd8//493vy//lh6yj5r5SRPf0LbfdbKSfSRtc9aPIk+gvZZ6yfRR8o+nVYQB+JAHIiDj9q63aGjvaLaed7qvKnxJ97m81bnTc3uo/+81XxTU/uImLf6b2peHynzOq0gDsSBOBAH4kAciANxIA7EAeLgdVvQffVpBo8ciANxIA7EgThAHIgDcSAOxIE4EAfiYJCkt+zHfFdHyv8eeORAHIgDcSAOxIE4EAfiQByIA8RBWByvvKM26RvyU+atiH3Nu3ZCxLzVf19Tr6rRf95qvq/Z11tpPu+W8vd0nD48IcVpBXEgDsQB+8VxtFc8O5xo9thnfWQeZUTss9bPo4yUfdbieZQRtM/T7XK2dJxWEAfiQByIA3EgDsSBOBAHiANxIA7EgTgQB+JAHIgDcYA4EAfiQByIA3EgDsSBOBAH4gBxIA7EgTgQB+JAHIgDcSAOEAfiQByIA3EgDsSBOBAH4gBxIA7EwdvdAfJbd8dXP2miAAAAAElFTkSuQmCC">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB+0lEQVR42u3dsXECUQxFUaPZNtwIrgOKdB9uBDdCSkBAwH70tOdkODHSXDN8MOzpdjl/wTNlBYgDcSAOxIE4EAfiQByIA3GAOBAH4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOBAH4kAciANxIA7EgTgQB+IAcSAOxIE4EAfiQByIA3EgDhAH4kAc7GHb+xd8//493vy//lh6yj5r5SRPf0LbfdbKSfSRtc9aPIk+gvZZ6yfRR8o+nVYQB+JAHIiDj9q63aGjvaLaed7qvKnxJ97m81bnTc3uo/+81XxTU/uImLf6b2peHynzOq0gDsSBOBAH4kAciANxIA7EAeLgdVvQffVpBo8ciANxIA7EgThAHIgDcSAOxIE4EAfiYJCkt+zHfFdHyv8eeORAHIgDcSAOxIE4EAfiQByIA8RBWByvvKM26RvyU+atiH3Nu3ZCxLzVf19Tr6rRf95qvq/Z11tpPu+W8vd0nD48IcVpBXEgDsQB+8VxtFc8O5xo9thnfWQeZUTss9bPo4yUfdbieZQRtM/T7XK2dJxWEAfiQByIA3EgDsSBOBAHiANxIA7EgTgQB+JAHIgDcYA4EAfiQByIA3EgDsSBOBAH4gBxIA7EgTgQB+JAHIgDcSAOEAfiQByIA3EgDsSBOBAH4gBxIA7EwdvdAfJbd8dXP2miAAAAAElFTkSuQmCC">
+<title>핏로그</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    --bg:#F1F3EF;
+    --surface:#FFFFFF;
+    --surface-2:#E8EBE4;
+    --line:#D8DCD3;
+    --text:#161A16;
+    --text-muted:#5B6259;
+    --text-faint:#8B9187;
+
+    --accent:#E15B36;        /* ember: primary / personal workout */
+    --accent-ink:#B23F20;
+    --on-accent:#FFFFFF;     /* 주황 위에 올라가는 글자색 */
+    --pt:#7C6FE0;            /* PT session */
+    --diet:#CE9A2A;          /* meals */
+    --water:#1F8A79;         /* water / recovery */
+    --supp:#C1587A;          /* supplements */
+    --inbody:#3B7DD8;        /* InBody */
+
+    --p-chest:var(--accent);
+    --p-back:var(--water);
+    --p-shoulder:var(--pt);
+    --p-arm:var(--diet);
+    --p-leg:var(--inbody);
+    --p-core:var(--supp);
+
+    --font-display:'Black Han Sans','IBM Plex Sans KR',sans-serif;
+    --font-body:'IBM Plex Sans KR',-apple-system,'Malgun Gothic',sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+
+    --radius-lg:20px;
+    --radius-md:14px;
+    --radius-sm:9px;
+    --shadow-1:0 1px 2px rgba(20,24,18,.06), 0 8px 24px -12px rgba(20,24,18,.18);
+    --shadow-2:0 4px 10px rgba(20,24,18,.08), 0 24px 48px -20px rgba(20,24,18,.28);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#14181A;
+      --surface:#1C211F;
+      --surface-2:#252B27;
+      --line:#333B35;
+      --text:#EDEFE9;
+      --text-muted:#9BA39A;
+      --text-faint:#6E766D;
+
+      --accent:#FF7A52;
+      --accent-ink:#FFA485;
+      --on-accent:#2B1207;
+      --pt:#9C8FFF;
+      --diet:#F0BF4C;
+      --water:#34C2A6;
+      --supp:#E28098;
+      --inbody:#5B9EF2;
+      --shadow-1:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+      --shadow-2:0 4px 10px rgba(0,0,0,.35), 0 24px 48px -20px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14181A;
+    --surface:#1C211F;
+    --surface-2:#252B27;
+    --line:#333B35;
+    --text:#EDEFE9;
+    --text-muted:#9BA39A;
+    --text-faint:#6E766D;
+
+    --accent:#FF7A52;
+    --accent-ink:#FFA485;
+    --on-accent:#2B1207;
+    --pt:#9C8FFF;
+    --diet:#F0BF4C;
+    --water:#34C2A6;
+    --supp:#E28098;
+    --inbody:#5B9EF2;
+    --shadow-1:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    --shadow-2:0 4px 10px rgba(0,0,0,.35), 0 24px 48px -20px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box;}
+  [hidden]{display:none !important;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);}
+  h1,h2,h3{font-family:var(--font-display);font-weight:400;letter-spacing:.01em;text-wrap:balance;}
+  button{font-family:inherit;}
+  ::selection{background:var(--accent);color:#fff;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .app{max-width:980px;margin:0 auto;padding:0 20px 64px;}
+
+  /* ---------- top bar ---------- */
+  .topbar{position:sticky;top:0;z-index:20;background:var(--bg);padding:22px 0 14px;}
+  .topbar-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .wordmark{display:flex;align-items:baseline;gap:10px;}
+  .wordmark .mark{font-family:var(--font-display);font-size:28px;color:var(--accent);}
+  .wordmark .sub{font-size:12px;color:var(--text-faint);font-family:var(--font-mono);letter-spacing:.04em;}
+  .week-strip{display:flex;gap:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);}
+  .week-strip b{color:var(--text);font-weight:600;}
+  .tabs{display:flex;gap:6px;margin-top:16px;background:var(--surface-2);padding:4px;border-radius:12px;width:fit-content;}
+  .tab-btn{border:none;background:transparent;padding:9px 18px;border-radius:9px;font-size:14px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:background .15s,color .15s;}
+  .tab-btn.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-1);}
+  .tab-btn:hover:not(.active){color:var(--text);}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ---------- calendar ---------- */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin:22px 0 14px;}
+  .cal-head h2{font-size:26px;margin:0;}
+  .cal-nav{display:flex;gap:6px;}
+  .icon-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .icon-btn:hover{background:var(--surface-2);}
+  .today-btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:0 14px;font-size:13px;font-weight:600;cursor:pointer;}
+
+  .dow-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;}
+  .dow-row span{text-align:center;font-size:11px;color:var(--text-faint);font-weight:600;letter-spacing:.06em;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .day-cell{position:relative;aspect-ratio:1/0.92;border-radius:var(--radius-md);border:1px solid var(--line);background:var(--surface);padding:8px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;transition:border-color .12s,transform .08s;}
+  .day-cell:hover{border-color:var(--text-faint);}
+  .day-cell:active{transform:scale(.97);}
+  .day-cell.outside{opacity:.35;}
+  .day-cell.today{border-color:var(--accent);border-width:2px;padding:7px;}
+  .day-cell.selected{box-shadow:0 0 0 2px var(--accent) inset;}
+  .day-num{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--text-muted);}
+  .day-cell.today .day-num{color:var(--accent);}
+  .day-dots{display:flex;flex-wrap:wrap;gap:3px;}
+  .dot{width:6px;height:6px;border-radius:50%;flex:none;}
+  .day-mins{font-size:10px;font-family:var(--font-mono);color:var(--text-faint);}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:20px;font-size:12px;color:var(--text-muted);}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend .dot{width:8px;height:8px;}
+
+  /* ---------- modal ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(15,18,15,.5);backdrop-filter:blur(2px);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .18s;}
+  .overlay.open{opacity:1;pointer-events:auto;}
+  @media (min-width:720px){.overlay{align-items:center;}}
+  .sheet{background:var(--surface);width:100%;max-width:640px;max-height:88vh;border-radius:20px 20px 0 0;box-shadow:var(--shadow-2);display:flex;flex-direction:column;transform:translateY(24px);transition:transform .2s;overflow:hidden;}
+  .overlay.open .sheet{transform:translateY(0);}
+  @media (min-width:720px){.sheet{border-radius:20px;margin-bottom:0;}}
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line);flex:none;}
+  .sheet-head h3{margin:0;font-size:20px;}
+  .sheet-head .save-status{font-size:11px;color:var(--text-faint);font-family:var(--font-mono);}
+  .sheet-body{padding:20px 22px 28px;overflow-y:auto;}
+  .close-btn{width:32px;height:32px;border-radius:50%;border:none;background:var(--surface-2);color:var(--text);cursor:pointer;font-size:15px;flex:none;}
+
+  .section{border-top:1px solid var(--line);padding:18px 0;}
+  .section:first-child{border-top:none;padding-top:0;}
+  .section-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .section-head .dot{width:9px;height:9px;}
+  .section-head h4{margin:0;font-size:14px;font-weight:700;letter-spacing:.01em;}
+
+  .segmented{display:flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:2px;}
+  .segmented button{flex:1;border:none;background:transparent;padding:8px 6px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;}
+  .segmented button.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-1);}
+
+  .field-row{display:flex;gap:10px;align-items:center;margin-top:10px;}
+  .field-row label{font-size:13px;color:var(--text-muted);flex:none;width:84px;}
+  input[type=text],input[type=number],input[type=date],textarea,select{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent);}
+  textarea{resize:vertical;min-height:44px;}
+
+  .chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;}
+  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--bg);border-radius:20px;padding:6px 12px 6px 12px;font-size:13px;cursor:pointer;user-select:none;}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .chip .rm{opacity:.7;font-size:11px;}
+  .add-chip{border:1px dashed var(--text-faint);background:transparent;color:var(--text-muted);}
+  .pick-btn{border:1px dashed var(--line);background:transparent;color:var(--text-muted);border-radius:9px;padding:9px 14px;font-size:13px;cursor:pointer;width:100%;text-align:left;}
+  .pick-btn:hover{border-color:var(--accent);color:var(--text);}
+
+  .meal-grid{display:grid;grid-template-columns:64px 1fr;gap:8px 10px;align-items:center;}
+  .meal-grid label{font-size:12.5px;color:var(--text-muted);}
+
+  .water-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .water-btn{border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;}
+  .water-btn:hover{border-color:var(--water);color:var(--water);}
+  .water-total{font-family:var(--font-mono);font-size:20px;font-weight:600;margin-left:auto;}
+  .water-bar{height:8px;border-radius:5px;background:var(--surface-2);overflow:hidden;margin-top:10px;}
+  .water-bar>i{display:block;height:100%;background:var(--water);border-radius:5px;transition:width .25s;}
+  .water-goal{font-size:11px;color:var(--text-faint);margin-top:5px;font-family:var(--font-mono);}
+
+  .inbody-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+  .inbody-toggle .arrow{transition:transform .15s;color:var(--text-faint);}
+  .inbody-toggle.open .arrow{transform:rotate(90deg);}
+  .inbody-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+  .inbody-grid .full{grid-column:1/-1;}
+  .ib-field label{display:block;font-size:11.5px;color:var(--text-muted);margin-bottom:4px;font-family:var(--font-mono);}
+
+  /* ---------- exercise library ---------- */
+  .lib-tools{display:flex;gap:8px;margin:20px 0 16px;flex-wrap:wrap;}
+  .search-box{flex:1;min-width:180px;position:relative;}
+  .search-box input{padding-left:34px;}
+  .search-box .ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:14px;}
+  .part-filters{display:flex;gap:6px;flex-wrap:wrap;}
+  .part-chip{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:7px 13px;font-size:12.5px;font-weight:600;color:var(--text-muted);cursor:pointer;}
+  .part-chip.active{color:#fff;border-color:transparent;}
+
+  .part-section{margin-top:26px;}
+  .part-title{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:10px;}
+  .part-title .dot{width:9px;height:9px;}
+  .ex-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;background:var(--surface);}
+  .ex-row{display:flex;align-items:center;gap:13px;padding:11px 14px;border:none;border-top:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer;text-align:left;width:100%;font-family:inherit;transition:background .12s;}
+  .ex-row:first-child{border-top:none;}
+  .ex-row:hover{background:var(--surface-2);}
+  .ex-row-thumb{width:52px;height:52px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;background-color:#161C18;}
+  .ex-row-thumb svg{width:78px;height:78px;flex:none;}
+  .ex-row-noicon{font-family:var(--font-display);font-size:18px;}
+  .ex-row-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .ex-row-name{font-size:14.5px;font-weight:600;}
+  .ex-row-name small{font-weight:500;color:var(--text-faint);font-size:11px;}
+  .ex-row-meta{font-size:12px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ex-row-chevron{flex:none;color:var(--text-faint);font-size:18px;}
+  .anim-badge{flex:none;font-size:10px;font-family:var(--font-mono);color:var(--text-faint);display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+  .anim-badge .pulse{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1.4s ease-in-out infinite;}
+  @media (max-width:560px){ .ex-row-meta{display:none;} .anim-badge{display:none;} }
+
+  /* favourite star */
+  .fav-btn{flex:none;width:32px;height:32px;border-radius:9px;border:none;background:transparent;color:var(--text-faint);font-size:17px;line-height:1;cursor:pointer;transition:background .12s,color .12s;font-family:inherit;}
+  .fav-btn:hover{background:var(--surface-2);color:var(--accent);}
+  .fav-btn.on{color:var(--accent);}
+  .picker-row .fav-btn{width:26px;height:26px;font-size:14px;}
+  .fav-pill{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .fav-pill.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent);}
+
+  /* external reference links */
+  .ex-ref{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .ex-ref a{display:inline-flex;align-items:center;gap:6px;padding:9px 13px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:12.5px;font-weight:600;text-decoration:none;}
+  .ex-ref a:hover{border-color:var(--accent);color:var(--accent);}
+  .ex-ref-note{font-size:11.5px;color:var(--text-faint);margin-top:7px;line-height:1.5;}
+  @keyframes pulse{0%,100%{opacity:.35;}50%{opacity:1;}}
+
+  /* ---------- exercise detail ---------- */
+  .rig-stage{background:var(--surface-2);border-radius:16px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .rig-stage svg{width:100%;max-width:280px;height:auto;}
+  .rig-caption{font-size:11px;color:var(--text-faint);text-align:center;}
+  .ex-detail-tags{display:flex;gap:8px;margin:14px 0 4px;flex-wrap:wrap;}
+  .tag-pill{font-size:11.5px;font-weight:600;border-radius:20px;padding:4px 11px;color:#fff;}
+  .steps-list{margin:8px 0 0;padding-left:20px;font-size:14px;line-height:1.65;}
+  .steps-list li{margin-bottom:4px;}
+  .angle-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;}
+  .angle-list li{font-size:13.5px;background:var(--surface-2);border-radius:9px;padding:8px 11px;display:flex;gap:8px;align-items:flex-start;}
+  .angle-list li::before{content:"∠";font-family:var(--font-mono);color:var(--accent);font-weight:600;}
+
+  /* ---------- exercise picker modal ---------- */
+  .picker-search{margin-bottom:12px;}
+  .picker-list{display:flex;flex-direction:column;gap:4px;}
+  .picker-part{font-size:11.5px;font-weight:700;color:var(--text-faint);margin:14px 0 6px;letter-spacing:.04em;}
+  .picker-part:first-child{margin-top:0;}
+  .picker-row{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:9px;cursor:pointer;}
+  .picker-row:hover{background:var(--surface-2);}
+  .picker-row .box{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--line);flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;}
+  .picker-row.checked .box{background:var(--accent);border-color:var(--accent);}
+  .picker-row .nm{font-size:14px;flex:1;}
+  .picker-row .mu{font-size:11.5px;color:var(--text-faint);}
+  .picker-done{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:12px 22px;margin:0 -22px -28px;}
+  .primary-btn{width:100%;background:var(--accent);color:var(--on-accent);border:none;border-radius:12px;padding:13px;font-size:14.5px;font-weight:700;cursor:pointer;}
+  .primary-btn:hover{background:var(--accent-ink);}
+
+  .empty-note{font-size:13px;color:var(--text-faint);padding:14px 0;}
+
+  /* ---------- rig joints ---------- */
+  @keyframes rigSwing{0%,100%{transform:rotate(var(--a0,0deg));}50%{transform:rotate(var(--a1,0deg));}}
+  @keyframes rigBob{0%,100%{transform:translateY(var(--b0,0px));}50%{transform:translateY(var(--b1,0px));}}
+  @keyframes rigBreathe{0%,100%{transform:scale(1);}50%{transform:scale(1.018);}}
+  @keyframes glowPulse{0%,100%{opacity:.18;}50%{opacity:.42;}}
+  .jointRotate{animation:rigSwing var(--dur,2.6s) ease-in-out infinite;}
+  .bobber{animation:rigBob var(--dur,2.6s) ease-in-out infinite;}
+  .breather{animation:rigBreathe 3.2s ease-in-out infinite;}
+  .glow{animation:glowPulse var(--dur,2.6s) ease-in-out infinite;}
+  @media (prefers-reduced-motion:reduce){
+    .jointRotate,.bobber,.breather,.glow{animation:none!important;}
+  }
+
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);background:var(--text);color:var(--bg);font-size:13px;font-weight:600;padding:10px 18px;border-radius:30px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:520px){
+    .inbody-grid{grid-template-columns:1fr 1fr;}
+    .wordmark .mark{font-size:24px;}
+  }
+
+  /* ---------- inbody tab ---------- */
+  .ib-tab-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin:22px 0 20px;flex-wrap:wrap;}
+  .ib-tab-head h2{margin:0 0 4px;font-size:26px;}
+  .ib-tab-sub{margin:0;font-size:13px;color:var(--text-faint);}
+  .ib-tab-actions{display:flex;gap:8px;flex:none;}
+  .ghost-btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:11px 16px;font-size:13.5px;font-weight:600;cursor:pointer;}
+  .ghost-btn:hover{border-color:var(--inbody);color:var(--inbody);}
+
+  .ib-empty{border:1px dashed var(--line);border-radius:var(--radius-lg);padding:48px 24px;text-align:center;color:var(--text-muted);}
+  .ib-empty p{max-width:360px;margin:6px auto 18px;font-size:13.5px;}
+
+  .ib-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:22px;}
+  .ib-stat-tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:14px 16px;}
+  .ib-stat-tile .label{font-size:11.5px;color:var(--text-faint);}
+  .ib-stat-tile .value{font-family:var(--font-mono);font-size:22px;font-weight:600;margin-top:4px;}
+  .ib-stat-tile .value small{font-size:12px;color:var(--text-faint);font-weight:500;}
+  .ib-stat-tile .delta{font-size:11.5px;color:var(--text-muted);margin-top:3px;font-family:var(--font-mono);}
+
+  .ib-chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:12px;margin-bottom:26px;}
+  .ib-chart-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:16px 16px 8px;position:relative;}
+  .ib-chart-card .ch-title{font-size:12.5px;font-weight:700;color:var(--text-muted);}
+  .ib-chart-card .ch-value{font-family:var(--font-mono);font-size:19px;font-weight:600;margin:2px 0 8px;}
+  .ib-chart-card svg{width:100%;height:auto;overflow:visible;}
+  .ib-chart-card .ch-empty{font-size:12px;color:var(--text-faint);padding:20px 0;text-align:center;}
+  .ib-tooltip{position:absolute;pointer-events:none;background:var(--text);color:var(--bg);font-size:11px;font-family:var(--font-mono);padding:4px 8px;border-radius:6px;transform:translate(-50%,-130%);white-space:nowrap;opacity:0;transition:opacity .1s;z-index:5;}
+  .ib-tooltip.show{opacity:1;}
+
+  .ib-hist{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;}
+  .ib-hist{overflow-x:auto;}
+  .ib-hist-row{display:grid;grid-template-columns:76px repeat(var(--ib-cols,9),minmax(62px,1fr)) 28px;gap:6px;padding:11px 14px;font-size:12.5px;align-items:center;border-top:1px solid var(--line);cursor:pointer;min-width:max-content;}
+  .ib-hist-row:first-child{border-top:none;}
+  .ib-hist-row:hover{background:var(--surface-2);}
+  .ib-hist-row.head{font-weight:700;color:var(--text-faint);font-size:11px;cursor:default;}
+  .ib-hist-row.head:hover{background:transparent;}
+  .ib-hist-row .num{font-family:var(--font-mono);}
+  .ib-hist-row .del{color:var(--text-faint);text-align:center;}
+  .ib-hist-row .del:hover{color:var(--supp);}
+  @media (max-width:640px){
+    .ib-hist-row{grid-template-columns:72px repeat(var(--ib-cols,9),68px) 24px;}
+  }
+
+  .ib-import-hint{font-size:13px;color:var(--text-muted);margin:0 0 12px;line-height:1.6;}
+  #ibCsvFile{font-size:13px;}
+  .ib-preview-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px;}
+  .ib-preview-table th,.ib-preview-table td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;}
+  .ib-preview-table th{color:var(--text-faint);font-weight:600;}
+  .ib-preview-wrap-scroll{overflow-x:auto;}
+  .ib-preview-note{font-size:12px;color:var(--text-faint);margin-top:8px;}
+
+  /* ---------- 운동 상세 탭 (기본 / 선생님) ---------- */
+  .ex-tabs{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:11px;margin-bottom:18px;}
+  .ex-tab{flex:1;border:none;background:transparent;padding:9px 10px;border-radius:8px;font-family:inherit;
+    font-size:13.5px;font-weight:700;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .ex-tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-1);}
+  .ex-tab .cnt{font-family:var(--font-mono);font-size:11px;background:var(--accent);color:var(--on-accent);
+    border-radius:999px;padding:1px 6px;font-weight:700;}
+
+  /* ---------- 선생님 운동법 ---------- */
+  .pt-datebar{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+  .pt-datebar select{flex:1;min-width:150px;}
+  .pt-empty{font-size:13px;color:var(--text-faint);line-height:1.7;padding:18px;background:var(--surface-2);border-radius:var(--radius-md);}
+  .pt-plan{background:var(--surface-2);border-radius:var(--radius-md);padding:15px 16px;}
+  .pt-plan h5{margin:0 0 9px;font-size:12px;font-family:var(--font-mono);color:var(--text-faint);letter-spacing:.04em;}
+  .pt-setline{display:flex;align-items:center;gap:9px;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px;}
+  .pt-setline:first-of-type{border-top:none;}
+  .pt-setline .n{font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);width:34px;flex:none;}
+  .pt-setline .v{font-family:var(--font-mono);font-weight:600;}
+  .pt-method{font-size:13.5px;line-height:1.75;white-space:pre-wrap;margin-top:10px;color:var(--text);}
+  .pt-parse-preview{font-size:12px;color:var(--text-muted);background:var(--surface-2);border-radius:10px;padding:11px 13px;margin-top:9px;line-height:1.7;}
+  .pt-parse-preview b{font-family:var(--font-mono);}
+  .pt-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+  .pt-actions button{flex:1;min-width:130px;}
+
+  /* ---------- 하루 기록: 운동 방식 선택 · 세트 실패 · 메모 ---------- */
+  .mode-seg{display:inline-flex;gap:3px;background:var(--surface-2);padding:3px;border-radius:9px;margin:10px 0 4px;}
+  .mode-seg button{border:none;background:transparent;padding:6px 12px;border-radius:7px;font-family:inherit;
+    font-size:12px;font-weight:700;color:var(--text-faint);cursor:pointer;}
+  .mode-seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow-1);}
+  .pt-hint{font-size:12px;color:var(--text-muted);background:var(--surface-2);border-radius:9px;
+    padding:9px 11px;margin:8px 0;line-height:1.6;display:flex;gap:9px;align-items:center;flex-wrap:wrap;}
+  .pt-hint .apply{border:1px solid var(--accent);background:transparent;color:var(--accent);
+    border-radius:8px;padding:5px 10px;font-family:inherit;font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;}
+  .set-fail-btn{flex:none;width:26px;height:26px;border-radius:7px;border:1px solid var(--line);
+    background:transparent;color:var(--text-faint);font-size:12px;cursor:pointer;font-family:inherit;}
+  .set-fail-btn.on{background:var(--supp);border-color:var(--supp);color:#fff;}
+  .set-fail-reason{margin:2px 0 8px 38px;}
+  .set-fail-reason input{font-size:12.5px;}
+  .ex-note-row{margin-top:10px;}
+  .ex-note-row label{display:block;font-size:11.5px;color:var(--text-muted);margin-bottom:5px;font-family:var(--font-mono);}
+  .rec-badge{flex:none;font-size:10px;font-family:var(--font-mono);border-radius:999px;padding:2px 7px;white-space:nowrap;}
+  .rec-badge.pt{background:var(--accent);color:var(--on-accent);}
+
+  /* ---------- 식단: 시간 + 간식 여러 개 ---------- */
+  .meal-row{display:grid;grid-template-columns:52px 96px 1fr;gap:8px;align-items:center;margin-bottom:8px;}
+  .meal-row > label{font-size:12.5px;color:var(--text-muted);}
+  .snack-row{display:grid;grid-template-columns:52px 96px 1fr 30px;gap:8px;align-items:center;margin-bottom:8px;}
+  .snack-del{border:none;background:transparent;color:var(--text-faint);font-size:14px;cursor:pointer;font-family:inherit;}
+  .snack-del:hover{color:var(--supp);}
+  .add-line-btn{width:100%;border:1px dashed var(--line);background:transparent;color:var(--text-muted);
+    border-radius:10px;padding:9px;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;margin-top:2px;}
+  .add-line-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  /* 하루 기록: 저장 버튼 · 미저장 안내 */
+  .head-actions{display:flex;align-items:center;gap:8px;flex:none;}
+  .save-btn{padding:9px 18px;border-radius:10px;border:none;background:var(--surface-2);color:var(--text-faint);
+    font-family:inherit;font-size:13.5px;font-weight:700;cursor:not-allowed;transition:background .14s,color .14s;}
+  .save-btn.dirty{background:var(--accent);color:var(--on-accent);cursor:pointer;}
+  .dirty-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:11px 20px;
+    background:#FBEEE9;border-bottom:1px solid var(--line);font-size:12.5px;color:#8A3A22;}
+  .dirty-bar button{padding:7px 13px;border-radius:8px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;border:1px solid transparent;}
+  .dirty-bar .db-primary{background:var(--accent);color:var(--on-accent);}
+  .dirty-bar .db-ghost{background:transparent;border-color:#D9B4A6;color:#8A3A22;}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .dirty-bar{background:#2A1B14;color:#F0C4B2;} }
+  :root[data-theme="dark"] .dirty-bar{background:#2A1B14;color:#F0C4B2;}
+
+  /* inbody record detail */
+  .ibd-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:4px;}
+  .ibd-date{font-family:var(--font-mono);font-size:13px;color:var(--text-muted);}
+  .ibd-group{margin-top:20px;}
+  .ibd-group h5{margin:0 0 8px;font-size:12px;font-weight:700;color:var(--text-faint);letter-spacing:.04em;text-transform:uppercase;font-family:var(--font-mono);}
+  .ibd-rows{border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;background:var(--surface);}
+  .ibd-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-top:1px solid var(--line);font-size:13px;}
+  .ibd-row:first-child{border-top:none;}
+  .ibd-row .k{color:var(--text-muted);}
+  .ibd-row .v{font-family:var(--font-mono);font-weight:600;}
+  .ibd-row .v small{font-weight:500;color:var(--text-faint);font-size:11px;}
+  .ibd-row .dlt{font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);margin-left:8px;}
+  .ibd-actions{display:flex;gap:8px;margin-top:22px;}
+  .ibd-actions button{flex:1;}
+  .ibd-memo{font-size:12.5px;color:var(--text-muted);line-height:1.7;background:var(--surface-2);border-radius:var(--radius-md);padding:12px 14px;word-break:break-all;}
+  .ib-preview-note.warn{color:var(--supp);}
+  .ib-link{color:var(--inbody);font-weight:600;cursor:pointer;text-decoration:underline;}
+
+  /* ---------- exercise set cards (day sheet) ---------- */
+  .ex-set-card{border:1px solid var(--line);border-radius:var(--radius-md);padding:12px 13px;margin-top:10px;background:var(--bg);}
+  .ex-set-head{display:flex;align-items:center;gap:10px;}
+  .ex-set-thumb{width:46px;height:46px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#161C18;}
+  .ex-set-thumb svg{width:70px;height:70px;flex:none;}
+  .ex-set-noicon{font-size:10px;font-weight:700;color:#cfd6ca;}
+  .ex-set-titlewrap{flex:1;min-width:0;}
+  .ex-set-name{display:block;font-size:14px;font-weight:600;cursor:pointer;}
+  .ex-set-name:hover{color:var(--accent);}
+  .ex-set-muscle{display:block;font-size:11px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ex-set-remove{flex:none;width:26px;height:26px;border-radius:50%;border:none;background:var(--surface-2);color:var(--text-faint);cursor:pointer;font-size:11px;}
+  .ex-set-remove:hover{color:var(--supp);}
+  .set-group-label{font-size:10.5px;font-weight:700;color:var(--text-faint);letter-spacing:.04em;margin:10px 0 5px;}
+  .set-rows{display:flex;flex-direction:column;gap:6px;}
+  .set-row{display:grid;grid-template-columns:46px 1fr auto 1fr auto;align-items:center;gap:6px;}
+  .set-idx{font-size:12px;color:var(--text-faint);font-family:var(--font-mono);}
+  .set-x{font-size:11px;color:var(--text-faint);text-align:center;}
+  .set-reps,.set-kg{padding:7px 8px;font-size:13px;text-align:center;font-family:var(--font-mono);}
+  .set-del{width:22px;height:22px;border-radius:50%;border:none;background:transparent;color:var(--text-faint);cursor:pointer;font-size:10px;}
+  .set-del:hover{color:var(--supp);}
+  .set-add-btn{border:1px dashed var(--line);background:transparent;color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;margin-top:7px;width:100%;text-align:left;}
+  .set-add-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  /* ---------- rig dark stage (both the card thumbnail and the full detail stage) ---------- */
+  .rig-stage{background:#161C18;--rig-ink:#E9EDE4;border-radius:16px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .rig-stage svg{width:100%;max-width:280px;height:auto;}
+  .rig-caption{font-size:11px;color:rgba(233,237,228,.5);text-align:center;}
+  .ex-set-thumb{--rig-ink:#E9EDE4;}
+  /* ---- iOS 홈화면 앱 보정 ---- */
+  html{-webkit-text-size-adjust:100%;}
+  body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);
+       -webkit-tap-highlight-color:transparent;overscroll-behavior-y:contain;}
+  input,select,textarea,button{font-size:16px;}  /* iOS 자동 확대 방지 */
+  .ib-hist,.ex-ref{-webkit-overflow-scrolling:touch;}
+
+  /* ---- 실제 동작 이미지(GIF) 스테이지 ---- */
+  .img-stage{background:#FFFFFF;padding:0;display:block;}
+  .img-stage.img-none{background:var(--surface-2);}
+  .img-stage img{display:block;width:100%;height:auto;border-radius:var(--radius-md);}
+  .img-stage.img-fail img{display:none;}
+  .img-stage.img-fail .img-fail-note{display:block;}
+  .img-fail-note{display:none;padding:26px 16px;text-align:center;font-size:12.5px;color:var(--text-faint);}
+  .img-credit{font-size:11px;color:var(--text-faint);padding:7px 2px 0;display:flex;justify-content:space-between;gap:8px;align-items:center;}
+  .img-credit a{color:var(--text-muted);}
+  .thumb-img{width:100%;height:100%;object-fit:cover;display:block;}
+  .imgurl-row{display:flex;gap:7px;margin-top:9px;}
+  .imgurl-row input{flex:1;}
+  .imgurl-row button{flex:none;padding:0 13px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;}
+
+  /* ---- 데이터 백업 ---- */
+  .data-btn{flex:none;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--text-muted);font-size:15px;cursor:pointer;font-family:inherit;}
+  .data-btn:hover{color:var(--text);}
+  .storage-note{font-size:12px;color:var(--text-faint);line-height:1.65;margin-top:10px;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="topbar">
+    <div class="topbar-row">
+      <div class="wordmark">
+        <span class="mark">핏로그</span>
+        <span class="sub">FITLOG</span>
+      </div>
+      <div class="week-strip" id="weekStrip"></div>
+    </div>
+    <nav class="tabs" style="align-items:center">
+      <button class="tab-btn active" data-view="calendar">달력</button>
+      <button class="tab-btn" data-view="library">운동 도감</button>
+      <button class="tab-btn" data-view="inbody">인바디</button>
+      <button class="data-btn" id="dataBtn" title="데이터 · 백업" aria-label="데이터 · 백업">⇅</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 달력 뷰 -->
+    <section class="view active" id="view-calendar">
+      <div class="cal-head">
+        <h2 id="calTitle"></h2>
+        <div class="cal-nav">
+          <button class="today-btn" id="btnToday">오늘</button>
+          <button class="icon-btn" id="btnPrev" aria-label="이전 달">‹</button>
+          <button class="icon-btn" id="btnNext" aria-label="다음 달">›</button>
+        </div>
+      </div>
+      <div class="dow-row">
+        <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+
+      <div class="legend">
+        <span><i class="dot" style="background:var(--accent)"></i>개인운동</span>
+        <span><i class="dot" style="background:var(--pt)"></i>PT</span>
+        <span><i class="dot" style="background:var(--diet)"></i>식단</span>
+        <span><i class="dot" style="background:var(--water)"></i>물</span>
+        <span><i class="dot" style="background:var(--supp)"></i>영양제</span>
+        <span><i class="dot" style="background:var(--inbody)"></i>인바디</span>
+      </div>
+    </section>
+
+    <!-- 운동 도감 뷰 -->
+    <section class="view" id="view-library">
+      <div class="lib-tools">
+        <div class="search-box">
+          <span class="ic">⌕</span>
+          <input type="text" id="libSearch" placeholder="운동 이름 검색">
+        </div>
+        <div class="part-filters" id="partFilters"></div>
+        <button class="ghost-btn" id="libAddExBtn">+ 내 운동 추가</button>
+      </div>
+      <div id="libResults"></div>
+    </section>
+
+    <!-- 인바디 뷰 -->
+    <section class="view" id="view-inbody">
+      <div class="ib-tab-head">
+        <div>
+          <h2>인바디</h2>
+          <p class="ib-tab-sub">체성분 측정 기록과 변화 추이</p>
+        </div>
+        <div class="ib-tab-actions">
+          <button class="ghost-btn" id="ibImportBtn">CSV 가져오기</button>
+          <button class="primary-btn" id="ibAddBtn" style="width:auto;padding:11px 18px">+ 기록 추가</button>
+        </div>
+      </div>
+      <div id="ibTabBody"></div>
+    </section>
+  </main>
+</div>
+
+<!-- 하루 기록 모달 -->
+<div class="overlay" id="dayOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div>
+        <h3 id="dayTitle"></h3>
+        <div class="save-status" id="saveStatus">&nbsp;</div>
+      </div>
+      <div class="head-actions">
+        <button class="save-btn" id="daySave" disabled>저장</button>
+        <button class="close-btn" id="dayClose">✕</button>
+      </div>
+    </div>
+    <div class="dirty-bar" id="dayDirtyBar" hidden>
+      <span>저장하지 않은 변경이 있어요.</span>
+      <button class="db-primary" id="dirtySave">저장하고 닫기</button>
+      <button class="db-ghost" id="dirtyDiscard">그냥 닫기</button>
+    </div>
+    <div class="sheet-body" id="daySheetBody"></div>
+  </div>
+</div>
+
+<!-- 운동 선택 모달 -->
+<div class="overlay" id="pickerOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h3>운동 선택</h3>
+      <button class="close-btn" id="pickerClose">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div class="picker-search">
+        <input type="text" id="pickerSearch" placeholder="운동 이름 검색">
+      </div>
+      <div class="picker-list" id="pickerList"></div>
+      <button class="pick-btn" id="pickerAddEx" style="margin-top:4px">+ 목록에 없는 운동 직접 추가하기</button>
+      <div class="picker-done">
+        <button class="primary-btn" id="pickerDone">선택 완료</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 내 운동 직접 추가 모달 -->
+<div class="overlay" id="exAddOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h3>내 운동 추가</h3>
+      <button class="close-btn" id="exAddClose">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div class="field-row"><label>운동 이름</label><input type="text" id="eaName" placeholder="예: 스미스머신 스쿼트"></div>
+      <div class="field-row"><label>부위</label>
+        <select id="eaPart"></select>
+      </div>
+      <div class="field-row"><label>장비</label><input type="text" id="eaEquip" placeholder="예: 머신 / 바벨 / 맨몸"></div>
+      <div class="field-row"><label>자극 부위</label><input type="text" id="eaMuscle" placeholder="예: 대퇴사두근, 둔근"></div>
+      <div class="field-row" style="align-items:flex-start"><label style="margin-top:9px">준비 자세</label><textarea id="eaSetup" rows="2" placeholder="시작 자세를 어떻게 잡는지 한 문장으로"></textarea></div>
+      <div class="field-row" style="align-items:flex-start"><label style="margin-top:9px">수행 방법</label><textarea id="eaSteps" rows="3" placeholder="한 줄에 한 단계씩 적어주세요"></textarea></div>
+      <div class="field-row" style="align-items:flex-start"><label style="margin-top:9px">각도/유의사항</label><textarea id="eaAngles" rows="2" placeholder="한 줄에 하나씩 (선택)"></textarea></div>
+      <div class="field-row" style="margin-top:6px"><button class="primary-btn" id="eaSave">추가하기</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- 운동 상세 모달 -->
+<div class="overlay" id="exOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h3 id="exTitle"></h3>
+      <button class="close-btn" id="exClose">✕</button>
+    </div>
+    <div class="sheet-body" id="exBody"></div>
+  </div>
+</div>
+
+<!-- 데이터 백업/복원 모달 -->
+<div class="overlay" id="dataOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h3>데이터 · 백업</h3>
+      <button class="close-btn" id="dataClose">✕</button>
+    </div>
+    <div class="sheet-body" id="dataBody"></div>
+  </div>
+</div>
+
+<!-- 인바디 기록 상세보기 모달 -->
+<div class="overlay" id="ibDetailOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h3 id="ibDetailTitle">인바디 상세</h3>
+      <button class="close-btn" id="ibDetailClose">✕</button>
+    </div>
+    <div class="sheet-body" id="ibDetailBody"></div>
+  </div>
+</div>
+
+<!-- 인바디 기록 추가/수정 모달 -->
+<div class="overlay" id="ibEntryOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h3 id="ibEntryTitle">인바디 기록 추가</h3>
+      <button class="close-btn" id="ibEntryClose">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div class="field-row">
+        <label>측정일</label>
+        <input type="date" id="ibEntryDate">
+      </div>
+      <div id="ibEntryFields" style="margin-top:14px"></div>
+      <div class="field-row" style="margin-top:14px;gap:10px">
+        <button class="primary-btn" id="ibEntrySave">저장</button>
+        <button class="ghost-btn" id="ibEntryDelete" style="display:none;border-color:var(--supp);color:var(--supp)">이 기록 삭제</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CSV 가져오기 모달 -->
+<div class="overlay" id="ibImportOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h3>인바디 CSV 가져오기</h3>
+      <button class="close-btn" id="ibImportClose">✕</button>
+    </div>
+    <div class="sheet-body">
+      <p class="ib-import-hint">인바디 기기/앱에서 내보낸 CSV 파일을 올리거나, 표 내용을 그대로 붙여넣으세요. 날짜·체중·골격근량·체지방량·체지방률·BMI·인바디점수 열을 자동으로 찾아 매칭해요.</p>
+      <input type="file" id="ibCsvFile" accept=".csv,text/csv">
+      <textarea id="ibCsvPaste" rows="6" placeholder="여기에 CSV 내용을 붙여넣어도 돼요&#10;예) 날짜,체중,골격근량,체지방량,체지방률,BMI,인바디점수" style="margin-top:10px"></textarea>
+      <div class="field-row" style="margin-top:12px">
+        <button class="primary-btn" id="ibCsvPreviewBtn" style="width:auto;padding:11px 18px">미리보기</button>
+      </div>
+      <div id="ibCsvPreviewWrap"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   핏로그 — data
+   ========================================================= */
+const PARTS = {
+  chest:{label:'가슴', color:'var(--p-chest)'},
+  back:{label:'등', color:'var(--p-back)'},
+  shoulder:{label:'어깨', color:'var(--p-shoulder)'},
+  arm:{label:'팔', color:'var(--p-arm)'},
+  leg:{label:'하체', color:'var(--p-leg)'},
+  core:{label:'코어', color:'var(--p-core)'},
+};
+const PART_ORDER = ['chest','back','shoulder','arm','leg','core'];
+
+const COMMON_SUPPLEMENTS = [
+  '종합비타민','비타민C','비타민D','오메가3','마그네슘','크레아틴',
+  '간 영양제','유산균','아연','콜라겐','철분','프로틴',
+];
+
+const GLOW_POS = {
+  'glute-thigh':{cx:100,cy:140,rx:34,ry:46},
+  'hamstring':{cx:95,cy:165,rx:18,ry:30},
+  'chest':{cx:104,cy:68,rx:26,ry:20},
+  'lat-back':{cx:82,cy:78,rx:22,ry:34},
+  'shoulder-delt':{cx:100,cy:60,rx:18,ry:18},
+  'bicep':{cx:110,cy:96,rx:11,ry:18},
+  'tricep':{cx:104,cy:96,rx:11,ry:18},
+  'core-abs':{cx:100,cy:125,rx:20,ry:24},
+};
+
+const EXERCISES = [
+  // ---- 가슴 ----
+  {id:'incline-press-machine', name:'인클라인 체스트프레스 머신 (일반형)', part:'chest', equip:'머신', mine:false,
+   muscle:'대흉근 상부, 전면 삼각근',
+   steps:['시트 높이를 조절해 손잡이가 쇄골 아래쯤 오도록 맞춘다.','등과 어깨를 패드에 붙이고 가슴을 편 채로 손잡이를 앞으로 민다.','팔꿈치를 완전히 펴지 않고 멈춘 뒤 천천히 제자리로 되돌린다.'],
+   angles:['팔꿈치 각도 90°에서 시작해 150°까지만 편다','손잡이 경로가 위쪽 대각선을 향하도록 유지'],
+   rig:{tpl:'lie',wrap:-68,a:{shoulder:{a0:-68,a1:-68},elbow:{a0:100,a1:15}},glow:'chest',badge:'팔꿈치 90°→150°'}},
+  {id:'chest-press-recline', name:'체스트프레스 머신 (일반형)', part:'chest', equip:'머신', mine:false,
+   muscle:'대흉근 중앙부, 삼각근 전면, 삼두근',
+   steps:['등받이에 등 전체를 기대고 손잡이를 가슴 옆 높이에 맞춘다.','숨을 내쉬며 손잡이를 정면으로 밀어 팔을 편다.','팔꿈치를 다 펴지 않고 버틴 뒤 천천히 되돌아온다.'],
+   angles:['팔꿈치 각도 90°→160°','손목이 꺾이지 않게 일직선 유지'],
+   rig:{tpl:'lie',wrap:-52,a:{shoulder:{a0:-52,a1:-52},elbow:{a0:95,a1:20}},glow:'chest',badge:'팔꿈치 90°→160°'}},
+  {id:'bench-press', name:'벤치프레스 (바벨)', part:'chest', equip:'바벨', mine:false,
+   muscle:'대흉근, 삼각근 전면, 삼두근',
+   steps:['벤치에 누워 견갑골을 모으고 바를 어깨너비보다 살짝 넓게 잡는다.','가슴 아래쪽으로 바를 내려 살짝 터치한다.','발로 바닥을 밀며 바를 다시 위로 밀어 올린다.'],
+   angles:['하강 시 팔꿈치 각도 약 75°','바 경로는 수직에 가깝게 유지'],
+   rig:{tpl:'lie',wrap:-90,a:{shoulder:{a0:-90,a1:-90},elbow:{a0:80,a1:8}},glow:'chest',badge:'팔꿈치 75°(바닥)'}},
+  {id:'pushup', name:'푸시업', part:'chest', equip:'맨몸', mine:false,
+   muscle:'대흉근, 삼각근 전면, 삼두근, 코어',
+   steps:['손을 어깨보다 살짝 넓게 짚고 머리부터 발끝까지 일직선을 만든다.','팔꿈치를 몸통에 45° 붙인 채 가슴을 바닥 가까이 내린다.','바닥을 밀어내며 처음 자세로 돌아온다.'],
+   angles:['팔꿈치 각도 90°까지 굽힘','몸통-엉덩이 일직선(0°) 유지']},
+  {id:'chest-fly', name:'체스트플라이 머신', part:'chest', equip:'머신', mine:false,
+   muscle:'대흉근 (내측 강조)',
+   steps:['패드에 등을 붙이고 팔꿈치를 살짝 굽힌 채 손잡이를 잡는다.','팔을 활처럼 모아 가슴 앞에서 손잡이를 맞닿게 한다.','천천히 양팔을 벌려 시작 자세로 되돌린다.'],
+   angles:['팔꿈치 각도 150° 고정(굽힘 유지)','손잡이가 가슴 정중앙에서 만나도록']},
+  {id:'dips', name:'딥스', part:'chest', equip:'맨몸', mine:false,
+   muscle:'대흉근 하부, 삼두근',
+   steps:['평행봉을 잡고 몸을 들어 올린 뒤 상체를 살짝 앞으로 기울인다.','팔꿈치를 굽히며 몸을 천천히 내린다.','가슴에 자극을 느낀 지점에서 다시 밀어 올린다.'],
+   angles:['팔꿈치 각도 90° 부근에서 정지','상체 전방 기울기 15~20°']},
+
+
+  // ---- 내가 다니는 헬스장의 빨간 해머스트렝스 머신 (사진으로 확인) ----
+  // 좌우 팔이 따로 움직이는 Iso-Lateral 계열, 원판을 직접 끼우는 플레이트 로디드.
+  // 자세 설명은 PT 선생님이 알려준 세팅 그대로.
+  {id:'hs-iso-incline-press', name:'인클라인 프레스 (빨간 머신)', part:'chest', equip:'머신 · 해머 아이소래터럴', mine:true,
+   alias:['빨간색 인클라인 프레스','인클라인 프레스','iso-lateral incline press','해머 인클라인'],
+   muscle:'대흉근 상부, 전면 삼각근, 삼두근',
+   steps:['손잡이를 기준으로 좌석 높이를 맞춘다 — 손잡이가 겨드랑이 바로 아래 오는 높이.',
+          '손잡이의 제일 안쪽을 잡고, 가슴과 허리는 편 상태를 유지한다.',
+          '약간 아래에서 위로 퍼올린다는 느낌으로 민다.',
+          '돌아올 때는 가슴이 손잡이를 마중 나가는 느낌으로 천천히 받아준다.'],
+   angles:['좌석 높이 = 손잡이가 겨드랑이 바로 아래','좌우 팔이 따로 움직이니 미는 거리를 양쪽 같게','기계 시작 중량 8lbs(3.6kg) · 원판은 양쪽에 따로 끼움']},
+  {id:'hs-iso-row', name:'로우 (빨간 머신)', part:'back', equip:'머신 · 해머 아이소래터럴', mine:true,
+   alias:['빨간색 로우','로우','iso-lateral row','해머 로우'],
+   muscle:'광배근, 능형근, 승모근 중부, 이두근',
+   steps:['다리를 잘 접지한 상태에서, 꼬리뼈부터 오리궁뎅이를 만든다 생각하고 앉는다.',
+          '아랫배꼽 정도만 패드에 붙이고 그 위쪽은 떼어, 뒤통수와 등이 90도 정도 되게 앉는다.',
+          '상체는 가만히 둔 채 날개뼈를 먼저 조이고, 팔로 당겨온 뒤 마지막에 다 같이 조여준다.',
+          '놓을 때는 상체가 딸려가지 않게 얌전히 되돌린다.'],
+   angles:['상체 고정 · 반동 금지','날개뼈 → 팔 순서로 당기기','기계 시작 중량 12lbs(5.4kg)']},
+  {id:'hs-iso-wide-pulldown', name:'와이드 풀다운 (빨간 머신)', part:'back', equip:'머신 · 해머 아이소래터럴', mine:true,
+   alias:['빨간색 풀다운','풀다운','iso-lateral wide pulldown','해머 풀다운'],
+   muscle:'광배근, 대원근, 이두근',
+   steps:['의자는 1~2칸 정도에 놓고, 손잡이는 제일 가까운 쪽을 잡는다.',
+          '오리궁뎅이를 만든 상태에서 상체를 살짝 눕혀, 시야 앞에 양쪽 팔이 보이도록 잡는다.',
+          '팔로 끌어내린 뒤, 어깨가 골반 쪽에 가까워지도록 어깨도 지그시 눌러준다.',
+          '놓을 때도 얌전히 되돌린다.'],
+   angles:['상체 살짝 뒤로 · 시야에 양팔이 보이는 각도','팔로 당긴 뒤 어깨를 눌러 마무리','기계 시작 중량 2lbs(0.9kg)']},
+  {id:'hs-iso-shoulder-press', name:'숄더프레스 (빨간 머신)', part:'shoulder', equip:'머신 · 해머 아이소래터럴', mine:true,
+   alias:['빨간색 프레스','숄더프레스','iso-lateral shoulder press','해머 프레스'],
+   muscle:'삼각근 전면·측면, 삼두근',
+   steps:['의자 높이를 먼저 세팅한다.',
+          '엄지 끝을 손잡이 끝에 맞춰서 잡는다.',
+          '팔꿈치가 몸통에서 벗어나지 않게 유지하며 위로 민다.',
+          '내릴 때는 어깨가 으쓱 올라가지 않게 천천히 내린다.'],
+   angles:['팔꿈치는 몸통 라인 안쪽 유지','엄지 끝 = 손잡이 끝','기계 시작 중량 10lbs(4.5kg)']},
+
+  // ---- 등 ----
+  {id:'lat-pulldown', name:'랫풀다운 (케이블)', part:'back', equip:'케이블', mine:false,
+   muscle:'광배근, 대원근, 이두근',
+   steps:['와이드 바를 어깨너비보다 넓게 잡고 가슴을 살짝 편다.','팔꿈치를 아래로 당기며 바를 쇄골 앞까지 내린다.','광배근에 힘을 유지한 채 천천히 바를 올려보낸다.'],
+   angles:['팔꿈치 각도 90°에서 마무리','상체 뒤 기울기 10° 이내로 제한'],
+   rig:{tpl:'stand',a:{shoulder:{a0:-155,a1:-15},elbow:{a0:15,a1:95}},glow:'lat-back',badge:'팔꿈치 90°에서 종료'}},
+  {id:'seated-row-machine', name:'시티드로우 (케이블)', part:'back', equip:'케이블', mine:false,
+   muscle:'광배근, 승모근 중부, 능형근',
+   steps:['가슴 패드에 상체를 기대거나 허리를 세우고 손잡이를 잡는다.','팔꿈치를 몸통 뒤로 당기며 견갑골을 모은다.','천천히 팔을 펴며 처음 자세로 되돌아온다.'],
+   angles:['팔꿈치 각도 70°까지 당김','상체는 수직 고정, 반동 금지'],
+   rig:{tpl:'stand',a:{torso:{a0:0,a1:0},shoulder:{a0:15,a1:-50},elbow:{a0:80,a1:70}},glow:'lat-back',badge:'상체 고정, 팔꿈치만 당기기'}},
+  {id:'assisted-pullup', name:'어시스트 풀업 머신', part:'back', equip:'머신', mine:true,
+   muscle:'광배근, 대원근, 이두근',
+   steps:['보조 무게를 설정하고 무릎(또는 발)을 패드 위에 올린다.','손잡이를 잡고 가슴이 손잡이 높이까지 오도록 몸을 끌어올린다.','천천히 팔을 펴며 시작 자세로 내려온다.'],
+   angles:['팔꿈치 각도 90°에서 정점','턱이 넘지 않아도 괜찮음, 가슴 높이가 기준'],
+   rig:{tpl:'stand',a:{shoulder:{a0:-165,a1:-20},elbow:{a0:10,a1:95}},glow:'lat-back',badge:'가슴이 손잡이 높이까지'}},
+  {id:'barbell-row', name:'바벨로우', part:'back', equip:'바벨', mine:false,
+   muscle:'광배근, 승모근, 능형근',
+   steps:['무릎을 살짝 굽히고 상체를 45°로 숙인다.','팔꿈치를 뒤로 당기며 바를 배꼽 쪽으로 끌어올린다.','천천히 팔을 펴 시작 자세로 되돌린다.'],
+   angles:['상체 기울기 약 45° 유지','팔꿈치 각도 40°까지 당김']},
+  {id:'face-pull', name:'페이스풀', part:'back', equip:'케이블', mine:false,
+   muscle:'후면 삼각근, 승모근 중하부',
+   steps:['로프를 얼굴 높이로 설정하고 양손으로 잡는다.','팔꿈치를 높게 유지하며 로프를 얼굴 쪽으로 당긴다.','견갑골을 모은 채 잠시 멈췄다가 되돌린다.'],
+   angles:['팔꿈치가 어깨 높이보다 살짝 위(약 100°)','당기는 방향은 눈높이~이마 사이']},
+  {id:'pullup', name:'풀업', part:'back', equip:'맨몸', mine:false,
+   muscle:'광배근, 대원근, 이두근',
+   steps:['어깨너비보다 넓게 바를 잡고 몸을 매단다.','턱이 바를 넘어갈 때까지 몸을 끌어올린다.','천천히 팔을 펴며 시작 자세로 내려온다.'],
+   angles:['팔꿈치 각도 90° 이하까지 당김','몸의 반동 없이 코어로 고정']},
+  {id:'one-arm-dumbbell-row', name:'원암 덤벨로우', part:'back', equip:'덤벨', mine:false,
+   muscle:'광배근, 능형근',
+   steps:['한 손과 무릎을 벤치에 올려 상체를 평행하게 만든다.','반대 손으로 덤벨을 잡고 팔꿈치를 몸통 옆으로 당긴다.','천천히 덤벨을 내려 시작 자세로 되돌린다.'],
+   angles:['상체는 바닥과 평행(약 0°)','팔꿈치 각도 40°까지 당김']},
+
+  // ---- 어깨 ----
+  {id:'overhead-press', name:'오버헤드프레스', part:'shoulder', equip:'바벨/덤벨', mine:false,
+   muscle:'삼각근 전면·측면, 삼두근',
+   steps:['바를 쇄골 앞에 두고 코어에 힘을 준다.','팔꿈치를 펴며 바를 머리 위로 곧게 밀어 올린다.','천천히 팔꿈치를 굽혀 시작 자세로 되돌린다.'],
+   angles:['상단에서 팔꿈치 완전 신전(약 170°)','허리가 과도하게 젖혀지지 않도록 주의'],
+   rig:{tpl:'stand',a:{shoulder:{a0:0,a1:-165},elbow:{a0:80,a1:0}},glow:'shoulder-delt',badge:'팔꿈치 완전 신전'}},
+  {id:'lateral-raise', name:'사이드 레터럴레이즈', part:'shoulder', equip:'덤벨', mine:false,
+   muscle:'삼각근 측면',
+   steps:['덤벨을 양손에 들고 팔꿈치를 살짝 굽힌다.','어깨 높이까지 팔을 옆으로 들어 올린다.','천천히 제자리로 내리며 반복한다.'],
+   angles:['팔꿈치 각도 약 160°(살짝 굽힘)로 고정','어깨보다 높이 들지 않기'],
+   rig:{tpl:'stand',a:{shoulder:{a0:0,a1:-78},elbow:{a0:20,a1:20}},glow:'shoulder-delt',badge:'어깨 높이까지만'}},
+  {id:'bent-over-lateral', name:'벤트오버 레터럴레이즈', part:'shoulder', equip:'덤벨', mine:false,
+   muscle:'삼각근 후면',
+   steps:['상체를 앞으로 숙이고 덤벨을 아래로 늘어뜨린다.','팔꿈치를 살짝 굽힌 채 양옆으로 들어 올린다.','견갑골을 모으듯 잠시 멈췄다가 내린다.'],
+   angles:['상체 기울기 약 70~80°','팔이 몸통과 이루는 각도 90°까지']},
+  {id:'front-raise', name:'프론트레이즈', part:'shoulder', equip:'덤벨', mine:false,
+   muscle:'삼각근 전면',
+   steps:['덤벨을 허벅지 앞에 두고 선다.','팔을 곧게 편 채 어깨 높이까지 들어 올린다.','천천히 제자리로 내린다.'],
+   angles:['들어올린 팔이 바닥과 이루는 각도 90°','반동 없이 삼각근 힘으로만 들기']},
+  {id:'upright-row', name:'업라이트로우', part:'shoulder', equip:'바벨/EZ바', mine:false,
+   muscle:'삼각근 측면, 승모근',
+   steps:['바를 좁게 잡고 몸 앞에 늘어뜨린다.','팔꿈치를 손목보다 높게 유지하며 바를 쇄골까지 끌어올린다.','천천히 제자리로 내린다.'],
+   angles:['팔꿈치가 손목보다 항상 높게','바가 몸에서 멀어지지 않도록 유지']},
+
+  // ---- 팔 ----
+  {id:'bicep-curl', name:'바이셉컬', part:'arm', equip:'덤벨/바벨', mine:false,
+   muscle:'상완이두근',
+   steps:['팔꿈치를 몸통 옆에 고정하고 덤벨을 잡는다.','팔꿈치만 굽혀 덤벨을 어깨 쪽으로 들어 올린다.','천천히 팔을 펴며 시작 자세로 되돌린다.'],
+   angles:['팔꿈치 각도 30°~150° 사이에서 반복','상완이 앞뒤로 움직이지 않게 고정'],
+   rig:{tpl:'stand',a:{elbow:{a0:5,a1:-140}},glow:'bicep',badge:'팔꿈치 30°~150°'}},
+  {id:'tricep-pushdown', name:'트라이셉 프레스다운', part:'arm', equip:'케이블', mine:false,
+   muscle:'상완삼두근',
+   steps:['팔꿈치를 몸통 옆에 고정하고 바를 잡는다.','팔꿈치만 펴며 바를 아래로 끝까지 민다.','천천히 팔꿈치를 굽혀 시작 자세로 되돌린다.'],
+   angles:['팔꿈치 완전 신전까지 밀어내기','상완이 움직이지 않도록 고정'],
+   rig:{tpl:'stand',a:{shoulder:{a0:22,a1:22},elbow:{a0:-90,a1:5}},glow:'tricep',badge:'팔꿈치 고정, 완전 신전'}},
+  {id:'hammer-curl', name:'해머컬', part:'arm', equip:'덤벨', mine:false,
+   muscle:'상완이두근, 상완근, 전완근',
+   steps:['덤벨을 손바닥이 서로 마주보게(뉴트럴 그립) 잡는다.','팔꿈치만 굽혀 덤벨을 들어 올린다.','천천히 팔을 펴며 되돌린다.'],
+   angles:['팔꿈치 각도 30°~150°','손목이 꺾이지 않게 중립 유지']},
+  {id:'skull-crusher', name:'스컬크러셔', part:'arm', equip:'EZ바/덤벨', mine:false,
+   muscle:'상완삼두근',
+   steps:['벤치에 누워 바를 이마 위쪽으로 든다.','팔꿈치만 굽혀 바를 이마 가까이 내린다.','팔꿈치를 펴며 시작 자세로 되돌린다.'],
+   angles:['팔꿈치 각도 약 30°까지 굽힘','상완은 수직으로 고정']},
+  {id:'concentration-curl', name:'컨센트레이션컬', part:'arm', equip:'덤벨', mine:false,
+   muscle:'상완이두근',
+   steps:['앉아서 팔꿈치를 허벅지 안쪽에 대고 고정한다.','팔꿈치만 굽혀 덤벨을 들어 올린다.','천천히 펴며 되돌린다.'],
+   angles:['팔꿈치 각도 20°~150°','상완이 허벅지에서 떨어지지 않게 고정']},
+  {id:'tricep-kickback', name:'트라이셉 킥백', part:'arm', equip:'덤벨', mine:false,
+   muscle:'상완삼두근',
+   steps:['상체를 숙이고 상완을 몸통과 평행하게 든다.','팔꿈치만 펴서 덤벨을 뒤로 밀어낸다.','천천히 굽히며 되돌린다.'],
+   angles:['상완은 바닥과 평행(0°) 고정','팔꿈치 완전 신전까지 밀기']},
+
+  // ---- 하체 ----
+  {id:'deadlift-barbell', name:'데드리프트 (바벨)', part:'leg', equip:'바벨', mine:true,
+   muscle:'둔근, 햄스트링, 척추기립근',
+   steps:['바를 정강이에 가깝게 두고 무릎을 살짝 굽혀 선다.','등을 편 채 고관절을 접으며 바를 잡는다.','고관절을 펴며 바를 몸에 붙여 들어 올린다.'],
+   angles:['고관절 힌지 각도 약 45°에서 시작','무릎 각도는 크게 변하지 않게 유지'],
+   rig:{tpl:'stand',a:{torso:{a0:0,a1:-52},thigh:{a0:0,a1:-14},shin:{a0:0,a1:18}},glow:'hamstring',badge:'고관절 힌지 45°'}},
+  {id:'deadlift-machine', name:'데드리프트 머신 (사이드 그립)', part:'leg', equip:'머신', mine:true,
+   muscle:'둔근, 햄스트링, 척추기립근',
+   steps:['발판 위에 서서 양옆 손잡이를 잡는다.','등을 편 채 고관절을 접어 상체를 숙인다.','고관절을 펴며 몸을 일으켜 세운다.'],
+   angles:['고관절 힌지 각도 약 40°','정해진 궤적을 따라가므로 무릎 각도는 거의 고정'],
+   rig:{tpl:'stand',a:{torso:{a0:0,a1:-46},thigh:{a0:0,a1:-8},shin:{a0:0,a1:10}},glow:'hamstring',badge:'고관절 힌지, 고정 궤적'}},
+  {id:'hack-squat', name:'핵스쿼트 머신', part:'leg', equip:'머신', mine:true,
+   muscle:'대퇴사두근, 둔근',
+   steps:['등과 어깨를 패드에 완전히 밀착한다.','무릎이 발끝 방향을 향하도록 천천히 내려간다.','발바닥 전체로 밀며 원위치로 올라온다.'],
+   angles:['무릎 각도 약 90°까지 내려가기','등은 패드에서 뜨지 않도록 고정'],
+   rig:{tpl:'stand',a:{thigh:{a0:0,a1:-46},shin:{a0:0,a1:88}},glow:'glute-thigh',badge:'무릎 90°, 등은 패드 고정'}},
+  {id:'squat-free', name:'스쿼트 (바벨/맨몸)', part:'leg', equip:'바벨/맨몸', mine:false,
+   muscle:'대퇴사두근, 둔근, 햄스트링',
+   steps:['발을 어깨너비로 벌리고 가슴을 편다.','고관절과 무릎을 동시에 접으며 앉는다.','발바닥으로 지면을 밀며 일어선다.'],
+   angles:['무릎 각도 약 90°(허벅지가 바닥과 평행)','무릎이 발끝 방향과 일치'],
+   rig:{tpl:'stand',a:{thigh:{a0:0,a1:-48},shin:{a0:0,a1:92},torso:{a0:0,a1:-10}},glow:'glute-thigh',badge:'무릎 각도 90°'}},
+  {id:'leg-press', name:'레그프레스 머신', part:'leg', equip:'머신', mine:false,
+   muscle:'대퇴사두근, 둔근',
+   steps:['발판에 발을 어깨너비로 올린다.','무릎이 가슴에 가깝게 오도록 천천히 내린다.','무릎을 다 펴지 않고 발판을 밀어낸다.'],
+   angles:['무릎 각도 약 90°까지 굽힘','무릎을 완전히 펴 잠그지 않기']},
+  {id:'lunge', name:'런지', part:'leg', equip:'덤벨/맨몸', mine:false,
+   muscle:'대퇴사두근, 둔근',
+   steps:['한 발을 크게 앞으로 내딛는다.','양 무릎이 90°가 되도록 몸을 내린다.','앞발로 밀어 시작 자세로 돌아온다.'],
+   angles:['앞무릎 각도 약 90°(발끝을 넘지 않게)','뒷무릎은 바닥 가까이만']},
+  {id:'leg-curl', name:'레그컬 머신', part:'leg', equip:'머신', mine:false,
+   muscle:'햄스트링',
+   steps:['패드를 발목 뒤에 걸고 엎드리거나 앉는다.','무릎을 굽혀 패드를 엉덩이 쪽으로 당긴다.','천천히 펴며 되돌린다.'],
+   angles:['무릎 각도 30°까지 굽힘','고관절은 움직이지 않게 고정']},
+  {id:'leg-extension', name:'레그익스텐션 머신', part:'leg', equip:'머신', mine:false,
+   muscle:'대퇴사두근',
+   steps:['패드를 발목 앞에 걸고 앉는다.','무릎을 펴며 패드를 들어 올린다.','천천히 굽히며 되돌린다.'],
+   angles:['무릎 완전 신전까지(약 170°)','등은 등받이에 밀착 고정']},
+  {id:'hip-thrust', name:'힙쓰러스트', part:'leg', equip:'바벨', mine:false,
+   muscle:'둔근',
+   steps:['어깨를 벤치에 기대고 바를 골반 위에 올린다.','발바닥으로 밀며 골반을 천장으로 들어 올린다.','천천히 내리며 반복한다.'],
+   angles:['상단에서 고관절 완전 신전(몸통-허벅지 일직선)','무릎 각도 약 90° 유지']},
+  {id:'calf-raise', name:'카프레이즈', part:'leg', equip:'머신/맨몸', mine:false,
+   muscle:'비복근, 가자미근',
+   steps:['발볼로 플랫폼을 딛고 선다.','발뒤꿈치를 최대한 높이 든다.','천천히 내려 발뒤꿈치를 바닥 가까이 늘린다.'],
+   angles:['발목 저측굴곡 최대치까지','무릎은 편 상태 유지']},
+  {id:'good-morning', name:'굿모닝', part:'leg', equip:'바벨', mine:false,
+   muscle:'햄스트링, 척추기립근',
+   steps:['바를 어깨에 얹고 무릎을 살짝 굽힌다.','고관절을 접으며 상체를 숙인다.','고관절을 펴며 원위치로 돌아온다.'],
+   angles:['고관절 힌지 각도 약 60°','무릎 각도는 거의 변화 없이 고정']},
+  {id:'hip-abduction', name:'힙 어브덕션 머신', part:'leg', equip:'머신', mine:false,
+   muscle:'중둔근, 대퇴근막장근',
+   steps:['패드에 앉아 무릎 바깥쪽에 패드를 댄다.','다리를 바깥으로 벌린다.','천천히 모으며 되돌린다.'],
+   angles:['다리가 벌어지는 각도 약 40°','상체는 움직이지 않게 고정']},
+
+  // ---- 코어 ----
+  {id:'plank', name:'플랭크', part:'core', equip:'맨몸', mine:false,
+   muscle:'복직근, 코어 전체',
+   steps:['팔꿈치와 발끝으로 몸을 지탱한다.','머리부터 발끝까지 일직선을 만든다.','호흡하며 자세를 유지한다.'],
+   angles:['몸통-엉덩이 일직선(0°) 유지','엉덩이가 처지거나 올라가지 않도록'],
+   rig:{tpl:'plank',wrap:-90,a:{shoulder:{a0:-90,a1:-90},elbow:{a0:95,a1:95}},glow:'core-abs',badge:'몸통 일직선(0°) 유지',breathe:true}},
+  {id:'side-plank', name:'사이드플랭크', part:'core', equip:'맨몸', mine:false,
+   muscle:'복사근',
+   steps:['옆으로 누워 팔꿈치로 상체를 지탱한다.','골반을 들어 올려 몸을 일직선으로 만든다.','자세를 유지하며 호흡한다.'],
+   angles:['몸통 일직선(0°) 유지','골반이 아래로 처지지 않도록']},
+  {id:'crunch', name:'크런치', part:'core', equip:'맨몸', mine:false,
+   muscle:'복직근',
+   steps:['무릎을 굽히고 손을 귀 옆에 가볍게 댄다.','복부 힘으로 상체를 살짝 말아 올린다.','천천히 내리며 반복한다.'],
+   angles:['상체가 들리는 각도 약 30°면 충분','목이 아닌 복부 힘으로 들어올리기']},
+  {id:'mountain-climber', name:'마운틴클라이머', part:'core', equip:'맨몸', mine:false,
+   muscle:'복직근, 코어, 유산소',
+   steps:['플랭크 자세에서 시작한다.','무릎을 번갈아 가슴 쪽으로 빠르게 당긴다.','골반 높이를 일정하게 유지한다.'],
+   angles:['당겨진 무릎 각도 약 45°','몸통 일직선(0°) 유지']},
+  {id:'hanging-leg-raise', name:'행잉레그레이즈', part:'core', equip:'맨몸', mine:false,
+   muscle:'복직근 하부',
+   steps:['바에 매달려 몸을 곧게 편다.','다리를 곧게 편 채 골반 높이까지 들어 올린다.','천천히 내리며 반복한다.'],
+   angles:['다리가 몸통과 이루는 각도 약 90°','반동 없이 복부 힘으로 들기']},
+  {id:'russian-twist', name:'러시안트위스트', part:'core', equip:'맨몸/덤벨', mine:false,
+   muscle:'복사근',
+   steps:['무릎을 굽히고 상체를 살짝 뒤로 기울인다.','양손을 좌우로 번갈아 회전시킨다.','코어에 힘을 유지하며 반복한다.'],
+   angles:['상체 기울기 약 45°','회전 각도는 무리하지 않는 범위까지']},
+];
+
+const EX_BY_ID = Object.fromEntries(EXERCISES.map(e=>[e.id,e]));
+// 처음 열었을 때 즐겨찾기에 미리 담아두는 운동. 이후에는 사용자가 별을 눌러 자유롭게 넣고 뺄 수 있다.
+const DEFAULT_FAVS = EXERCISES.filter(e=>e.mine).map(e=>e.id);
+function allExercises(){ return EXERCISES.concat(state.customExercises); }
+function getEx(id){ return EX_BY_ID[id] || state.customExercises.find(e=>e.id===id); }
+
+/* ---- 즐겨찾기 (내가 자주 하는 운동) ---- */
+function isFav(id){ return state.favorites.has(id); }
+function myRoutine(){ return allExercises().filter(e=>state.favorites.has(e.id)); }
+function saveFavs(){ lsSave(); }
+function toggleFav(id){
+  const ex = getEx(id);
+  if(state.favorites.has(id)) state.favorites.delete(id);
+  else state.favorites.add(id);
+  saveFavs();
+  showToast(isFav(id) ? `즐겨찾기에 추가: ${ex?ex.name:''}` : `즐겨찾기에서 제거: ${ex?ex.name:''}`);
+  refreshFavViews();
+}
+function favBtnHtml(id){
+  return `<button class="fav-btn ${isFav(id)?'on':''}" data-fav="${id}" aria-label="즐겨찾기" title="${isFav(id)?'즐겨찾기에서 빼기':'즐겨찾기에 넣기'}">${isFav(id)?'★':'☆'}</button>`;
+}
+function wireFavButtons(root){
+  root.querySelectorAll('[data-fav]').forEach(btn=>{
+    btn.addEventListener('click', ev=>{
+      ev.stopPropagation();
+      ev.preventDefault();
+      toggleFav(btn.dataset.fav);
+    });
+  });
+}
+function refreshFavViews(){
+  const v = document.querySelector('.tab-btn.active')?.dataset.view;
+  if(v==='library') renderLibrary();
+  const pk = document.getElementById('pickerOverlay');
+  if(pk && pk.classList.contains('open')) renderPickerList(document.getElementById('pickerSearch').value);
+  const ov = document.getElementById('exOverlay');
+  if(ov && ov.classList.contains('open') && ov.dataset.exid){
+    const id = ov.dataset.exid;
+    const pill = document.getElementById('exFavPill');
+    if(pill){
+      pill.classList.toggle('on', isFav(id));
+      pill.innerHTML = `${isFav(id)?'★':'☆'} ${isFav(id)?'내가 자주 하는 운동':'즐겨찾기에 넣기'}`;
+    }
+  }
+}
+
+/* =========================================================
+   선생님(PT) 운동법 — 운동별로 날짜마다 여러 장 쌓인다.
+   ========================================================= */
+function ptPlansFor(exId){
+  return (state.ptPlans[exId] || []).slice().sort((a,b)=> a.date<b.date ? 1 : (a.date>b.date ? -1 : 0));
+}
+function latestPtPlan(exId){ return ptPlansFor(exId)[0] || null; }
+function ptPlanById(exId, planId){ return (state.ptPlans[exId]||[]).find(p=>p.id===planId) || null; }
+function hasPtPlan(exId){ return !!(state.ptPlans[exId] && state.ptPlans[exId].length); }
+
+/* 선생님이 보내준 글을 그대로 붙여넣으면 무게·횟수·세트로 나눠 담는다.
+   "인클라인 20kg 12회 4세트", "랫풀다운 25 x 10 x 3", "3세트 12회 20킬로" 같은 표현을 읽는다.
+   숫자를 못 찾은 줄은 그대로 '방법' 설명으로 남긴다. */
+function parsePtText(text){
+  const sets = [], methodLines = [];
+  String(text||'').split(/\r?\n/).forEach(line=>{
+    const t = line.trim();
+    if(!t){ return; }
+    let weight = null, reps = null, count = 1, matched = false;
+
+    const mW = t.match(/(\d+(?:\.\d+)?)\s*(?:kg|KG|Kg|킬로|㎏)/);
+    if(mW){ weight = mW[1]; matched = true; }
+    const mR = t.match(/(\d+)\s*(?:회|번|개|reps?|RM)/i);
+    if(mR){ reps = mR[1]; matched = true; }
+    const mS = t.match(/(\d+)\s*(?:세트|셋트|sets?)/i);
+    if(mS){ count = Math.min(20, Math.max(1, parseInt(mS[1],10))); matched = true; }
+
+    // "20 x 12 x 3" / "20*12*3" 처럼 단위 없이 쓴 경우
+    if(!matched){
+      const mX = t.match(/(\d+(?:\.\d+)?)\s*[x×*]\s*(\d+)(?:\s*[x×*]\s*(\d+))?/i);
+      if(mX){
+        weight = mX[1]; reps = mX[2];
+        if(mX[3]) count = Math.min(20, Math.max(1, parseInt(mX[3],10)));
+        matched = true;
+      }
+    }
+    if(matched && (weight!==null || reps!==null)){
+      const label = t.replace(/\s+/g,' ');
+      for(let i=0;i<count;i++) sets.push({weight: weight??'', reps: reps??'', src:label});
+    }else{
+      methodLines.push(t);
+    }
+  });
+  return {sets, method: methodLines.join('\n')};
+}
+function ptPlanSummary(plan){
+  if(!plan) return '';
+  if(!plan.sets.length) return (plan.method||'').split('\n')[0].slice(0,40);
+  const g = {};
+  plan.sets.forEach(x=>{ const k = `${x.weight||'-'}|${x.reps||'-'}`; g[k]=(g[k]||0)+1; });
+  return Object.entries(g).map(([k,n])=>{
+    const [w,r] = k.split('|');
+    return `${w!=='-'?w+'kg ':''}${r!=='-'?r+'회':''} × ${n}세트`.trim();
+  }).join(' · ');
+}
+async function savePtPlan(exId, plan){
+  const list = (state.ptPlans[exId] || []).filter(p=>p.id!==plan.id);
+  list.push(plan);
+  state.ptPlans[exId] = list;
+  lsSave();
+}
+async function deletePtPlan(exId, planId){
+  state.ptPlans[exId] = (state.ptPlans[exId]||[]).filter(p=>p.id!==planId);
+  lsSave();
+}
+
+/* ---- 외부 레퍼런스 검색용 영문 운동명 ----
+   실제 시범 영상/GIF은 원 저작자 사이트에서 바로 보도록 링크로 연결한다.
+   (외부 이미지는 아티팩트 보안정책상 페이지 안에 표시할 수 없고,
+    남의 GIF을 복사해 넣는 것도 아니라서 '원본에서 보기' 방식으로 처리) */
+const EX_EN = {
+  'incline-press-machine':'Incline Chest Press Machine','chest-press-recline':'Machine Chest Press',
+  'bench-press':'Bench Press','pushup':'Push Up','chest-fly':'Pec Deck Fly','dips':'Chest Dip',
+  'lat-pulldown':'Lat Pulldown','seated-row-machine':'Seated Cable Row','assisted-pullup':'Assisted Pull Up',
+  'barbell-row':'Barbell Row','face-pull':'Face Pull','pullup':'Pull Up','one-arm-dumbbell-row':'One Arm Dumbbell Row',
+  'overhead-press':'Overhead Press','lateral-raise':'Dumbbell Lateral Raise','bent-over-lateral':'Bent Over Lateral Raise',
+  'front-raise':'Dumbbell Front Raise','upright-row':'Upright Row',
+  'bicep-curl':'Biceps Curl','tricep-pushdown':'Triceps Pushdown','hammer-curl':'Hammer Curl',
+  'skull-crusher':'Skull Crusher','concentration-curl':'Concentration Curl','tricep-kickback':'Triceps Kickback',
+  'deadlift-barbell':'Deadlift','deadlift-machine':'Machine Deadlift','hack-squat':'Hack Squat',
+  'squat-free':'Barbell Squat','leg-press':'Leg Press','lunge':'Lunge','leg-curl':'Leg Curl',
+  'leg-extension':'Leg Extension','hip-thrust':'Hip Thrust','calf-raise':'Calf Raise',
+  'good-morning':'Good Morning','hip-abduction':'Hip Abduction',
+  'plank':'Plank','side-plank':'Side Plank','crunch':'Crunch','mountain-climber':'Mountain Climber',
+  'hanging-leg-raise':'Hanging Leg Raise','russian-twist':'Russian Twist',
+};
+function refLinksHtml(e){
+  const q = EX_EN[e.id] || e.name;
+  const fp = `https://fitnessprogramer.com/?s=${encodeURIComponent(q)}`;
+  const yt = `https://www.youtube.com/results?search_query=${encodeURIComponent(q+' proper form')}`;
+  return `<div class="ex-ref">
+      <a href="${fp}" target="_blank" rel="noopener">↗ FitnessProgramer 동작 영상</a>
+      <a href="${yt}" target="_blank" rel="noopener">↗ YouTube 자세 영상</a>
+    </div>
+    <div class="ex-ref-note">위 애니메이션은 각도 감각만 잡기 위한 자체 제작 예시예요. 실제 시범 GIF·영상은 원 저작자 사이트에서 바로 열려요.</div>`;
+}
+
+/* =========================================================
+   동작 이미지 (외부 GIF) — 아티팩트가 아닌 일반 웹페이지라서 그대로 표시된다.
+   기본값은 fitnessprogramer.com 원본을 그 주소로 직접 불러오는 것이고(복제 아님,
+   출처 표기 + 원문 링크 유지), 목록에 없는 운동은 아래 '이미지 주소' 칸에
+   원하는 GIF/이미지 URL을 넣으면 그 운동에 계속 쓰인다.
+   ========================================================= */
+const FP = 'https://fitnessprogramer.com/wp-content/uploads/';
+const EX_GIF = {
+  'incline-press-machine':FP+'2021/06/Lever-Incline-Chest-Press.gif',
+  'chest-press-recline':FP+'2021/06/Lever-Chest-Press.gif',
+  'bench-press':FP+'2021/02/Barbell-Bench-Press.gif',
+  'pushup':FP+'2021/02/Push-Up.gif',
+  'lat-pulldown':FP+'2021/02/Lat-Pulldown.gif',
+  'seated-row-machine':FP+'2021/02/Seated-Cable-Row.gif',
+  'assisted-pullup':FP+'2021/04/Assisted-Pull-up.gif',
+  'barbell-row':FP+'2021/02/Barbell-Bent-Over-Row.gif',
+  'pullup':FP+'2021/02/Pull-up.gif',
+  'lateral-raise':FP+'2021/02/Dumbbell-Lateral-Raise.gif',
+  'bicep-curl':FP+'2021/02/Barbell-Curl.gif',
+  'deadlift-barbell':FP+'2021/02/Barball-Deadlift.gif',
+  'hack-squat':FP+'2021/02/Sled-Hack-Squat.gif',
+  'leg-press':FP+'2015/11/Leg-Press.gif',
+  'leg-extension':FP+'2021/02/LEG-EXTENSION.gif',
+  'plank':FP+'2021/02/plank.gif',
+  'hs-iso-incline-press':FP+'2021/09/Lever-Incline-Hammer-Chest-Press.gif',
+  'hs-iso-row':FP+'2022/02/Plate-Loaded-Seated-Row.gif',
+  'hs-iso-wide-pulldown':FP+'2021/05/Front-Pulldown.gif',
+  'hs-iso-shoulder-press':FP+'2022/04/Plate-Loaded-Shoulder-Press.gif',
+};
+function exImgUrl(id){
+  const custom = state.exImages && state.exImages[id];
+  return (custom && custom.trim()) || EX_GIF[id] || '';
+}
+function isFpUrl(u){ return /^https?:\/\/([a-z0-9-]+\.)*fitnessprogramer\.com\//i.test(u); }
+function exStageHtml(e, color){
+  const url = exImgUrl(e.id);
+  if(url){
+    return `<div class="rig-stage img-stage">
+      <img src="${url}" alt="${e.name} 동작" loading="lazy"
+           onerror="this.closest('.img-stage').classList.add('img-fail')">
+      <div class="img-fail-note">이미지를 불러오지 못했어요.<br>아래에서 다른 주소를 넣어보세요.</div>
+    </div>
+    <div class="img-credit">
+      <span>${isFpUrl(url)? '출처: fitnessprogramer.com' : '직접 지정한 이미지'}</span>
+      <a href="${url}" target="_blank" rel="noopener">원본 열기 ↗</a>
+    </div>`;
+  }
+  // 실제 이미지가 없으면 비워 둔다 (직접 그린 그림으로 대체하지 않음)
+  return `<div class="rig-stage img-stage img-none">
+      <div class="img-fail-note" style="display:block">이 운동은 아직 동작 이미지가 없어요.<br>아래 ④에서 GIF·이미지 주소를 넣으면 여기에 표시돼요.</div>
+    </div>`;
+}
+function exThumbHtml(e, color, cls){
+  const url = exImgUrl(e.id);
+  if(url) return `<img class="thumb-img" src="${url}" alt="" loading="lazy" onerror="this.style.display='none'">`;
+  return `<span class="${cls}" style="color:${color}">${PARTS[e.part].label[0]}</span>`;
+}
+function setExImage(id, url){
+  state.exImages[id] = url.trim();
+  if(!state.exImages[id]) delete state.exImages[id];
+  lsSave();
+  const v = document.querySelector('.tab-btn.active')?.dataset.view;
+  if(v==='library') renderLibrary();
+  renderDayIfOpen(state.selectedDate);
+  openExerciseDetail(id);
+}
+
+/* =========================================================
+   rig svg builder
+   ========================================================= */
+function jointStyle(j){
+  if(!j) return '';
+  const a0 = (j.a0??0)+'deg', a1=(j.a1??0)+'deg';
+  return `--a0:${a0};--a1:${a1}`;
+}
+let rigIdSeq=0;
+function buildRigSVG(rig, color){
+  const a = rig.a||{};
+  const glow = GLOW_POS[rig.glow] || GLOW_POS['core-abs'];
+  const wrapT = (rig.tpl==='lie'||rig.tpl==='plank') ? `rotate(${rig.wrap??-90} 115 120)` : '';
+  const bob = rig.bob ? `--b0:${rig.bob.b0}px;--b1:${rig.bob.b1}px` : '';
+  const breatheClass = rig.breathe ? 'breather' : '';
+  const fid = 'glow'+(rigIdSeq++);
+  return `
+  <svg viewBox="0 0 220 220" role="img" aria-label="운동 동작 예시 애니메이션">
+    <defs>
+      <filter id="${fid}" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="6"/>
+      </filter>
+    </defs>
+    <g class="${breatheClass}" style="transform-origin:115px 120px">
+      <g transform="${wrapT}">
+        <g class="bobber" style="${bob}">
+          <line x1="20" y1="206" x2="200" y2="206" stroke="rgba(255,255,255,.14)" stroke-width="2"/>
+          <ellipse class="glow" cx="${glow.cx}" cy="${glow.cy}" rx="${glow.rx}" ry="${glow.ry}" fill="${color}" filter="url(#${fid})"/>
+          <ellipse class="glow" cx="${glow.cx}" cy="${glow.cy}" rx="${glow.rx*.62}" ry="${glow.ry*.62}" fill="${color}" opacity=".85"/>
+          <!-- thigh + shin -->
+          <g class="jointRotate" style="transform-origin:100px 118px;${jointStyle(a.thigh)}">
+            <line x1="100" y1="118" x2="100" y2="158" stroke="var(--rig-ink)" stroke-width="15" stroke-linecap="round"/>
+            <g class="jointRotate" style="transform-origin:100px 158px;${jointStyle(a.shin)}">
+              <line x1="100" y1="158" x2="100" y2="200" stroke="var(--rig-ink)" stroke-width="13" stroke-linecap="round"/>
+              <path d="M100,200 h22 l-5,8 h-17 z" fill="var(--rig-ink)"/>
+            </g>
+          </g>
+          <!-- pelvis block -->
+          <ellipse cx="100" cy="118" rx="13" ry="10" fill="var(--rig-ink)"/>
+          <!-- torso + head + arm -->
+          <g class="jointRotate" style="transform-origin:100px 118px;${jointStyle(a.torso)}">
+            <path d="M82,56 Q100,50 118,56 L109,120 Q100,124 91,120 Z" fill="var(--rig-ink)"/>
+            <circle cx="100" cy="41" r="15" fill="var(--rig-ink)"/>
+            <g class="jointRotate" style="transform-origin:100px 58px;${jointStyle(a.shoulder)}">
+              <line x1="100" y1="58" x2="112" y2="86" stroke="var(--rig-ink)" stroke-width="10" stroke-linecap="round"/>
+              <g class="jointRotate" style="transform-origin:112px 86px;${jointStyle(a.elbow)}">
+                <line x1="112" y1="86" x2="112" y2="112" stroke="var(--rig-ink)" stroke-width="9" stroke-linecap="round"/>
+                <circle cx="112" cy="112" r="6" fill="var(--rig-ink)"/>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </svg>`;
+}
+
+/* =========================================================
+   db layer (with in-memory fallback)
+   ========================================================= */
+let db = null;
+const state = {
+  logs:{},           // 'YYYY-MM-DD' -> log object
+  supplements:[],    // {id,name}
+  customExercises:[],// user-added exercises, same shape as EXERCISES entries
+  exImages:{},       // 운동 id -> 직접 지정한 이미지 URL
+  favorites:new Set(DEFAULT_FAVS), // 즐겨찾기 = '내가 자주 하는 운동' (사용자가 넣고 뺄 수 있음)
+  ptPlans:{},        // 운동 id -> [선생님 운동법 기록]
+  draft:null,        // 열려 있는 하루 기록의 편집 중 사본 (저장 눌러야 반영)
+  draftDate:null,
+  dirty:false,
+  favLoaded:false,
+  month:new Date(),
+  selectedDate:null,
+  pickerSelection:new Set(),
+};
+
+function pad2(n){return String(n).padStart(2,'0');}
+function fmtDate(d){return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;}
+function todayStr(){return fmtDate(new Date());}
+function emptyMeal(){ return {text:'', time:''}; }
+function emptyLog(date){
+  return {date, workout:{type:'none',durationMin:'',exercises:[],memo:''},
+           diet:{breakfast:emptyMeal(), lunch:emptyMeal(), dinner:emptyMeal(), snacks:[], memo:''},
+           water:{ml:0,goal:2000}, supplementsTaken:[],
+           inbody:null};
+}
+// 예전 저장본은 끼니가 문자열이고 간식이 하나였다. 새 구조로 올려준다.
+function normalizeMeal(v){
+  if(v && typeof v==='object') return {text:v.text||'', time:v.time||''};
+  return {text: v? String(v):'', time:''};
+}
+function normalizeDiet(raw){
+  const d = raw || {};
+  let snacks = Array.isArray(d.snacks) ? d.snacks.map(normalizeMeal) : [];
+  if(!snacks.length && d.snack) snacks = [normalizeMeal(d.snack)];
+  return {
+    breakfast: normalizeMeal(d.breakfast), lunch: normalizeMeal(d.lunch),
+    dinner: normalizeMeal(d.dinner), snacks, memo: d.memo||'',
+  };
+}
+function emptySet(){ return {reps:'', weight:'', failed:false, failReason:''}; }
+function normalizeSet(x){
+  const s = (x && typeof x==='object') ? x : {};
+  return {reps:s.reps??'', weight:s.weight??'', failed:!!s.failed, failReason:s.failReason||''};
+}
+// 저장된 기록을 현재 스키마로 맞춘다. 예전 버전이 쓴 문서(workout.exerciseIds)나
+// 필드가 빠진 문서를 열어도 화면이 깨지지 않게 하기 위한 이관/보정 단계.
+function normalizeLog(raw, date){
+  const base = emptyLog(date || (raw && raw.date));
+  if(!raw || typeof raw!=='object') return base;
+  const w = raw.workout || {};
+  let exercises = Array.isArray(w.exercises) ? w.exercises : null;
+  if(!exercises){
+    const ids = Array.isArray(w.exerciseIds) ? w.exerciseIds : [];
+    exercises = ids.map(id=>({id, warmupSets:[], workSets:[emptySet()]}));
+  }
+  exercises = exercises.filter(e=>e && e.id).map(e=>({
+    id: e.id,
+    mode: e.mode==='pt' ? 'pt' : 'mine',      // 선생님 운동법대로 / 내 방식대로
+    ptPlanId: e.ptPlanId || null,             // 따라한 선생님 운동법
+    note: e.note || '',                       // 운동 중 메모
+    warmupSets: (Array.isArray(e.warmupSets) ? e.warmupSets : []).map(normalizeSet),
+    workSets: (Array.isArray(e.workSets) && e.workSets.length ? e.workSets : [emptySet()]).map(normalizeSet),
+  }));
+  return {
+    ...base, ...raw,
+    date: date || raw.date || base.date,
+    workout: {type: w.type||'none', durationMin: w.durationMin??'', memo: w.memo??'', exercises},
+    diet: normalizeDiet(raw.diet),
+    water: {...base.water, ...(raw.water||{})},
+    supplementsTaken: Array.isArray(raw.supplementsTaken) ? raw.supplementsTaken : [],
+    inbody: (raw.inbody && typeof raw.inbody==='object') ? raw.inbody : null,
+  };
+}
+function getLog(date){
+  // 하루 기록 모달이 열려 있는 날짜는 '저장 전 사본'을 본다 (저장 눌러야 실제 반영)
+  if(state.draft && date===state.draftDate) return state.draft;
+  const l = state.logs[date];
+  return l ? normalizeLog(l, date) : emptyLog(date);
+}
+
+let saveTimer=null;
+// patch: partial log fields to merge. opts.refresh=true re-renders the open day sheet
+// immediately (use for button/toggle actions); leave false (default) for free-typing
+// inputs so the field the user is typing in never loses focus.
+function queueSave(date, patch, opts={}){
+  const cur = getLog(date);
+  const merged = {...cur, ...patch, date};
+  // 편집 중인 날짜라면 사본만 바꾸고, 달력·서버에는 손대지 않는다.
+  if(state.draft && date===state.draftDate){
+    state.draft = merged;
+    markDirty(true);
+    if(opts.refresh) renderDaySheet(date);
+    return;
+  }
+  state.logs[date]=merged;
+  renderCalendar();
+  if(opts.refresh) renderDayIfOpen(date);
+  const statusEl = document.getElementById('saveStatus');
+  if(statusEl) statusEl.textContent='저장 중…';
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>persist(date, merged), 350);
+}
+const LS_KEY = 'fitlog.v1';
+let lsWarned = false;
+function lsSave(){
+  const payload = {
+    v:1,
+    logs: state.logs,
+    supplements: state.supplements,
+    customExercises: state.customExercises,
+    exImages: state.exImages,
+    ptPlans: state.ptPlans,
+    favorites: [...state.favorites],
+    savedAt: new Date().toISOString(),
+  };
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(payload));
+    return true;
+  }catch(err){
+    if(!lsWarned){ lsWarned = true; showToast('저장 공간에 쓸 수 없어요. 백업을 받아두세요.'); }
+    return false;
+  }
+}
+function lsLoad(){
+  let raw = null;
+  try{ raw = localStorage.getItem(LS_KEY); }catch(err){ return null; }
+  if(!raw) return null;
+  try{ return JSON.parse(raw); }catch(err){ return null; }
+}
+async function persist(date, data){
+  const ok = lsSave();
+  if(!ok){
+    const statusEl = document.getElementById('saveStatus');
+    if(statusEl) statusEl.textContent = '저장 실패 — 백업 필요';
+  }
+}
+async function addSupplement(name, ds){
+  const id = 'sup-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+  state.supplements.push({id, name});
+  lsSave();
+  if(ds){
+    const cur = getLog(ds);
+    queueSave(ds, {supplementsTaken:[...cur.supplementsTaken, id]});
+  }
+  renderSupplementChips();
+}
+
+const SEED_LOGS = {};
+
+async function initDb(){
+  const saved = lsLoad();
+  if(saved){
+    Object.entries(saved.logs||{}).forEach(([d,l])=>{ state.logs[d] = normalizeLog(l, d); });
+    state.supplements = Array.isArray(saved.supplements)? saved.supplements : [];
+    state.customExercises = Array.isArray(saved.customExercises)? saved.customExercises : [];
+    state.exImages = (saved.exImages && typeof saved.exImages==='object')? saved.exImages : {};
+    state.ptPlans = (saved.ptPlans && typeof saved.ptPlans==='object')? saved.ptPlans : {};
+    if(Array.isArray(saved.favorites)) state.favorites = new Set(saved.favorites);
+  }else{
+    // 첫 실행: 아티팩트 버전에 들어 있던 인바디 기록을 그대로 옮겨온다
+    Object.entries(SEED_LOGS).forEach(([d,l])=>{ state.logs[d] = normalizeLog(l, d); });
+    lsSave();
+  }
+  state.favLoaded = true;
+  renderCalendar();
+  renderLibrary();
+  renderSupplementChips();
+  const v = document.querySelector('.tab-btn.active')?.dataset.view;
+  if(v==='inbody') renderInbodyTab();
+  const statusEl = document.getElementById('saveStatus');
+  if(statusEl) statusEl.textContent = '';
+}
+
+/* ---- 백업 내보내기 / 복원 ---- */
+function exportData(){
+  const payload = lsLoad() || {v:1, logs:state.logs, supplements:state.supplements,
+    customExercises:state.customExercises, exImages:state.exImages, favorites:[...state.favorites]};
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `fitlog-backup-${todayStr()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  showToast('백업 파일을 내려받았어요');
+}
+function importData(text, mode){
+  let data;
+  try{ data = JSON.parse(text); }
+  catch(err){ showToast('JSON 형식이 아니에요'); return false; }
+  if(!data || typeof data!=='object' || !data.logs){ showToast('핏로그 백업 파일이 아니에요'); return false; }
+  if(mode==='replace'){ state.logs = {}; state.supplements = []; state.customExercises = []; state.exImages = {}; }
+  Object.entries(data.logs||{}).forEach(([d,l])=>{ state.logs[d] = normalizeLog(l, d); });
+  (data.supplements||[]).forEach(s=>{ if(s && s.id && !state.supplements.some(x=>x.id===s.id)) state.supplements.push(s); });
+  (data.customExercises||[]).forEach(e=>{ if(e && e.id && !state.customExercises.some(x=>x.id===e.id)) state.customExercises.push(e); });
+  Object.assign(state.exImages, data.exImages||{});
+  Object.assign(state.ptPlans, data.ptPlans||{});
+  if(Array.isArray(data.favorites)) state.favorites = new Set(data.favorites);
+  lsSave();
+  renderCalendar(); renderLibrary(); renderSupplementChips();
+  const v = document.querySelector('.tab-btn.active')?.dataset.view;
+  if(v==='inbody') renderInbodyTab();
+  showToast(`기록 ${Object.keys(data.logs||{}).length}일치를 불러왔어요`);
+  return true;
+}
+function storageInfo(){
+  const raw = (()=>{ try{ return localStorage.getItem(LS_KEY)||''; }catch(e){ return ''; } })();
+  const kb = (new Blob([raw]).size/1024).toFixed(1);
+  const saved = lsLoad();
+  const days = saved? Object.keys(saved.logs||{}).length : Object.keys(state.logs).length;
+  return {kb, days, savedAt: saved && saved.savedAt};
+}
+function openDataModal(){
+  const info = storageInfo();
+  document.getElementById('dataBody').innerHTML = `
+    <div class="storage-note">
+      기록은 이 브라우저(홈화면 앱)에만 저장돼요. 현재 <b>${info.days}일치 · ${info.kb}KB</b>${
+        info.savedAt? ` · 마지막 저장 ${info.savedAt.slice(0,16).replace('T',' ')}`:''}.<br>
+      기기를 바꾸거나 사파리 데이터를 지우면 사라지니, 가끔 백업 파일을 받아두는 게 안전해요.
+    </div>
+    <div class="field-row" style="margin-top:16px"><button class="primary-btn" id="dataExport">백업 파일 내보내기</button></div>
+    <h4 style="margin:22px 0 6px;font-size:14px">백업 복원</h4>
+    <div class="field-row"><input type="file" id="dataFile" accept="application/json,.json"></div>
+    <div class="field-row" style="margin-top:8px"><textarea id="dataPaste" rows="4" placeholder="또는 백업 JSON 내용을 붙여넣기"></textarea></div>
+    <div class="field-row" style="margin-top:8px;gap:10px">
+      <button class="ghost-btn" id="dataMerge">지금 기록에 합치기</button>
+      <button class="ghost-btn" id="dataReplace" style="border-color:var(--supp);color:var(--supp)">전부 덮어쓰기</button>
+    </div>`;
+  const body = document.getElementById('dataBody');
+  let pendingText = '';
+  body.querySelector('#dataExport').addEventListener('click', exportData);
+  body.querySelector('#dataFile').addEventListener('change', async ev=>{
+    const f = ev.target.files && ev.target.files[0];
+    if(f){ pendingText = await f.text(); showToast('파일을 읽었어요. 합치기/덮어쓰기를 눌러주세요'); }
+  });
+  const run = mode => {
+    const text = pendingText || document.getElementById('dataPaste').value;
+    if(!text.trim()){ showToast('백업 파일이나 내용을 먼저 넣어주세요'); return; }
+    if(importData(text, mode)) closeDataModal();
+  };
+  body.querySelector('#dataMerge').addEventListener('click', ()=>run('merge'));
+  body.querySelector('#dataReplace').addEventListener('click', ()=>run('replace'));
+  document.getElementById('dataOverlay').classList.add('open');
+}
+function closeDataModal(){ document.getElementById('dataOverlay').classList.remove('open'); }
+
+/* =========================================================
+   toast
+   ========================================================= */
+let toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+/* =========================================================
+   calendar
+   ========================================================= */
+const DOW_KEYS=['sun','mon','tue','wed','thu','fri','sat'];
+function renderWeekStrip(){
+  const now=new Date();
+  const day=now.getDay();
+  const start=new Date(now); start.setDate(now.getDate()-day);
+  let workouts=0, waterSum=0, waterDays=0;
+  for(let i=0;i<7;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i);
+    const log=state.logs[fmtDate(d)];
+    if(log && log.workout && log.workout.type!=='none') workouts++;
+    if(log && log.water && log.water.ml>0){ waterSum+=log.water.ml; waterDays++; }
+  }
+  const avgWater = waterDays? Math.round(waterSum/waterDays):0;
+  document.getElementById('weekStrip').innerHTML =
+    `<span>이번 주 운동 <b>${workouts}</b>회</span><span>물 평균 <b>${avgWater?  (avgWater/1000).toFixed(1)+'L':'—'}</b></span>`;
+}
+
+function renderCalendar(){
+  const m = state.month;
+  const y = m.getFullYear(), mo = m.getMonth();
+  document.getElementById('calTitle').textContent = `${y}년 ${mo+1}월`;
+  const firstDow = new Date(y,mo,1).getDay();
+  const daysInMonth = new Date(y,mo+1,0).getDate();
+  const daysInPrev = new Date(y,mo,0).getDate();
+  const cells=[];
+  for(let i=firstDow-1;i>=0;i--) cells.push({d:daysInPrev-i, outside:true, month:mo-1});
+  for(let d=1; d<=daysInMonth; d++) cells.push({d, outside:false, month:mo});
+  while(cells.length%7!==0 || cells.length<42) cells.push({d:cells.length- (firstDow+daysInMonth) +1, outside:true, month:mo+1});
+
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML='';
+  const todayS = todayStr();
+  cells.forEach(c=>{
+    const realDate = new Date(y, c.outside ? c.month : mo, c.d);
+    const ds = fmtDate(realDate);
+    const cell = document.createElement('div');
+    cell.className='day-cell'+(c.outside?' outside':'')+(ds===todayS?' today':'')+(ds===state.selectedDate?' selected':'');
+    const log = state.logs[ds];
+    let dots='';
+    let mins='';
+    if(log){
+      if(log.workout && log.workout.type && log.workout.type!=='none'){
+        // 종류만 눌러둔 상태(운동·시간·메모 없음)는 속이 빈 점으로 구분해서,
+        // 실수로 누른 게 완료한 운동처럼 보이지 않게 한다.
+        const w = log.workout;
+        const filled = !!(w.durationMin || w.memo || (w.exercises && w.exercises.length));
+        const c = w.type==='pt' ? 'var(--pt)' : 'var(--accent)';
+        dots += filled
+          ? `<i class="dot" style="background:${c}"></i>`
+          : `<i class="dot" style="background:transparent;box-shadow:inset 0 0 0 1.5px ${c}"></i>`;
+        if(w.durationMin) mins=w.durationMin+'분';
+      }
+      const d = log.diet;
+      const hasDiet = d && (
+        (d.breakfast && d.breakfast.text) || (d.lunch && d.lunch.text) || (d.dinner && d.dinner.text) ||
+        (Array.isArray(d.snacks) && d.snacks.some(sn=>sn && sn.text)) ||
+        (typeof d.breakfast==='string' && (d.breakfast||d.lunch||d.dinner||d.snack)));
+      if(hasDiet) dots+=`<i class="dot" style="background:var(--diet)"></i>`;
+      if(log.water && log.water.ml>0) dots+=`<i class="dot" style="background:var(--water)"></i>`;
+      if(log.supplementsTaken && log.supplementsTaken.length) dots+=`<i class="dot" style="background:var(--supp)"></i>`;
+      if(log.inbody) dots+=`<i class="dot" style="background:var(--inbody)"></i>`;
+    }
+    cell.innerHTML = `<span class="day-num">${c.d}</span><div class="day-dots">${dots}</div><span class="day-mins">${mins}</span>`;
+    cell.addEventListener('click', ()=>openDay(ds));
+    grid.appendChild(cell);
+  });
+  renderWeekStrip();
+}
+
+document.getElementById('btnPrev').addEventListener('click',()=>{state.month=new Date(state.month.getFullYear(),state.month.getMonth()-1,1);renderCalendar();});
+document.getElementById('btnNext').addEventListener('click',()=>{state.month=new Date(state.month.getFullYear(),state.month.getMonth()+1,1);renderCalendar();});
+document.getElementById('btnToday').addEventListener('click',()=>{state.month=new Date();renderCalendar();});
+
+/* =========================================================
+   day sheet
+   ========================================================= */
+function markDirty(on){
+  state.dirty = !!on;
+  const btn = document.getElementById('daySave');
+  btn.classList.toggle('dirty', state.dirty);
+  btn.disabled = !state.dirty;
+  document.getElementById('saveStatus').textContent = state.dirty ? '저장 안 된 변경사항' : '';
+  if(!state.dirty) document.getElementById('dayDirtyBar').hidden = true;
+}
+function openDay(ds){
+  state.selectedDate = ds;
+  // 저장 전 편집 사본을 만든다. 이 사본을 고치는 동안 달력과 저장된 기록은 그대로다.
+  state.draftDate = ds;
+  state.draft = JSON.parse(JSON.stringify(normalizeLog(state.logs[ds], ds)));
+  const [y,mo,d] = ds.split('-').map(Number);
+  const dow = ['일','월','화','수','목','금','토'][new Date(y,mo-1,d).getDay()];
+  document.getElementById('dayTitle').textContent = `${mo}월 ${d}일 (${dow})`;
+  document.getElementById('dayDirtyBar').hidden = true;
+  // 시트를 먼저 띄운 뒤 그린다. 기록 데이터에 예상치 못한 값이 있어도
+  // '아무 반응 없음' 대신 최소한 시트는 열리고 상황을 알려준다.
+  document.getElementById('dayOverlay').classList.add('open');
+  try{
+    renderDaySheet(ds);
+  }catch(err){
+    document.getElementById('daySheetBody').innerHTML =
+      `<div class="empty-note" style="padding:20px 0">이 날짜의 기록을 표시하는 중 문제가 생겼어요.<br><small>${String(err && err.message || err)}</small></div>`;
+  }
+  markDirty(false);
+  renderCalendar();
+}
+// 저장: 사본을 실제 기록으로 확정한다.
+function saveDay(opts={}){
+  if(!state.draft) return;
+  const ds = state.draftDate;
+  const data = state.draft;
+  state.logs[ds] = data;
+  persist(ds, data);
+  markDirty(false);
+  renderCalendar();
+  if(!opts.silent) showToast('저장했어요');
+}
+function closeDay(opts={}){
+  if(state.dirty && !opts.force){
+    document.getElementById('dayDirtyBar').hidden = false;
+    return;
+  }
+  document.getElementById('dayOverlay').classList.remove('open');
+  document.getElementById('dayDirtyBar').hidden = true;
+  state.selectedDate=null;
+  state.draft=null; state.draftDate=null;
+  markDirty(false);
+  renderCalendar();
+}
+document.getElementById('daySave').addEventListener('click', ()=>saveDay());
+document.getElementById('dirtySave').addEventListener('click', ()=>{ saveDay({silent:true}); closeDay({force:true}); showToast('저장하고 닫았어요'); });
+document.getElementById('dirtyDiscard').addEventListener('click', ()=>{ closeDay({force:true}); showToast('변경사항을 버렸어요'); });
+document.getElementById('dayClose').addEventListener('click', ()=>closeDay());
+document.getElementById('dayOverlay').addEventListener('click', e=>{ if(e.target.id==='dayOverlay') closeDay(); });
+
+function renderDayIfOpen(ds){
+  if(state.selectedDate===ds && document.getElementById('dayOverlay').classList.contains('open')){
+    renderDaySheet(ds);
+  }
+}
+
+function renderSupplementChips(){
+  const body = document.getElementById('daySheetBody');
+  const wrap = body && body.querySelector('#suppChipRow');
+  if(!wrap || !state.selectedDate) return;
+  const log = getLog(state.selectedDate);
+  const commonChips = COMMON_SUPPLEMENTS.map(name=>{
+    const on = log.supplementsTaken.includes(name);
+    return `<span class="chip ${on?'on':''}" data-supp="${name}">${name}</span>`;
+  }).join('');
+  const customChips = state.supplements.map(s=>{
+    const on = log.supplementsTaken.includes(s.id);
+    return `<span class="chip ${on?'on':''}" data-supp="${s.id}">${s.name}</span>`;
+  }).join('');
+  wrap.innerHTML = commonChips + customChips + `<span class="chip add-chip" id="suppAddChip">기타 (직접 입력)</span>`;
+  wrap.querySelectorAll('[data-supp]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const id = el.dataset.supp;
+      const cur = getLog(state.selectedDate);
+      const set = new Set(cur.supplementsTaken);
+      set.has(id) ? set.delete(id) : set.add(id);
+      queueSave(state.selectedDate, {supplementsTaken:[...set]});
+      el.classList.toggle('on');
+    });
+  });
+  const addChip = wrap.querySelector('#suppAddChip');
+  if(addChip) addChip.addEventListener('click', ()=>{
+    const nameBox = body.querySelector('#suppNewBox');
+    nameBox.style.display = nameBox.style.display==='flex' ? 'none':'flex';
+    if(nameBox.style.display==='flex') nameBox.querySelector('input').focus();
+  });
+}
+
+function renderDaySheet(ds){
+  const log = getLog(ds);
+  const body = document.getElementById('daySheetBody');
+  const waterPct = Math.min(100, Math.round((log.water.ml/log.water.goal)*100));
+
+  body.innerHTML = `
+    <div class="section">
+      <div class="section-head"><i class="dot" style="background:var(--accent)"></i><h4>운동</h4></div>
+      <div class="segmented" id="wtSeg">
+        <button data-v="none" class="${log.workout.type==='none'?'active':''}">안 함</button>
+        <button data-v="personal" class="${log.workout.type==='personal'?'active':''}">개인운동</button>
+        <button data-v="pt" class="${log.workout.type==='pt'?'active':''}">PT</button>
+      </div>
+      <div id="wtDetail" style="${log.workout.type==='none'?'display:none':''}">
+        <div class="field-row">
+          <label>운동 시간</label>
+          <input type="number" min="0" id="wtDuration" placeholder="분" value="${log.workout.durationMin||''}">
+        </div>
+        <div id="exCardsWrap">${renderExerciseCards(log)}</div>
+        <div class="field-row" style="margin-top:12px">
+          <button class="pick-btn" id="openPicker">+ 운동 선택하기 (목록에서 고르기)</button>
+        </div>
+        <div class="field-row">
+          <label>메모</label>
+          <input type="text" id="wtMemo" placeholder="컨디션, 특이사항 등" value="${log.workout.memo||''}">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><i class="dot" style="background:var(--diet)"></i><h4>식단</h4></div>
+      ${[['breakfast','아침'],['lunch','점심'],['dinner','저녁']].map(([k,lab])=>`
+      <div class="meal-row">
+        <label>${lab}</label>
+        <input type="time" class="meal-time" data-meal="${k}" value="${log.diet[k].time||''}">
+        <input type="text" class="meal-text" data-meal="${k}" placeholder="무엇을 드셨나요?" value="${(log.diet[k].text||'').replace(/"/g,'&quot;')}">
+      </div>`).join('')}
+      ${log.diet.snacks.map((sn,i)=>`
+      <div class="snack-row">
+        <label>간식${log.diet.snacks.length>1? ' '+(i+1):''}</label>
+        <input type="time" class="snack-time" data-idx="${i}" value="${sn.time||''}">
+        <input type="text" class="snack-text" data-idx="${i}" placeholder="무엇을 드셨나요?" value="${(sn.text||'').replace(/"/g,'&quot;')}">
+        <button class="snack-del" data-snackdel="${i}" aria-label="간식 삭제">✕</button>
+      </div>`).join('')}
+      <button class="add-line-btn" id="addSnack">+ 간식 추가</button>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><i class="dot" style="background:var(--supp)"></i><h4>영양제</h4></div>
+      <div class="chip-row" id="suppChipRow"></div>
+      <div class="field-row" id="suppNewBox" style="display:none">
+        <input type="text" id="suppNewInput" placeholder="영양제 이름을 직접 입력 (예: 밀크씨슬)">
+        <button class="pick-btn" style="width:auto;white-space:nowrap" id="suppNewConfirm">추가</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><i class="dot" style="background:var(--water)"></i><h4>물</h4></div>
+      <div class="water-row">
+        <button class="water-btn" data-ml="100">+100ml</button>
+        <button class="water-btn" data-ml="250">+250ml</button>
+        <button class="water-btn" data-ml="500">+500ml</button>
+        <span class="water-total">${(log.water.ml/1000).toFixed(2)}<span style="font-size:12px;color:var(--text-faint)"> L</span></span>
+      </div>
+      <div class="water-bar"><i style="width:${waterPct}%"></i></div>
+      <div class="water-goal">목표 ${(log.water.goal/1000).toFixed(1)}L 중 ${waterPct}% · <a href="#" id="waterReset" style="color:var(--text-faint)">초기화</a></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><i class="dot" style="background:var(--inbody)"></i><h4>인바디</h4></div>
+      <div style="font-size:13px;color:var(--text-muted)">
+        ${log.inbody ? `체중 ${log.inbody.weight??'—'}kg · 체지방률 ${log.inbody.bodyFatPct??'—'}% · 인바디점수 ${log.inbody.score??'—'}점` : '이 날 측정한 인바디 기록이 없어요.'}
+      </div>
+      <div style="margin-top:8px;display:flex;gap:14px;flex-wrap:wrap">
+        <span class="ib-link" id="gotoInbodyTab">인바디 탭에서 ${log.inbody?'수정':'추가'}하기 →</span>
+        <span class="ib-link" id="gotoCsvImport">CSV로 가져오기</span>
+      </div>
+    </div>
+  `;
+
+  // 운동 세그먼트
+  body.querySelectorAll('#wtSeg button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const cur = getLog(ds).workout;
+      // 이미 선택된 항목을 다시 누르면 해제된다(잘못 눌렀을 때 바로 되돌리기).
+      const next = (cur.type===btn.dataset.v && btn.dataset.v!=='none') ? 'none' : btn.dataset.v;
+      queueSave(ds, {workout:{...cur, type:next}}, {refresh:true});
+    });
+  });
+  const wtDur = body.querySelector('#wtDuration');
+  if(wtDur) wtDur.addEventListener('input', e=>queueSave(ds,{workout:{...getLog(ds).workout, durationMin:e.target.value}}));
+  const wtMemo = body.querySelector('#wtMemo');
+  if(wtMemo) wtMemo.addEventListener('input', e=>queueSave(ds,{workout:{...getLog(ds).workout, memo:e.target.value}}));
+  const openPickerBtn = body.querySelector('#openPicker');
+  if(openPickerBtn) openPickerBtn.addEventListener('click', ()=>openPicker(ds));
+  wireExerciseCards(ds, body);
+
+  // 식단 — 끼니별 시간 + 간식 여러 개
+  const patchMeal = (key, field, value)=>{
+    const d = getLog(ds).diet;
+    queueSave(ds, {diet:{...d, [key]:{...d[key], [field]:value}}});
+  };
+  body.querySelectorAll('.meal-text').forEach(inp=>
+    inp.addEventListener('input', e=>patchMeal(inp.dataset.meal, 'text', e.target.value)));
+  body.querySelectorAll('.meal-time').forEach(inp=>
+    inp.addEventListener('change', e=>patchMeal(inp.dataset.meal, 'time', e.target.value)));
+  const patchSnack = (i, field, value)=>{
+    const d = getLog(ds).diet;
+    const snacks = d.snacks.map((sn,j)=> j===i ? {...sn, [field]:value} : sn);
+    queueSave(ds, {diet:{...d, snacks}});
+  };
+  body.querySelectorAll('.snack-text').forEach(inp=>
+    inp.addEventListener('input', e=>patchSnack(Number(inp.dataset.idx), 'text', e.target.value)));
+  body.querySelectorAll('.snack-time').forEach(inp=>
+    inp.addEventListener('change', e=>patchSnack(Number(inp.dataset.idx), 'time', e.target.value)));
+  body.querySelectorAll('[data-snackdel]').forEach(btn=>btn.addEventListener('click', ()=>{
+    const d = getLog(ds).diet;
+    queueSave(ds, {diet:{...d, snacks:d.snacks.filter((_,j)=>j!==Number(btn.dataset.snackdel))}}, {refresh:true});
+  }));
+  const addSnackBtn = body.querySelector('#addSnack');
+  if(addSnackBtn) addSnackBtn.addEventListener('click', ()=>{
+    const d = getLog(ds).diet;
+    queueSave(ds, {diet:{...d, snacks:[...d.snacks, emptyMeal()]}}, {refresh:true});
+  });
+
+  // 영양제
+  renderSupplementChips();
+  const suppConfirm = body.querySelector('#suppNewConfirm');
+  if(suppConfirm) suppConfirm.addEventListener('click', ()=>{
+    const inp = body.querySelector('#suppNewInput');
+    const v = inp.value.trim();
+    if(v){ addSupplement(v, ds); inp.value=''; body.querySelector('#suppNewBox').style.display='none'; }
+  });
+
+  // 물
+  body.querySelectorAll('.water-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const cur = getLog(ds);
+      queueSave(ds, {water:{...cur.water, ml:cur.water.ml+Number(btn.dataset.ml)}}, {refresh:true});
+    });
+  });
+  body.querySelector('#waterReset').addEventListener('click', e=>{
+    e.preventDefault();
+    queueSave(ds, {water:{...getLog(ds).water, ml:0}}, {refresh:true});
+  });
+
+  // 인바디 → 탭 이동 / CSV 가져오기
+  const gotoBtn = body.querySelector('#gotoInbodyTab');
+  if(gotoBtn) gotoBtn.addEventListener('click', ()=>{
+    if(state.dirty) saveDay({silent:true});
+    closeDay({force:true});
+    switchTab('inbody');
+    openInbodyEntry(ds);
+  });
+  const gotoCsv = body.querySelector('#gotoCsvImport');
+  if(gotoCsv) gotoCsv.addEventListener('click', ()=>{
+    if(state.dirty) saveDay({silent:true});
+    closeDay({force:true});
+    switchTab('inbody');
+    openCsvImport();
+  });
+}
+
+/* =========================================================
+   exercise cards (sets logging) inside the day sheet
+   ========================================================= */
+function renderExerciseCards(log){
+  if(!log.workout.exercises.length) return `<div class="empty-note" style="padding:6px 0">아직 선택한 운동이 없어요.</div>`;
+  return log.workout.exercises.map(entry=>{
+    const ex = getEx(entry.id);
+    if(!ex) return '';
+    const color = PARTS[ex.part].color;
+    const warmup = entry.warmupSets||[];
+    const work = entry.workSets||[];
+    return `
+    <div class="ex-set-card" data-exid="${entry.id}">
+      <div class="ex-set-head">
+        <div class="ex-set-thumb" style="background:${color}22">${exThumbHtml(ex, color, 'ex-set-noicon')}</div>
+        <div class="ex-set-titlewrap">
+          <span class="ex-set-name" data-detail="${entry.id}">${ex.name}</span>
+          <span class="ex-set-muscle">${ex.equip} · ${ex.muscle}</span>
+        </div>
+        <button class="ex-set-remove" data-removeex="${entry.id}" aria-label="운동 삭제">✕</button>
+      </div>
+      <div class="mode-seg" data-modeseg="${entry.id}">
+        <button data-mode="mine" class="${entry.mode!=='pt'?'on':''}">내 방식대로</button>
+        <button data-mode="pt" class="${entry.mode==='pt'?'on':''}">선생님 운동법</button>
+      </div>
+      ${ptHintHtml(entry)}
+      ${warmup.length? `<div class="set-group-label">웜업</div>
+      <div class="set-rows">${warmup.map((s,i)=>setRow(entry.id,'warmupSets',i,s,'W')).join('')}</div>` : ''}
+      <button class="set-add-btn" data-addset="${entry.id}" data-kind="warmupSets">+ 웜업 세트 추가</button>
+      <div class="set-group-label">세트 <span style="font-weight:500;color:var(--text-faint)">· ✕를 누르면 실패로 표시돼요</span></div>
+      <div class="set-rows">${work.map((s,i)=>setRow(entry.id,'workSets',i,s,i+1)).join('')}</div>
+      <button class="set-add-btn" data-addset="${entry.id}" data-kind="workSets">+ 세트 추가</button>
+      <div class="ex-note-row">
+        <label>운동 중 메모 — 뭐가 잘 됐고 뭐가 힘들었는지</label>
+        <input type="text" class="ex-note" data-noteex="${entry.id}" placeholder="예) 마지막 세트 팔꿈치 아파서 무게 낮춤" value="${(entry.note||'').replace(/"/g,'&quot;')}">
+      </div>
+    </div>`;
+  }).join('');
+}
+// 선생님 운동법을 따르는 중이면 그 지시를 카드 안에서 바로 보여준다.
+function ptHintHtml(entry){
+  if(entry.mode!=='pt') return '';
+  const plan = (entry.ptPlanId && ptPlanById(entry.id, entry.ptPlanId)) || latestPtPlan(entry.id);
+  if(!plan) return `<div class="pt-hint">선생님 운동법이 아직 없어요.
+      <button class="apply" data-openpt="${entry.id}">입력하러 가기</button></div>`;
+  return `<div class="pt-hint">
+      <span><b>${plan.date}</b> · ${ptPlanSummary(plan) || '설명만'}</span>
+      <button class="apply" data-applypt="${entry.id}" data-planid="${plan.id}">이대로 세트 채우기</button>
+      <button class="apply" data-openpt="${entry.id}">자세히</button>
+    </div>${plan.method? `<div class="pt-method" style="font-size:12.5px;margin:0 0 8px">${plan.method.replace(/</g,'&lt;')}</div>`:''}`;
+}
+function setRow(exId, kind, idx, s, label){
+  const failed = !!s.failed;
+  return `<div class="set-row" data-exid="${exId}" data-kind="${kind}" data-idx="${idx}">
+    <span class="set-idx">${typeof label==='number'?label+'세트':label}</span>
+    <input type="number" inputmode="numeric" placeholder="회" class="set-reps" value="${s.reps??''}">
+    <span class="set-x">×</span>
+    <input type="number" inputmode="decimal" placeholder="kg" class="set-kg" value="${s.weight??''}">
+    <button class="set-fail-btn ${failed?'on':''}" data-failset="${exId}" data-kind3="${kind}" data-idx3="${idx}" title="${failed?'실패 해제':'실패로 표시'}">✕</button>
+    <button class="set-del" data-delset="${exId}" data-kind2="${kind}" data-idx2="${idx}" aria-label="세트 삭제">−</button>
+  </div>
+  ${failed? `<div class="set-fail-reason"><input type="text" class="set-fail-why" data-exid2="${exId}" data-kind4="${kind}" data-idx4="${idx}" placeholder="왜 못 했는지 (예: 마지막 2회 못 듦, 어깨 통증)" value="${(s.failReason||'').replace(/"/g,'&quot;')}"></div>`:''}`;
+}
+function mutateExercise(ds, exId, fn){
+  const cur = getLog(ds);
+  const list = cur.workout.exercises.map(e=>{
+    if(e.id!==exId) return e;
+    const copy = {...e, warmupSets:[...(e.warmupSets||[])], workSets:[...(e.workSets||[])]};
+    return fn(copy);
+  });
+  queueSave(ds, {workout:{...cur.workout, exercises:list}});
+}
+function wireExerciseCards(ds, body){
+  body.querySelectorAll('[data-detail]').forEach(el=>{
+    el.addEventListener('click', ()=>openExerciseDetail(el.dataset.detail));
+  });
+  body.querySelectorAll('[data-removeex]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const cur = getLog(ds);
+      const list = cur.workout.exercises.filter(e=>e.id!==btn.dataset.removeex);
+      queueSave(ds, {workout:{...cur.workout, exercises:list}}, {refresh:true});
+    });
+  });
+  body.querySelectorAll('[data-addset]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const kind = btn.dataset.kind;
+      mutateExercise(ds, btn.dataset.addset, e=>{ e[kind]=[...e[kind], emptySet()]; return e; });
+      renderDaySheet(ds);
+    });
+  });
+  body.querySelectorAll('[data-delset]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const kind = btn.dataset.kind2, idx=Number(btn.dataset.idx2);
+      mutateExercise(ds, btn.dataset.delset, e=>{ e[kind]=e[kind].filter((_,i)=>i!==idx); return e; });
+      renderDaySheet(ds);
+    });
+  });
+  body.querySelectorAll('.set-row').forEach(row=>{
+    const exId=row.dataset.exid, kind=row.dataset.kind, idx=Number(row.dataset.idx);
+    row.querySelector('.set-reps').addEventListener('input', e=>{
+      mutateExercise(ds, exId, ex=>{ ex[kind][idx]={...ex[kind][idx], reps:e.target.value}; return ex; });
+    });
+    row.querySelector('.set-kg').addEventListener('input', e=>{
+      mutateExercise(ds, exId, ex=>{ ex[kind][idx]={...ex[kind][idx], weight:e.target.value}; return ex; });
+    });
+  });
+  // 실패 표시 토글 + 사유
+  body.querySelectorAll('[data-failset]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const kind=btn.dataset.kind3, idx=Number(btn.dataset.idx3);
+      mutateExercise(ds, btn.dataset.failset, ex=>{
+        const cur = ex[kind][idx];
+        ex[kind][idx] = {...cur, failed: !cur.failed, failReason: cur.failed ? '' : (cur.failReason||'')};
+        return ex;
+      });
+      renderDaySheet(ds);
+    });
+  });
+  body.querySelectorAll('.set-fail-why').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      const kind=inp.dataset.kind4, idx=Number(inp.dataset.idx4);
+      mutateExercise(ds, inp.dataset.exid2, ex=>{ ex[kind][idx]={...ex[kind][idx], failReason:e.target.value}; return ex; });
+    });
+  });
+  // 운동 중 메모
+  body.querySelectorAll('.ex-note').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      mutateExercise(ds, inp.dataset.noteex, ex=>{ ex.note = e.target.value; return ex; });
+    });
+  });
+  // 내 방식 / 선생님 방식
+  body.querySelectorAll('[data-modeseg] button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const exId = btn.closest('[data-modeseg]').dataset.modeseg;
+      mutateExercise(ds, exId, ex=>{ ex.mode = btn.dataset.mode; return ex; });
+      renderDaySheet(ds);
+    });
+  });
+  body.querySelectorAll('[data-applypt]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const exId = btn.dataset.applypt;
+      const plan = ptPlanById(exId, btn.dataset.planid);
+      if(!plan) return;
+      mutateExercise(ds, exId, ex=>{
+        ex.ptPlanId = plan.id;
+        ex.workSets = plan.sets.length ? plan.sets.map(x=>({reps:x.reps||'', weight:x.weight||'', failed:false, failReason:''})) : ex.workSets;
+        return ex;
+      });
+      renderDaySheet(ds);
+      showToast('선생님 지정 세트로 채웠어요');
+    });
+  });
+  body.querySelectorAll('[data-openpt]').forEach(btn=>{
+    btn.addEventListener('click', ()=>openExerciseDetailPt(btn.dataset.openpt));
+  });
+}
+
+/* =========================================================
+   exercise picker modal
+   ========================================================= */
+function openPicker(ds){
+  state.pickerSelection = new Set(getLog(ds).workout.exercises.map(e=>e.id));
+  document.getElementById('pickerSearch').value='';
+  renderPickerList('');
+  document.getElementById('pickerOverlay').classList.add('open');
+  document.getElementById('pickerOverlay').dataset.forDate = ds;
+}
+function closePicker(){ document.getElementById('pickerOverlay').classList.remove('open'); }
+document.getElementById('pickerClose').addEventListener('click', closePicker);
+document.getElementById('pickerOverlay').addEventListener('click', e=>{ if(e.target.id==='pickerOverlay') closePicker(); });
+document.getElementById('pickerSearch').addEventListener('input', e=>renderPickerList(e.target.value));
+document.getElementById('pickerDone').addEventListener('click', ()=>{
+  const ds = document.getElementById('pickerOverlay').dataset.forDate;
+  const cur = getLog(ds);
+  const existing = Object.fromEntries(cur.workout.exercises.map(e=>[e.id,e]));
+  const list = [...state.pickerSelection].map(id => existing[id] || {id, mode:'mine', ptPlanId:null, note:'', warmupSets:[], workSets:[emptySet()]});
+  queueSave(ds, {workout:{...cur.workout, exercises:list}}, {refresh:true});
+  closePicker();
+});
+function renderPickerList(query){
+  const q = query.trim().toLowerCase();
+  const list = document.getElementById('pickerList');
+  const mine = myRoutine().filter(e=>e.name.toLowerCase().includes(q));
+  const custom = state.customExercises.filter(e=>!isFav(e.id) && e.name.toLowerCase().includes(q));
+  let html='';
+  if(mine.length){
+    html += `<div class="picker-part">★ 내가 자주 하는 운동</div>`;
+    mine.forEach(e=>html+=pickerRow(e));
+  }
+  if(custom.length){
+    html += `<div class="picker-part">직접 추가한 운동</div>`;
+    custom.forEach(e=>html+=pickerRow(e));
+  }
+  PART_ORDER.forEach(p=>{
+    const items = EXERCISES.filter(e=>e.part===p && e.name.toLowerCase().includes(q));
+    if(!items.length) return;
+    html += `<div class="picker-part">${PARTS[p].label}</div>`;
+    items.forEach(e=>html+=pickerRow(e));
+  });
+  list.innerHTML = html || `<div class="empty-note">검색 결과가 없어요.</div>`;
+  list.querySelectorAll('.picker-row').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      const id = row.dataset.id;
+      state.pickerSelection.has(id) ? state.pickerSelection.delete(id) : state.pickerSelection.add(id);
+      row.classList.toggle('checked');
+      row.querySelector('.box').textContent = state.pickerSelection.has(id) ? '✓' : '';
+    });
+  });
+  wireFavButtons(list);
+}
+function pickerRow(e){
+  const on = state.pickerSelection.has(e.id);
+  return `<div class="picker-row ${on?'checked':''}" data-id="${e.id}">
+    <span class="box">${on?'✓':''}</span>
+    <span class="nm">${e.name}</span>
+    <span class="mu">${e.equip}</span>
+    ${hasPtPlan(e.id)? `<span class="rec-badge pt">쌤</span>`:''}
+    ${favBtnHtml(e.id)}
+  </div>`;
+}
+
+/* =========================================================
+   exercise library view
+   ========================================================= */
+let activePartFilter = 'all';
+function renderPartFilters(){
+  const wrap = document.getElementById('partFilters');
+  const allBtn = `<button class="part-chip ${activePartFilter==='all'?'active':''}" data-part="all" style="${activePartFilter==='all'?'background:var(--text);':''}">전체</button>`;
+  const rest = PART_ORDER.map(p=>{
+    const active = activePartFilter===p;
+    return `<button class="part-chip ${active?'active':''}" data-part="${p}" style="${active?`background:${PARTS[p].color};`:''}">${PARTS[p].label}</button>`;
+  }).join('');
+  wrap.innerHTML = allBtn+rest;
+  wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{
+    activePartFilter = b.dataset.part;
+    renderLibrary();
+  }));
+}
+function renderLibrary(){
+  _loggedCache = null;
+  const q = (document.getElementById('libSearch').value||'').trim().toLowerCase();
+  const results = document.getElementById('libResults');
+  let html='';
+  if(activePartFilter==='all' && !q){
+    const mine = myRoutine();
+    html += `<div class="part-section"><div class="part-title"><i class="dot" style="background:var(--accent)"></i>★ 내가 자주 하는 운동</div>${
+      mine.length
+        ? `<div class="ex-list">${mine.map(exRow).join('')}</div>`
+        : `<div class="empty-note" style="padding:16px 14px">아직 즐겨찾기한 운동이 없어요. 아래 목록에서 ☆ 를 누르면 여기에 모여요.</div>`
+    }</div>`;
+    const customOnly = state.customExercises.filter(e=>!isFav(e.id));
+    if(customOnly.length){
+      html += `<div class="part-section"><div class="part-title"><i class="dot" style="background:var(--text)"></i>직접 추가한 운동</div><div class="ex-list">${customOnly.map(exRow).join('')}</div></div>`;
+    }
+  }
+  PART_ORDER.forEach(p=>{
+    if(activePartFilter!=='all' && activePartFilter!==p) return;
+    const items = allExercises().filter(e=>e.part===p && (e.name.toLowerCase().includes(q) || e.muscle.toLowerCase().includes(q)));
+    if(!items.length) return;
+    html += `<div class="part-section"><div class="part-title"><i class="dot" style="background:${PARTS[p].color}"></i>${PARTS[p].label}</div><div class="ex-list">${items.map(exRow).join('')}</div></div>`;
+  });
+  if(!html) html = `<div class="empty-note">검색 결과가 없어요.</div>`;
+  results.innerHTML = html;
+  results.querySelectorAll('[data-openex]').forEach(card=>{
+    card.addEventListener('click', ()=>openExerciseDetail(card.dataset.openex));
+  });
+  wireFavButtons(results);
+}
+// 기록이 남아 있는 운동 id 모음 (도감에 표시용)
+function loggedExIds(){
+  const set = new Set();
+  Object.values(state.logs).forEach(l=>{
+    (l && l.workout && Array.isArray(l.workout.exercises) ? l.workout.exercises : []).forEach(x=>{ if(x && x.id) set.add(x.id); });
+  });
+  return set;
+}
+let _loggedCache = null;
+function exRow(e){
+  const color = PARTS[e.part].color;
+  const logged = (_loggedCache || (_loggedCache = loggedExIds())).has(e.id);
+  return `<div class="ex-row" role="button" tabindex="0" data-openex="${e.id}">
+    <span class="ex-row-thumb" style="background:${color}1a">${exThumbHtml(e, color, 'ex-row-noicon')}</span>
+    <span class="ex-row-mid">
+      <span class="ex-row-name">${e.name}${e.custom?' <small>(직접 추가)</small>':''}</span>
+      <span class="ex-row-meta"><b style="color:${color}">${e.equip}</b> · ${e.muscle}</span>
+    </span>
+    ${hasPtPlan(e.id)? `<span class="rec-badge pt">쌤 ${ptPlansFor(e.id).length}</span>`:''}
+    ${logged? `<span class="anim-badge" title="기록 있음"><i class="pulse" style="background:var(--diet)"></i>기록</span>`:''}
+    ${favBtnHtml(e.id)}
+    <span class="ex-row-chevron">›</span>
+  </div>`;
+}
+document.getElementById('libSearch').addEventListener('input', renderLibrary);
+
+function exBasicPaneHtml(e, color){
+  return `
+    ${exStageHtml(e, color)}
+    <div class="ex-detail-tags">
+      <span class="tag-pill" style="background:${color}">${PARTS[e.part].label}</span>
+      <span class="tag-pill" style="background:var(--text-faint)">${e.equip}</span>
+    </div>
+    <div style="margin-top:14px;font-size:13px;color:var(--text-muted)">${e.muscle}</div>
+    <div style="margin-top:12px">
+      <button class="fav-pill ${isFav(e.id)?'on':''}" id="exFavPill">${isFav(e.id)?'★':'☆'} ${isFav(e.id)?'내가 자주 하는 운동':'즐겨찾기에 넣기'}</button>
+    </div>
+    <h4 style="margin:20px 0 4px;font-size:14px">① 준비 자세 잡는 법</h4>
+    <ol class="steps-list"><li>${e.steps[0]}</li></ol>
+    <h4 style="margin:16px 0 4px;font-size:14px">② 운동 수행 방법</h4>
+    <ol class="steps-list" start="2">${e.steps.slice(1).map(s=>`<li>${s}</li>`).join('')}</ol>
+    <h4 style="margin:16px 0 4px;font-size:14px">③ 각도 · 자세 유의사항</h4>
+    <ul class="angle-list">${e.angles.map(a=>`<li>${a}</li>`).join('')}</ul>
+    <h4 style="margin:20px 0 4px;font-size:14px">④ 실제 시범 영상 · 이미지</h4>
+    ${refLinksHtml(e)}
+    <div class="imgurl-row">
+      <input type="url" id="exImgUrl" placeholder="이 운동에 쓸 GIF/이미지 주소" value="${(state.exImages[e.id]||'').replace(/"/g,'&quot;')}">
+      <button id="exImgSave">적용</button>
+      ${state.exImages[e.id]? `<button id="exImgReset">기본값</button>`:''}
+    </div>
+  `;
+}
+
+/* ---- 선생님 운동법 탭 ---- */
+let ptView = {exId:null, planId:null, editing:false};
+function ptSetsHtml(sets){
+  return sets.map((x,i)=>`<div class="pt-setline">
+      <span class="n">${i+1}세트</span>
+      <span class="v">${x.weight? x.weight+'kg' : '체중'}${x.reps? ' × '+x.reps+'회' : ''}</span>
+    </div>`).join('');
+}
+function renderPtPane(e){
+  const pane = document.getElementById('exPanePt');
+  const plans = ptPlansFor(e.id);
+  if(!ptView.editing && !plans.length){
+    pane.innerHTML = `<div class="pt-empty">아직 선생님이 알려준 운동법이 없어요.<br>
+      받은 내용을 그대로 붙여넣으면 무게·횟수·세트로 나눠서 정리해둘게요.</div>
+      <div class="pt-actions"><button class="primary-btn" id="ptNew">+ 선생님 운동법 입력</button></div>`;
+    pane.querySelector('#ptNew').addEventListener('click', ()=>{ ptView={exId:e.id, planId:null, editing:true}; renderPtPane(e); });
+    return;
+  }
+  if(ptView.editing){
+    const plan = ptView.planId ? ptPlanById(e.id, ptView.planId) : null;
+    pane.innerHTML = `
+      <div class="field-row"><label>받은 날짜</label><input type="date" id="ptDate" value="${plan? plan.date : todayStr()}"></div>
+      <h4 style="margin:16px 0 6px;font-size:14px">선생님이 보내준 내용</h4>
+      <textarea id="ptRaw" rows="6" placeholder="그대로 붙여넣으세요&#10;예) 인클라인 프레스 20kg 12회 4세트&#10;내릴 때 3초, 팔꿈치 45도 유지">${plan? (plan.raw||'').replace(/</g,'&lt;') : ''}</textarea>
+      <div class="pt-parse-preview" id="ptPreview"></div>
+      <div class="field-row" style="margin-top:12px"><label>메모</label><input type="text" id="ptMemo" placeholder="선택" value="${plan? (plan.memo||'').replace(/"/g,'&quot;') : ''}"></div>
+      <div class="pt-actions">
+        <button class="primary-btn" id="ptSave">저장</button>
+        <button class="ghost-btn" id="ptCancel">취소</button>
+      </div>`;
+    const raw = pane.querySelector('#ptRaw');
+    const preview = pane.querySelector('#ptPreview');
+    const refresh = ()=>{
+      const r = parsePtText(raw.value);
+      preview.innerHTML = r.sets.length
+        ? `이렇게 정리돼요 — <b>${r.sets.length}세트</b><br>${ptPlanSummary({sets:r.sets, method:r.method})}${r.method? `<br><span style="color:var(--text-faint)">방법: ${r.method.replace(/</g,'&lt;').split('\n').join(' / ')}</span>`:''}`
+        : `아직 무게·횟수를 못 찾았어요. 숫자가 없으면 전부 '방법' 설명으로 저장돼요.`;
+    };
+    raw.addEventListener('input', refresh); refresh();
+    pane.querySelector('#ptCancel').addEventListener('click', ()=>{ ptView={exId:e.id, planId:ptView.planId, editing:false}; renderPtPane(e); });
+    pane.querySelector('#ptSave').addEventListener('click', async ()=>{
+      const rawText = raw.value.trim();
+      if(!rawText){ showToast('내용을 입력해주세요'); return; }
+      const parsed = parsePtText(rawText);
+      const saved = {
+        id: (plan && plan.id) || 'pt-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),
+        date: pane.querySelector('#ptDate').value || todayStr(),
+        raw: rawText, sets: parsed.sets, method: parsed.method,
+        memo: pane.querySelector('#ptMemo').value || '',
+        updatedAt: new Date().toISOString(),
+      };
+      await savePtPlan(e.id, saved);
+      ptView = {exId:e.id, planId:saved.id, editing:false};
+      renderPtPane(e);
+      renderExTabCount(e);
+      renderDayIfOpen(state.selectedDate);
+      showToast('선생님 운동법을 저장했어요');
+    });
+    return;
+  }
+  const cur = ptPlanById(e.id, ptView.planId) || plans[0];
+  ptView.planId = cur.id;
+  pane.innerHTML = `
+    <div class="pt-datebar">
+      <select id="ptPlanSel">${plans.map(pl=>`<option value="${pl.id}" ${pl.id===cur.id?'selected':''}>${pl.date}${pl===plans[0]?' (최신)':''} · ${ptPlanSummary(pl)||'설명만'}</option>`).join('')}</select>
+      <button class="ghost-btn" style="width:auto;padding:9px 14px" id="ptNew">+ 새로</button>
+    </div>
+    <div class="pt-plan">
+      <h5>지정 세트 ${cur.sets.length? `· 총 ${cur.sets.length}세트` : ''}</h5>
+      ${cur.sets.length ? ptSetsHtml(cur.sets) : `<div style="font-size:13px;color:var(--text-faint)">세트 지정 없음</div>`}
+      ${cur.method ? `<div class="pt-method">${cur.method.replace(/</g,'&lt;')}</div>` : ''}
+      ${cur.memo ? `<div class="pt-method" style="color:var(--text-muted)">메모: ${cur.memo.replace(/</g,'&lt;')}</div>` : ''}
+    </div>
+    <div class="pt-actions">
+      <button class="primary-btn" id="ptApply">이대로 운동 기록에 넣기</button>
+      <button class="ghost-btn" id="ptEdit">수정</button>
+      <button class="ghost-btn" id="ptDel" style="border-color:var(--supp);color:var(--supp);flex:0 0 auto;min-width:0;padding:0 14px">삭제</button>
+    </div>`;
+  pane.querySelector('#ptPlanSel').addEventListener('change', ev=>{ ptView.planId = ev.target.value; renderPtPane(e); });
+  pane.querySelector('#ptNew').addEventListener('click', ()=>{ ptView={exId:e.id, planId:null, editing:true}; renderPtPane(e); });
+  pane.querySelector('#ptEdit').addEventListener('click', ()=>{ ptView={exId:e.id, planId:cur.id, editing:true}; renderPtPane(e); });
+  pane.querySelector('#ptApply').addEventListener('click', ()=>applyPtPlanToDay(e.id, cur));
+  pane.querySelector('#ptDel').addEventListener('click', async ()=>{
+    await deletePtPlan(e.id, cur.id);
+    ptView = {exId:e.id, planId:null, editing:false};
+    renderPtPane(e); renderExTabCount(e);
+    showToast('삭제했어요');
+  });
+}
+function renderExTabCount(e){
+  const el = document.getElementById('exTabPtCnt');
+  if(!el) return;
+  const n = ptPlansFor(e.id).length;
+  el.textContent = n || '';
+  el.hidden = !n;
+}
+// 선생님 운동법을 그날 운동 기록으로 옮긴다.
+function applyPtPlanToDay(exId, plan){
+  const ds = state.draftDate || todayStr();
+  document.getElementById('exOverlay').classList.remove('open');
+  if(!state.draft || state.draftDate!==ds) openDay(ds);
+  const cur = getLog(ds);
+  const sets = plan.sets.length ? plan.sets.map(x=>({reps:x.reps||'', weight:x.weight||'', failed:false, failReason:''})) : [emptySet()];
+  const rest = cur.workout.exercises.filter(x=>x.id!==exId);
+  const prev = cur.workout.exercises.find(x=>x.id===exId) || {};
+  const entry = {id:exId, mode:'pt', ptPlanId:plan.id, note:prev.note||'', warmupSets:prev.warmupSets||[], workSets:sets};
+  queueSave(ds, {workout:{...cur.workout, type: cur.workout.type==='none' ? 'personal' : cur.workout.type,
+                          exercises:[...rest, entry]}}, {refresh:true});
+  showToast('오늘 운동 기록에 넣었어요 · 저장을 눌러주세요');
+}
+
+function openExerciseDetail(id){
+  const e = getEx(id);
+  document.getElementById('exTitle').textContent = e.name;
+  const color = PARTS[e.part].color;
+  const body = document.getElementById('exBody');
+  const ptCount = ptPlansFor(e.id).length;
+  body.innerHTML = `
+    <div class="ex-tabs">
+      <button class="ex-tab active" data-extab="basic">기본 운동법</button>
+      <button class="ex-tab" data-extab="pt">선생님 추천 <span class="cnt" id="exTabPtCnt" ${ptCount?'':'hidden'}>${ptCount||''}</span></button>
+    </div>
+    <div class="ex-pane" id="exPaneBasic">${exBasicPaneHtml(e, color)}</div>
+    <div class="ex-pane" id="exPanePt" hidden></div>
+  `;
+  const ov = document.getElementById('exOverlay');
+  ov.dataset.exid = e.id;
+  body.querySelector('#exFavPill').addEventListener('click', ()=>toggleFav(e.id));
+  body.querySelector('#exImgSave').addEventListener('click', ()=>setExImage(e.id, document.getElementById('exImgUrl').value));
+  const imgReset = body.querySelector('#exImgReset');
+  if(imgReset) imgReset.addEventListener('click', ()=>setExImage(e.id, ''));
+  body.querySelectorAll('.ex-tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const which = btn.dataset.extab;
+      body.querySelectorAll('.ex-tab').forEach(b=>b.classList.toggle('active', b===btn));
+      document.getElementById('exPaneBasic').hidden = which!=='basic';
+      document.getElementById('exPanePt').hidden = which!=='pt';
+      if(which==='pt') renderPtPane(e);
+    });
+  });
+  ptView = {exId:e.id, planId:null, editing:false};
+  ov.classList.add('open');
+}
+// 선생님 탭을 바로 열고 싶을 때
+function openExerciseDetailPt(id){
+  openExerciseDetail(id);
+  const t = document.querySelector('.ex-tab[data-extab="pt"]');
+  if(t) t.click();
+}
+document.getElementById('exClose').addEventListener('click', ()=>document.getElementById('exOverlay').classList.remove('open'));
+document.getElementById('exOverlay').addEventListener('click', e=>{ if(e.target.id==='exOverlay') document.getElementById('exOverlay').classList.remove('open'); });
+
+/* =========================================================
+   내 운동 직접 추가
+   ========================================================= */
+let exAddFromPicker = false;
+document.getElementById('eaPart').innerHTML = PART_ORDER.map(p=>`<option value="${p}">${PARTS[p].label}</option>`).join('');
+function openExAddModal(fromPicker){
+  exAddFromPicker = !!fromPicker;
+  ['eaName','eaEquip','eaMuscle','eaSetup','eaSteps','eaAngles'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('eaPart').value='chest';
+  document.getElementById('exAddOverlay').classList.add('open');
+}
+function closeExAddModal(){ document.getElementById('exAddOverlay').classList.remove('open'); }
+document.getElementById('libAddExBtn').addEventListener('click', ()=>openExAddModal(false));
+document.getElementById('pickerAddEx').addEventListener('click', ()=>openExAddModal(true));
+document.getElementById('exAddClose').addEventListener('click', closeExAddModal);
+document.getElementById('exAddOverlay').addEventListener('click', e=>{ if(e.target.id==='exAddOverlay') closeExAddModal(); });
+document.getElementById('eaSave').addEventListener('click', async ()=>{
+  const name = document.getElementById('eaName').value.trim();
+  if(!name){ showToast('운동 이름을 입력해주세요'); return; }
+  const part = document.getElementById('eaPart').value;
+  const equip = document.getElementById('eaEquip').value.trim() || '기타';
+  const muscle = document.getElementById('eaMuscle').value.trim() || '—';
+  const setup = document.getElementById('eaSetup').value.trim();
+  const stepLines = document.getElementById('eaSteps').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const angleLines = document.getElementById('eaAngles').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const steps = [setup || '준비 자세를 잡는다.', ...(stepLines.length? stepLines : ['동작을 수행한다.'])];
+  const id = 'custom-'+Date.now();
+  const exObj = {id, name, part, equip, muscle, steps, angles: angleLines.length? angleLines : ['본인에게 맞는 자세와 각도를 확인하며 진행하세요.'], mine:false, custom:true};
+  state.customExercises.push(exObj);
+  lsSave();
+  closeExAddModal();
+  if(exAddFromPicker){
+    state.pickerSelection.add(id);
+    renderPickerList(document.getElementById('pickerSearch').value);
+  }
+  renderLibrary();
+  showToast('내 운동을 추가했어요');
+});
+
+/* =========================================================
+   인바디 tab — stats, trend charts, history, CSV import
+   ========================================================= */
+/* 인바디 항목 레지스트리. 입력폼 / 히스토리 표 / 상세보기 / CSV 매칭이
+   모두 이 한 곳에서 파생된다. group: 상세보기 묶음, form:true 는 기본 입력폼 노출,
+   hist:true 는 히스토리 표 컬럼. */
+const IB_GROUPS = {
+  basic:'기본 체성분',
+  muscleFat:'골격근 · 지방',
+  water:'체수분',
+  nutri:'영양 · 균형',
+  seg:'부위별 상세',
+};
+const IB_FIELDS = [
+  // ---- 기본 ----
+  {key:'weight',       label:'체중',           unit:'kg',    dec:1, group:'basic', form:true, hist:true, aliases:['체중','weight','bodyweight']},
+  {key:'bmi',          label:'BMI',            unit:'kg/㎡', dec:1, group:'basic', form:true, hist:true, aliases:['bmi','체질량지수']},
+  {key:'bmr',          label:'기초대사량',      unit:'kcal',  dec:0, group:'basic', form:true, hist:true, short:'기초대사', aliases:['기초대사량','basalmetabolicrate','bmr']},
+  {key:'score',        label:'인바디 점수',     unit:'점',    dec:0, group:'basic', form:true, hist:true, short:'점수', aliases:['인바디점수','inbodyscore','점수','score']},
+  // ---- 근육 · 지방 ----
+  {key:'smm',          label:'골격근량',        unit:'kg',    dec:1, group:'muscleFat', form:true, hist:true, aliases:['골격근량','skeletalmusclemass','smm']},
+  {key:'muscleMass',   label:'근육량',          unit:'kg',    dec:1, group:'muscleFat', form:true, aliases:['근육량','musclemass','softleanmass']},
+  {key:'bodyFatMass',  label:'체지방량',        unit:'kg',    dec:1, group:'muscleFat', form:true, hist:true, aliases:['체지방량','bodyfatmass','bfm']},
+  {key:'bodyFatPct',   label:'체지방률',        unit:'%',     dec:1, group:'muscleFat', form:true, hist:true, aliases:['체지방률','체지방율','percentbodyfat','pbf']},
+  {key:'visceral',     label:'내장지방레벨',    unit:'Lv',    dec:0, group:'muscleFat', form:true, hist:true, short:'내장지방', aliases:['내장지방레벨','visceralfatlevel','vfl']},
+  {key:'visceralArea', label:'내장지방단면적',  unit:'cm²',   dec:1, group:'muscleFat', aliases:['내장지방단면적','visceralfatarea','vfa']},
+  {key:'abdFatRatio',  label:'복부지방률',      unit:'',      dec:2, group:'muscleFat', aliases:['복부지방률','whr','waisthipratio']},
+  {key:'waist',        label:'허리둘레',        unit:'cm',    dec:1, group:'muscleFat', aliases:['허리둘레','waistcircumference','waist']},
+  {key:'smi',          label:'SMI (골격근지수)',unit:'kg/㎡', dec:2, group:'muscleFat', aliases:['smi','골격근지수']},
+  // ---- 체수분 ----
+  {key:'tbw',          label:'체수분 (총 수분량)', unit:'L', dec:1, group:'water', form:true, hist:true, short:'체수분', aliases:['체수분','수분량','totalbodywater','tbw']},
+  {key:'icw',          label:'세포내수분',      unit:'L',     dec:1, group:'water', form:true, aliases:['세포내수분','intracellularwater','icw']},
+  {key:'ecw',          label:'세포외수분',      unit:'L',     dec:1, group:'water', form:true, aliases:['세포외수분','extracellularwater','ecw']},
+  {key:'ecwRatio',     label:'세포외수분비',    unit:'',      dec:3, group:'water', form:true, aliases:['세포외수분비','ecwtbw']},
+  // ---- 영양 · 균형 ----
+  {key:'protein',      label:'단백질',          unit:'kg',    dec:2, group:'nutri', form:true, aliases:['단백질','protein']},
+  {key:'mineral',      label:'무기질',          unit:'kg',    dec:2, group:'nutri', form:true, aliases:['무기질','minerals','mineral']},
+  {key:'boneMineral',  label:'골무기질량',      unit:'kg',    dec:2, group:'nutri', aliases:['골무기질량','bonemineralcontent','bmc']},
+  {key:'bcm',          label:'체세포량',        unit:'kg',    dec:1, group:'nutri', aliases:['체세포량','bodycellmass','bcm']},
+  {key:'phaseAngle',   label:'전신 위상각',     unit:'°',     dec:1, group:'nutri', aliases:['전신위상각','phaseangle','wholebodyphaseangle']},
+  {key:'legMuscle',    label:'다리 근육량',     unit:'kg',    dec:1, group:'nutri', aliases:['다리근육량','legmusclemass']},
+  {key:'legMuscleLevel',label:'다리 근육레벨',  unit:'Lv',    dec:0, group:'nutri', aliases:['다리근육레벨','legmusclelevel']},
+  {key:'balUpLow',     label:'상체·하체 균형',  unit:'',      dec:0, group:'nutri', aliases:['상체하체']},
+  {key:'balUpLR',      label:'상체 좌·우 균형', unit:'',      dec:0, group:'nutri', aliases:['상체좌우']},
+  {key:'balLowLR',     label:'하체 좌·우 균형', unit:'',      dec:0, group:'nutri', aliases:['하체좌우']},
+  // ---- 부위별 ----
+  {key:'armRMuscle', label:'오른팔 근육량', unit:'kg', dec:2, group:'seg', aliases:['오른팔근육량']},
+  {key:'armLMuscle', label:'왼팔 근육량',   unit:'kg', dec:2, group:'seg', aliases:['왼팔근육량']},
+  {key:'trunkMuscle',label:'몸통 근육량',   unit:'kg', dec:2, group:'seg', aliases:['몸통근육량']},
+  {key:'legRMuscle', label:'오른다리 근육량',unit:'kg',dec:2, group:'seg', aliases:['오른다리근육량']},
+  {key:'legLMuscle', label:'왼다리 근육량', unit:'kg', dec:2, group:'seg', aliases:['왼다리근육량']},
+  {key:'armRFat',    label:'오른팔 체지방', unit:'kg', dec:2, group:'seg', aliases:['오른팔체지방']},
+  {key:'armLFat',    label:'왼팔 체지방',   unit:'kg', dec:2, group:'seg', aliases:['왼팔체지방']},
+  {key:'trunkFat',   label:'몸통 체지방',   unit:'kg', dec:2, group:'seg', aliases:['몸통체지방']},
+  {key:'legRFat',    label:'오른다리 체지방',unit:'kg',dec:2, group:'seg', aliases:['오른다리체지방']},
+  {key:'legLFat',    label:'왼다리 체지방', unit:'kg', dec:2, group:'seg', aliases:['왼다리체지방']},
+  {key:'armREcw',    label:'오른팔 세포외수분비', unit:'', dec:3, group:'seg', aliases:['오른팔세포외수분비']},
+  {key:'armLEcw',    label:'왼팔 세포외수분비',   unit:'', dec:3, group:'seg', aliases:['왼팔세포외수분비']},
+  {key:'trunkEcw',   label:'몸통 세포외수분비',   unit:'', dec:3, group:'seg', aliases:['몸통세포외수분비']},
+  {key:'legREcw',    label:'오른다리 세포외수분비',unit:'',dec:3, group:'seg', aliases:['오른다리세포외수분비']},
+  {key:'legLEcw',    label:'왼다리 세포외수분비', unit:'', dec:3, group:'seg', aliases:['왼다리세포외수분비']},
+  // 날짜는 CSV 매칭 전용
+  {key:'date', label:'측정일', unit:'', dec:0, group:null, aliases:['날짜','일자','측정일','측정일자','date','testdate']},
+];
+const IB_VALUE_FIELDS = IB_FIELDS.filter(f=>f.key!=='date');
+const IB_BY_KEY = Object.fromEntries(IB_FIELDS.map(f=>[f.key,f]));
+const IB_HIST_ORDER = ['weight','smm','bodyFatMass','bodyFatPct','bmi','tbw','bmr','visceral','score'];
+const IB_HIST_FIELDS = IB_HIST_ORDER.map(k=>IB_BY_KEY[k]).filter(Boolean);
+
+function inbodyEntries(){
+  return Object.values(state.logs)
+    .filter(l=>l && l.inbody)
+    .map(l=>({date:l.date, ...l.inbody}))
+    .sort((a,b)=> a.date<b.date ? 1 : (a.date>b.date? -1 : 0));
+}
+function statTile(label,val,unit,delta){
+  return `<div class="ib-stat-tile"><div class="label">${label}</div>
+    <div class="value">${val??'—'}${val!=null?`<small> ${unit}</small>`:''}</div>
+    <div class="delta">${delta||'&nbsp;'}</div></div>`;
+}
+function deltaStr(entriesDesc,key,decimals){
+  const latest=entriesDesc[0], prev=entriesDesc[1];
+  if(!prev || latest[key]==null || prev[key]==null) return '';
+  const d = latest[key]-prev[key];
+  if(Math.abs(d)<0.05) return '이전 기록과 동일';
+  return (d>0?'▲ ':'▼ ')+Math.abs(d).toFixed(decimals!=null?decimals:1)+' · 이전 기록 대비';
+}
+function renderInbodyTab(){
+  const entriesDesc = inbodyEntries();
+  const body = document.getElementById('ibTabBody');
+  if(!entriesDesc.length){
+    body.innerHTML = `<div class="ib-empty">
+      <h3 style="margin:0 0 4px;font-size:17px">아직 인바디 기록이 없어요</h3>
+      <p>인바디를 측정한 날의 결과를 직접 추가하거나, 기기·앱에서 내보낸 CSV 파일로 한 번에 가져와보세요.</p>
+      <button class="primary-btn" style="width:auto;padding:11px 20px" id="ibEmptyAddBtn">+ 기록 추가하기</button>
+    </div>`;
+    body.querySelector('#ibEmptyAddBtn').addEventListener('click', ()=>openInbodyEntry());
+    return;
+  }
+  const latest = entriesDesc[0];
+  const [ly,lm,ld] = latest.date.split('-');
+  body.innerHTML = `
+    <div style="font-size:12px;color:var(--text-faint);margin-bottom:8px;font-family:var(--font-mono)">최근 측정 · ${ly}.${lm}.${ld}</div>
+    <div class="ib-stat-grid">
+      ${statTile('체중', latest.weight, 'kg', deltaStr(entriesDesc,'weight',1))}
+      ${statTile('골격근량', latest.smm, 'kg', deltaStr(entriesDesc,'smm',1))}
+      ${statTile('체지방률', latest.bodyFatPct, '%', deltaStr(entriesDesc,'bodyFatPct',1))}
+      ${statTile('체수분', latest.tbw, 'L', deltaStr(entriesDesc,'tbw',1))}
+      ${statTile('기초대사량', latest.bmr, 'kcal', deltaStr(entriesDesc,'bmr',0))}
+      ${statTile('인바디점수', latest.score, '점', deltaStr(entriesDesc,'score',0))}
+      ${statTile('내장지방레벨', latest.visceral, 'Lv', deltaStr(entriesDesc,'visceral',0))}
+    </div>
+    <div class="ib-chart-grid">
+      <div class="ib-chart-card" id="chartWeight"></div>
+      <div class="ib-chart-card" id="chartSmm"></div>
+      <div class="ib-chart-card" id="chartFat"></div>
+      <div class="ib-chart-card" id="chartTbw"></div>
+    </div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px">
+      <h4 style="margin:0;font-size:14px">측정 기록 (${entriesDesc.length}건)</h4>
+      <span style="font-size:11.5px;color:var(--text-faint)">행을 누르면 그 날짜의 전체 항목을 볼 수 있어요</span>
+    </div>
+    <div class="ib-hist" id="ibHistTable"></div>
+  `;
+  const asc = [...entriesDesc].reverse();
+  drawTrendChart(document.getElementById('chartWeight'), asc, 'weight', {title:'체중 추이', unit:'kg', decimals:1});
+  drawTrendChart(document.getElementById('chartSmm'), asc, 'smm', {title:'골격근량 추이', unit:'kg', decimals:1});
+  drawTrendChart(document.getElementById('chartFat'), asc, 'bodyFatPct', {title:'체지방률 추이', unit:'%', decimals:1});
+  drawTrendChart(document.getElementById('chartTbw'), asc, 'tbw', {title:'체수분 추이', unit:'L', decimals:1});
+  renderIbHistTable(entriesDesc);
+}
+function renderIbHistTable(entriesDesc){
+  const head = `<div class="ib-hist-row head"><span>날짜</span>${
+    IB_HIST_FIELDS.map(f=>`<span>${f.short||f.label}${f.unit?`<br><small style="font-weight:500;opacity:.65">${f.unit}</small>`:''}</span>`).join('')
+  }<span></span></div>`;
+  const rows = entriesDesc.map(e=>{
+    const [y,mo,d]=e.date.split('-');
+    return `<div class="ib-hist-row" data-date="${e.date}" title="${y}.${mo}.${d} 상세보기">
+      <span>${y.slice(2)}.${mo}.${d}</span>
+      ${IB_HIST_FIELDS.map(f=>`<span class="num">${e[f.key]??'—'}</span>`).join('')}
+      <span class="del" data-del="${e.date}" title="삭제">✕</span>
+    </div>`;
+  }).join('');
+  const wrap = document.getElementById('ibHistTable');
+  wrap.style.setProperty('--ib-cols', IB_HIST_FIELDS.length);
+  wrap.innerHTML = head+rows;
+  wrap.querySelectorAll('.ib-hist-row[data-date]').forEach(row=>{
+    row.addEventListener('click', ev=>{
+      if(ev.target.dataset.del) return;
+      openIbDetail(row.dataset.date);
+    });
+  });
+  wrap.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click', ev=>{
+      ev.stopPropagation();
+      const date = btn.dataset.del;
+      const merged = {...getLog(date), inbody:null};
+      state.logs[date]=merged;
+      persist(date, merged);
+      renderCalendar();
+      renderInbodyTab();
+    });
+  });
+}
+// ---- 한 측정일의 전체 항목 상세보기 ----
+let ibDetailDate = null;
+function fmtIbNum(v, dec){
+  if(typeof v !== 'number') return String(v);
+  return dec===0 ? String(Math.round(v)) : v.toFixed(dec).replace(/\.?0+$/,'') || String(v);
+}
+function openIbDetail(date){
+  const entriesDesc = inbodyEntries();
+  const idx = entriesDesc.findIndex(e=>e.date===date);
+  if(idx<0) return;
+  const cur = entriesDesc[idx];
+  const prev = entriesDesc[idx+1]; // 바로 이전(더 오래된) 측정
+  const [y,mo,d] = date.split('-');
+  ibDetailDate = date;
+  document.getElementById('ibDetailTitle').textContent = '인바디 상세';
+
+  let html = `<div class="ibd-head">
+      <div style="font-family:var(--font-display);font-size:26px">${y}.${mo}.${d}</div>
+      <div class="ibd-date">${idx===0? '최근 측정' : `${idx+1}번째 최근 기록`}${prev? ` · 이전 측정 ${prev.date} 대비` : ''}</div>
+    </div>`;
+
+  let shown = 0;
+  Object.entries(IB_GROUPS).forEach(([g,gLabel])=>{
+    const fields = IB_VALUE_FIELDS.filter(f=>f.group===g && cur[f.key]!=null && cur[f.key]!=='');
+    if(!fields.length) return;
+    shown += fields.length;
+    html += `<div class="ibd-group"><h5>${gLabel}</h5><div class="ibd-rows">${
+      fields.map(f=>{
+        const v = cur[f.key];
+        let dlt = '';
+        if(prev && typeof v==='number' && typeof prev[f.key]==='number'){
+          const diff = v - prev[f.key];
+          const step = f.dec===0 ? 0.5 : Math.pow(10,-f.dec)/2;
+          dlt = Math.abs(diff)<step ? '—' : (diff>0?'▲ ':'▼ ')+fmtIbNum(Math.abs(diff), f.dec);
+        }
+        return `<div class="ibd-row">
+          <span class="k">${f.label}</span>
+          <span><span class="v">${fmtIbNum(v, f.dec)}${f.unit?`<small> ${f.unit}</small>`:''}</span>${dlt?`<span class="dlt">${dlt}</span>`:''}</span>
+        </div>`;
+      }).join('')
+    }</div></div>`;
+  });
+
+  if(cur.memo){
+    html += `<div class="ibd-group"><h5>그 밖에 기록된 값 · 메모</h5><div class="ibd-memo">${cur.memo}</div></div>`;
+  }
+  if(!shown && !cur.memo){
+    html += `<div class="empty-note" style="margin-top:16px">이 날짜에 저장된 수치가 없어요.</div>`;
+  }
+
+  html += `<div class="ibd-actions">
+      <button class="primary-btn" id="ibdEdit">항목 수정하기</button>
+      <button class="ghost-btn" id="ibdDelete" style="border-color:var(--supp);color:var(--supp)">삭제</button>
+    </div>`;
+
+  const bodyEl = document.getElementById('ibDetailBody');
+  bodyEl.innerHTML = html;
+  bodyEl.querySelector('#ibdEdit').addEventListener('click', ()=>{
+    closeIbDetail();
+    openInbodyEntry(date);
+  });
+  bodyEl.querySelector('#ibdDelete').addEventListener('click', ()=>{
+    const merged = {...getLog(date), inbody:null};
+    state.logs[date]=merged;
+    persist(date, merged);
+    closeIbDetail();
+    renderCalendar();
+    renderInbodyTab();
+    showToast('인바디 기록을 삭제했어요');
+  });
+  document.getElementById('ibDetailOverlay').classList.add('open');
+}
+function closeIbDetail(){ document.getElementById('ibDetailOverlay').classList.remove('open'); }
+document.getElementById('ibDetailClose').addEventListener('click', closeIbDetail);
+document.getElementById('ibDetailOverlay').addEventListener('click', e=>{ if(e.target.id==='ibDetailOverlay') closeIbDetail(); });
+
+function drawTrendChart(container, ascEntries, key, opts){
+  const pts = ascEntries.filter(e=>typeof e[key]==='number');
+  container.innerHTML = `<div class="ch-title">${opts.title}</div>`;
+  if(!pts.length){ container.innerHTML += `<div class="ch-empty">기록 없음</div>`; return; }
+  const last = pts[pts.length-1][key];
+  container.innerHTML += `<div class="ch-value">${last.toFixed(opts.decimals)}<small> ${opts.unit}</small></div>`;
+  const W=240,H=84,PAD=10;
+  const NS='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  container.style.position='relative';
+  container.appendChild(svg);
+
+  if(pts.length===1){
+    const c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx',W/2); c.setAttribute('cy',H/2); c.setAttribute('r',5);
+    c.setAttribute('fill','var(--inbody)'); c.setAttribute('stroke','var(--surface)'); c.setAttribute('stroke-width','2');
+    svg.appendChild(c);
+    return;
+  }
+  const vals = pts.map(p=>p[key]);
+  let min=Math.min(...vals), max=Math.max(...vals);
+  if(min===max){ min-=1; max+=1; }
+  const pad=(max-min)*0.15; min-=pad; max+=pad;
+  const coords = pts.map((p,i)=>({
+    x: PAD + (i/(pts.length-1))*(W-PAD*2),
+    y: H-8 - ((p[key]-min)/(max-min))*(H-16),
+    date:p.date, val:p[key]
+  }));
+  const base=document.createElementNS(NS,'line');
+  base.setAttribute('x1',PAD); base.setAttribute('x2',W-PAD); base.setAttribute('y1',H-8); base.setAttribute('y2',H-8);
+  base.setAttribute('stroke','var(--line)'); base.setAttribute('stroke-width','1');
+  svg.appendChild(base);
+
+  const areaPath = `M${coords[0].x},${H-8} ` + coords.map(c=>`L${c.x},${c.y}`).join(' ') + ` L${coords[coords.length-1].x},${H-8} Z`;
+  const area=document.createElementNS(NS,'path');
+  area.setAttribute('d',areaPath); area.setAttribute('fill','var(--inbody)'); area.setAttribute('opacity','.12'); area.setAttribute('stroke','none');
+  svg.appendChild(area);
+
+  const linePath = coords.map((c,i)=>(i===0?'M':'L')+c.x+','+c.y).join(' ');
+  const line=document.createElementNS(NS,'path');
+  line.setAttribute('d',linePath); line.setAttribute('fill','none'); line.setAttribute('stroke','var(--inbody)');
+  line.setAttribute('stroke-width','2'); line.setAttribute('stroke-linejoin','round'); line.setAttribute('stroke-linecap','round');
+  svg.appendChild(line);
+
+  const endC=coords[coords.length-1];
+  const endDot=document.createElementNS(NS,'circle');
+  endDot.setAttribute('cx',endC.x); endDot.setAttribute('cy',endC.y); endDot.setAttribute('r',5);
+  endDot.setAttribute('fill','var(--inbody)'); endDot.setAttribute('stroke','var(--surface)'); endDot.setAttribute('stroke-width','2');
+  svg.appendChild(endDot);
+
+  const cross=document.createElementNS(NS,'line');
+  cross.setAttribute('y1',4); cross.setAttribute('y2',H-8); cross.setAttribute('stroke','var(--text-faint)'); cross.setAttribute('stroke-width','1'); cross.setAttribute('opacity','0');
+  svg.appendChild(cross);
+  const hoverDot=document.createElementNS(NS,'circle');
+  hoverDot.setAttribute('r',5); hoverDot.setAttribute('fill','var(--inbody)'); hoverDot.setAttribute('stroke','var(--surface)'); hoverDot.setAttribute('stroke-width','2'); hoverDot.setAttribute('opacity','0');
+  svg.appendChild(hoverDot);
+
+  const tip=document.createElement('div');
+  tip.className='ib-tooltip';
+  container.appendChild(tip);
+
+  svg.addEventListener('mousemove', ev=>{
+    const rect = svg.getBoundingClientRect();
+    const relX = (ev.clientX-rect.left)/rect.width*W;
+    let nearest=coords[0], nd=Infinity;
+    coords.forEach(c=>{ const d=Math.abs(c.x-relX); if(d<nd){nd=d; nearest=c;} });
+    cross.setAttribute('x1',nearest.x); cross.setAttribute('x2',nearest.x); cross.setAttribute('opacity','.6');
+    hoverDot.setAttribute('cx',nearest.x); hoverDot.setAttribute('cy',nearest.y); hoverDot.setAttribute('opacity','1');
+    const [,mo,d]=nearest.date.split('-');
+    tip.textContent = `${mo}/${d} · ${nearest.val}${opts.unit}`;
+    tip.style.left = (nearest.x/W*100)+'%';
+    tip.style.top = (nearest.y/H*100)+'%';
+    tip.classList.add('show');
+  });
+  svg.addEventListener('mouseleave', ()=>{
+    cross.setAttribute('opacity','0'); hoverDot.setAttribute('opacity','0'); tip.classList.remove('show');
+  });
+}
+
+// ---- add / edit single entry ----
+let ibEntryDate = null;
+function ibFieldsFormHtml(ib){
+  const f=(fd)=>`<div class="ib-field"><label>${fd.label}${fd.unit?` (${fd.unit})`:''}</label><input type="number" step="${fd.dec===0?'1':(fd.dec>=3?'0.001':'0.01')}" id="ibf_${fd.key}" value="${ib[fd.key]??''}"></div>`;
+  const main = IB_VALUE_FIELDS.filter(fd=>fd.form);
+  const extra = IB_VALUE_FIELDS.filter(fd=>!fd.form);
+  return `<div class="inbody-grid">${main.map(f).join('')}</div>
+    <details style="margin-top:14px">
+      <summary style="cursor:pointer;font-size:12.5px;color:var(--text-muted);font-family:var(--font-mono)">부위별 · 상세 항목 더보기 (${extra.length}개)</summary>
+      <div class="inbody-grid">${extra.map(f).join('')}</div>
+    </details>
+    <div class="inbody-grid" style="margin-top:14px">
+      <div class="ib-field full"><label>메모</label><input type="text" id="ibf_memo" placeholder="특이사항, CSV에서 알아보지 못한 값 등" value="${(ib.memo||'').replace(/"/g,'&quot;')}"></div>
+    </div>`;
+}
+function openInbodyEntry(date){
+  ibEntryDate = date || todayStr();
+  const log = getLog(ibEntryDate);
+  const ib = log.inbody || {};
+  document.getElementById('ibEntryTitle').textContent = log.inbody ? '인바디 기록 수정' : '인바디 기록 추가';
+  document.getElementById('ibEntryDate').value = ibEntryDate;
+  document.getElementById('ibEntryFields').innerHTML = ibFieldsFormHtml(ib);
+  document.getElementById('ibEntryDelete').style.display = log.inbody ? 'block':'none';
+  document.getElementById('ibEntryOverlay').classList.add('open');
+}
+function closeIbEntry(){ document.getElementById('ibEntryOverlay').classList.remove('open'); }
+document.getElementById('ibEntryClose').addEventListener('click', closeIbEntry);
+document.getElementById('ibEntryOverlay').addEventListener('click', e=>{ if(e.target.id==='ibEntryOverlay') closeIbEntry(); });
+document.getElementById('ibAddBtn').addEventListener('click', ()=>openInbodyEntry());
+document.getElementById('ibEntrySave').addEventListener('click', ()=>{
+  const newDate = document.getElementById('ibEntryDate').value;
+  if(!newDate){ showToast('측정일을 선택해주세요'); return; }
+  const get=(k)=>{ const el=document.getElementById('ibf_'+k); if(!el) return undefined; const v=el.value; return v===''? undefined : (k==='memo'? v : Number(v)); };
+  const ib = {};
+  IB_VALUE_FIELDS.map(f=>f.key).concat('memo').forEach(k=>{
+    const v=get(k);
+    if(v!==undefined && !(typeof v==='number' && Number.isNaN(v))) ib[k]=v;
+  });
+  if(newDate!==ibEntryDate && state.logs[ibEntryDate] && state.logs[ibEntryDate].inbody){
+    const cleared = {...state.logs[ibEntryDate], inbody:null};
+    state.logs[ibEntryDate]=cleared;
+    persist(ibEntryDate, cleared);
+  }
+  const merged = {...getLog(newDate), inbody:ib, date:newDate};
+  state.logs[newDate]=merged;
+  persist(newDate, merged);
+  renderCalendar(); renderInbodyTab();
+  closeIbEntry();
+  showToast('인바디 기록을 저장했어요');
+});
+document.getElementById('ibEntryDelete').addEventListener('click', ()=>{
+  const merged = {...getLog(ibEntryDate), inbody:null};
+  state.logs[ibEntryDate]=merged;
+  persist(ibEntryDate, merged);
+  renderCalendar(); renderInbodyTab();
+  closeIbEntry();
+});
+
+// ---- CSV import ----
+function parseCSVText(text){
+  const rows=[]; let row=[]; let field=''; let inQuotes=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(inQuotes){
+      if(c==='"'){ if(text[i+1]==='"'){ field+='"'; i++; } else inQuotes=false; }
+      else field+=c;
+    } else {
+      if(c==='"') inQuotes=true;
+      else if(c===','){ row.push(field); field=''; }
+      else if(c==='\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else if(c==='\r'){ /* skip */ }
+      else field+=c;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r=>r.some(c=>c.trim()!==''));
+}
+const IB_FIELD_ALIASES = Object.fromEntries(IB_FIELDS.map(f=>[f.key, f.aliases]));
+const IB_IGNORE_HEADERS = ['측정장비','device','deviceid','기기'];
+// 괄호 안 단위는 통째로 떼고 비교한다. '체중(kg)' -> '체중', 'BMI(kg/m²)' -> 'bmi'
+function normHeader(h){
+  return String(h||'').replace(/\([^)]*\)/g,'').toLowerCase().replace(/[\s%._\-\[\]㎡²°]/g,'');
+}
+// 1차: 완전일치 / 2차: 긴 별칭 우선 부분일치(앞부분만). '오른팔 근육량'이 '근육량'으로
+// 잘못 잡히지 않도록 includes 대신 startsWith 를 쓴다.
+const IB_ALIAS_PAIRS = IB_FIELDS
+  .flatMap(f=>f.aliases.map(a=>({key:f.key, an:normHeader(a)})))
+  .filter(p=>p.an.length>=2)
+  .sort((a,b)=> b.an.length - a.an.length);
+function matchIbField(header){
+  const n = normHeader(header);
+  if(!n) return null;
+  for(const p of IB_ALIAS_PAIRS){ if(n===p.an) return p.key; }
+  for(const p of IB_ALIAS_PAIRS){
+    if(p.an.length>=3 && (n.startsWith(p.an) || p.an.startsWith(n))) return p.key;
+  }
+  return null;
+}
+function isIgnoredIbHeader(header){
+  const n = normHeader(header);
+  return IB_IGNORE_HEADERS.some(a=>n===normHeader(a));
+}
+function parseIbDate(s){
+  const t=String(s||'').trim();
+  // pure-digit timestamp, e.g. 20260905130838 (YYYYMMDDhhmmss) or 20260905 (YYYYMMDD)
+  const digitsOnly = t.match(/^\d{8,14}$/);
+  if(digitsOnly){
+    const y=t.slice(0,4), mo=t.slice(4,6), d=t.slice(6,8);
+    if(+mo>=1 && +mo<=12 && +d>=1 && +d<=31) return `${y}-${mo}-${d}`;
+  }
+  let m=t.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+  if(m) return `${m[1]}-${pad2(+m[2])}-${pad2(+m[3])}`;
+  m=t.match(/(\d{1,2})\D+(\d{1,2})\D+(\d{4})/);
+  if(m) return `${m[3]}-${pad2(+m[1])}-${pad2(+m[2])}`;
+  return null;
+}
+function parseInbodyCsv(text){
+  const rows = parseCSVText(text.trim());
+  if(!rows.length) return {ok:false, error:'내용이 비어 있어요.'};
+  const header = rows[0];
+  const colMap = header.map(matchIbField);
+  const dateIdx = colMap.indexOf('date');
+  if(dateIdx===-1) return {ok:false, error:'날짜 열을 찾지 못했어요. 헤더에 "날짜" 또는 "date" 열이 있는지 확인해주세요.'};
+  const parsed=[], skipped=[];
+  rows.slice(1).forEach((r,idx)=>{
+    if(r.every(c=>c.trim()==='')) return;
+    const date = parseIbDate(r[dateIdx]);
+    if(!date){ skipped.push(`${idx+2}행: 날짜 인식 실패 ("${r[dateIdx]||''}")`); return; }
+    const entry={date}; const unmatched=[];
+    header.forEach((h,ci)=>{
+      if(ci===dateIdx) return;
+      const val=(r[ci]||'').trim();
+      if(!val || val==='-' || val.toLowerCase()==='n/a') return; // no reading for this field
+      if(isIgnoredIbHeader(h)) return; // device id etc. — not useful to keep
+      const key=colMap[ci];
+      if(key){ const num=Number(val.replace(/[^0-9.\-]/g,'')); entry[key]= isNaN(num)? val : num; }
+      else unmatched.push(`${h.replace(/\(.*?\)/g,'').trim()}: ${val}`);
+    });
+    if(unmatched.length) entry.memo = unmatched.join(', ');
+    parsed.push(entry);
+  });
+  return {ok:true, header, colMap, parsed, skipped};
+}
+let ibPendingImport = null;
+function openCsvImport(){
+  document.getElementById('ibCsvFile').value='';
+  document.getElementById('ibCsvPaste').value='';
+  document.getElementById('ibCsvPreviewWrap').innerHTML='';
+  ibPendingImport=null;
+  document.getElementById('ibImportOverlay').classList.add('open');
+}
+function closeCsvImport(){ document.getElementById('ibImportOverlay').classList.remove('open'); }
+document.getElementById('ibImportBtn').addEventListener('click', openCsvImport);
+document.getElementById('ibImportClose').addEventListener('click', closeCsvImport);
+document.getElementById('ibImportOverlay').addEventListener('click', e=>{ if(e.target.id==='ibImportOverlay') closeCsvImport(); });
+document.getElementById('ibCsvFile').addEventListener('change', e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{ document.getElementById('ibCsvPaste').value = reader.result; };
+  reader.readAsText(file);
+});
+document.getElementById('ibCsvPreviewBtn').addEventListener('click', ()=>{
+  const text = document.getElementById('ibCsvPaste').value;
+  const wrap = document.getElementById('ibCsvPreviewWrap');
+  const res = parseInbodyCsv(text);
+  if(!res.ok){ wrap.innerHTML = `<div class="ib-preview-note warn">${res.error}</div>`; ibPendingImport=null; return; }
+  if(!res.parsed.length){ wrap.innerHTML = `<div class="ib-preview-note warn">가져올 수 있는 행이 없어요.</div>`; ibPendingImport=null; return; }
+  ibPendingImport = res.parsed;
+  // 미리보기: 인식된 항목이 있는 컬럼만 보여준다
+  const present = IB_VALUE_FIELDS.filter(f=>res.parsed.some(r=>r[f.key]!=null && r[f.key]!==''));
+  const cols = ['date', ...present.map(f=>f.key), ...(res.parsed.some(r=>r.memo)? ['memo']:[])];
+  const labels = Object.assign({date:'날짜', memo:'기타'}, Object.fromEntries(IB_VALUE_FIELDS.map(f=>[f.key,f.label])));
+  wrap.innerHTML = `
+    <div class="ib-preview-wrap-scroll"><table class="ib-preview-table">
+      <thead><tr>${cols.map(c=>`<th>${labels[c]}</th>`).join('')}</tr></thead>
+      <tbody>${res.parsed.map(r=>`<tr>${cols.map(c=>`<td>${r[c]??''}</td>`).join('')}</tr>`).join('')}</tbody>
+    </table></div>
+    <div class="ib-preview-note">${res.parsed.length}건을 인식했어요.${res.skipped.length? ` (${res.skipped.length}건 건너뜀)`:''}</div>
+    ${res.skipped.length? `<div class="ib-preview-note warn">${res.skipped.join(' · ')}</div>`:''}
+    <div class="field-row" style="margin-top:12px"><button class="primary-btn" id="ibCsvConfirmBtn">${res.parsed.length}건 가져오기</button></div>
+  `;
+  document.getElementById('ibCsvConfirmBtn').addEventListener('click', commitCsvImport);
+});
+function commitCsvImport(){
+  if(!ibPendingImport || !ibPendingImport.length) return;
+  ibPendingImport.forEach(entry=>{
+    const {date, ...fields} = entry;
+    const cur = getLog(date);
+    const merged = {...cur, inbody:{...(cur.inbody||{}), ...fields}, date};
+    state.logs[date] = merged;
+    persist(date, merged);
+  });
+  const n = ibPendingImport.length;
+  ibPendingImport = null;
+  renderCalendar();
+  renderInbodyTab();
+  closeCsvImport();
+  showToast(`인바디 기록 ${n}건을 가져왔어요`);
+}
+
+/* =========================================================
+   tabs
+   ========================================================= */
+function switchTab(view){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view));
+  if(view==='inbody') renderInbodyTab();
+}
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>switchTab(btn.dataset.view));
+});
+document.getElementById('dataBtn').addEventListener('click', openDataModal);
+document.getElementById('dataClose').addEventListener('click', closeDataModal);
+document.getElementById('dataOverlay').addEventListener('click', e=>{ if(e.target.id==='dataOverlay') closeDataModal(); });
+
+/* =========================================================
+   init
+   ========================================================= */
+renderPartFilters();
+renderLibrary();
+renderCalendar();
+initDb();
+</script>
+</body>
+</html>
+
