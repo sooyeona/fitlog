@@ -1,8 +1,8 @@
-/* 수댕로그 — 오프라인 지원
+/* 수딩핏 — 오프라인 지원
    헬스장 지하처럼 신호가 없는 곳에서도 앱이 열리도록,
    앱 화면과 한 번 본 운동 GIF를 이 기기에 캐시해 둔다.
    기록 데이터는 여기서 다루지 않는다(브라우저 저장 공간에 따로 들어감). */
-const VERSION = 'sudaenglog-v1';
+const VERSION = 'soodingfit-v3';
 const SHELL = VERSION + '-shell';   // 앱 화면(HTML·폰트)
 const MEDIA = VERSION + '-media';   // 운동 GIF·이미지
 
