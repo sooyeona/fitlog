@@ -276,6 +276,8 @@
   .sum-supps{display:flex;flex-wrap:wrap;gap:7px 12px;}
   .sum-supp{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;}
   .sum-supp>i{width:6px;height:6px;border-radius:50%;background:var(--supp);flex:none;}
+  .sum-supp.none{color:var(--text-faint);}
+  .sum-supp.none>i{background:var(--line);}
   .sum-meal{display:flex;align-items:baseline;gap:10px;font-size:13.5px;}
   .sum-meal .lab{color:var(--text-muted);width:46px;flex:none;font-size:12.5px;}
   .sum-meal .tm{font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);width:42px;flex:none;}
@@ -550,9 +552,42 @@
   .rec-badge.pt{background:var(--accent);color:var(--on-accent);}
 
   /* ---------- 식단: 시간 + 간식 여러 개 ---------- */
-  .meal-row{display:grid;grid-template-columns:52px 96px 1fr;gap:8px;align-items:center;margin-bottom:8px;}
+  .meal-row{display:grid;grid-template-columns:52px 96px 1fr 32px;gap:8px;align-items:center;margin-bottom:8px;}
+  .photo-btn{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--bg);
+    color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+  .photo-btn:hover{border-color:var(--diet);color:var(--diet);}
+
+  /* 사진 줄 */
+  .photo-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 2px;margin-top:10px;
+    -webkit-overflow-scrolling:touch;scrollbar-width:thin;}
+  .photo-thumb{position:relative;flex:none;width:72px;height:72px;border-radius:11px;overflow:hidden;
+    border:1px solid var(--line);background:var(--surface-2);cursor:pointer;}
+  .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .photo-thumb .pm{position:absolute;left:0;bottom:0;right:0;font-size:9.5px;font-weight:700;
+    color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.62));padding:8px 5px 3px;text-align:center;}
+  .photo-del{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;border:none;
+    background:rgba(0,0,0,.55);color:#fff;font-size:9px;line-height:1;cursor:pointer;padding:0;}
+
+  /* 사진 크게 보기 */
+  .photo-overlay{background:#0A0C0A;backdrop-filter:none;align-items:center;}
+  .photo-overlay .pv-wrap{width:100%;height:100%;display:flex;flex-direction:column;}
+  .pv-top{display:flex;align-items:center;gap:10px;padding:14px 16px;
+    padding-top:calc(14px + env(safe-area-inset-top));flex:none;}
+  .pv-badge{font-size:12px;font-weight:700;color:#fff;background:var(--diet);
+    border-radius:999px;padding:4px 12px;}
+  .pv-count{font-family:var(--font-mono);font-size:12px;color:rgba(255,255,255,.72);}
+  .pv-close{margin-left:auto;width:34px;height:34px;border-radius:50%;border:none;
+    background:rgba(255,255,255,.14);color:#fff;font-size:15px;cursor:pointer;}
+  .pv-stage{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;
+    padding:0 8px calc(16px + env(safe-area-inset-bottom));touch-action:pan-y;}
+  .pv-stage img{max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;
+    user-select:none;-webkit-user-drag:none;}
+  .pv-arrow{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:56px;border:none;
+    background:rgba(255,255,255,.12);color:#fff;font-size:24px;cursor:pointer;border-radius:10px;}
+  .pv-arrow.left{left:6px;} .pv-arrow.right{right:6px;}
+  @media (max-width:520px){ .pv-arrow{display:none;} }
   .meal-row > label{font-size:12.5px;color:var(--text-muted);}
-  .snack-row{display:grid;grid-template-columns:52px 96px 1fr 30px;gap:8px;align-items:center;margin-bottom:8px;}
+  .snack-row{display:grid;grid-template-columns:52px 96px 1fr 32px 30px;gap:8px;align-items:center;margin-bottom:8px;}
   .snack-del{border:none;background:transparent;color:var(--text-faint);font-size:14px;cursor:pointer;font-family:inherit;}
   .snack-del:hover{color:var(--danger);}
   .add-line-btn{width:100%;border:1px dashed var(--line);background:transparent;color:var(--text-muted);
@@ -790,6 +825,22 @@
         </div>
       </div>
       <div id="pickPaneRoutine" hidden></div>
+    </div>
+  </div>
+</div>
+
+<!-- 식단 사진 크게 보기 -->
+<div class="overlay photo-overlay" id="photoOverlay">
+  <div class="pv-wrap">
+    <div class="pv-top">
+      <span class="pv-badge" id="pvBadge"></span>
+      <span class="pv-count" id="pvCount"></span>
+      <button class="pv-close" id="pvClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="pv-stage" id="pvStage">
+      <img id="pvImg" alt="식단 사진">
+      <button class="pv-arrow left" id="pvPrev" aria-label="이전 사진">‹</button>
+      <button class="pv-arrow right" id="pvNext" aria-label="다음 사진">›</button>
     </div>
   </div>
 </div>
@@ -1783,7 +1834,7 @@ function todayStr(){return fmtDate(new Date());}
 function emptyMeal(){ return {text:'', time:''}; }
 function emptyLog(date){
   return {date, workout:{type:'none',durationMin:'',exercises:[],memo:''},
-           diet:{breakfast:emptyMeal(), lunch:emptyMeal(), dinner:emptyMeal(), snacks:[], memo:''},
+           diet:{breakfast:emptyMeal(), lunch:emptyMeal(), dinner:emptyMeal(), snacks:[], memo:'', photos:[]},
            water:{ml:0,goal:2000}, protein:{g:0}, supplementsTaken:[],
            inbody:null};
 }
@@ -1796,9 +1847,13 @@ function normalizeDiet(raw){
   const d = raw || {};
   let snacks = Array.isArray(d.snacks) ? d.snacks.map(normalizeMeal) : [];
   if(!snacks.length && d.snack) snacks = [normalizeMeal(d.snack)];
+  // 사진: {id, meal:'breakfast'|'lunch'|'dinner'|'snack', src:dataURL, at:ISO}
+  const photos = (Array.isArray(d.photos) ? d.photos : [])
+    .filter(x=>x && x.src).map(x=>({id:x.id||('ph-'+Math.random().toString(36).slice(2,9)),
+      meal:x.meal||'snack', src:x.src, at:x.at||''}));
   return {
     breakfast: normalizeMeal(d.breakfast), lunch: normalizeMeal(d.lunch),
-    dinner: normalizeMeal(d.dinner), snacks, memo: d.memo||'',
+    dinner: normalizeMeal(d.dinner), snacks, memo: d.memo||'', photos,
   };
 }
 function emptySet(){ return {reps:'', weight:'', failed:false, failReason:''}; }
@@ -2315,11 +2370,18 @@ function hasWorkoutContent(log){
 function hasDietContent(log){
   const d = log.diet;
   return !!(d && ((d.breakfast&&d.breakfast.text) || (d.lunch&&d.lunch.text) ||
-    (d.dinner&&d.dinner.text) || (d.snacks||[]).some(x=>x&&x.text)));
+    (d.dinner&&d.dinner.text) || (d.snacks||[]).some(x=>x&&x.text) || (d.photos||[]).length));
 }
 function isEditing(key, hasContent){
   const v = state.sectionEdit[key];
-  return v === undefined ? !hasContent : v;   // 내용이 없으면 바로 편집 상태
+  if(v !== undefined) return v;
+  // 영양제·단백질은 항상 접힌 상태로 시작한다 (한 줄이면 충분한 정보라서)
+  if(key==='supp' || key==='protein') return false;
+  return !hasContent;                        // 나머지는 내용이 없으면 바로 편집 상태
+}
+function sectionHeadAlwaysHtml(color, title, key, editing){
+  return `<div class="section-head"><i class="dot" style="background:${color}"></i><h4>${title}</h4>`
+       + `<button class="sec-edit" data-secedit="${key}">${editing ? '접기' : '편집'}</button></div>`;
 }
 function sectionHeadHtml(color, title, key, hasContent, editing){
   const btn = hasContent
@@ -2356,21 +2418,133 @@ function workoutSummaryHtml(log){
   return head + (exs || `<div class="sum-empty">선택한 운동 없음</div>`)
     + (w.memo ? `<div class="sum-note">메모 · ${w.memo.replace(/</g,'&lt;')}</div>` : '');
 }
+/* =========================================================
+   식단 사진 — 폰 저장 공간이 작으니 최대한 줄여서 담는다.
+   긴 변 800px, JPEG 품질 0.6 으로 줄이고 그래도 크면 더 낮춘다.
+   ========================================================= */
+const MEAL_LABEL = {breakfast:'아침', lunch:'점심', dinner:'저녁', snack:'간식'};
+const MAX_PHOTOS_PER_DAY = 12;
+const CAMERA_SVG = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.2l1.1-1.8A1 1 0 0 1 8.7 4.7h6.6a1 1 0 0 1 .86.5L17.3 7h2.2A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="12.8" r="3.3"/></svg>';
+
+// 파일 하나를 작은 JPEG data URL 로 바꾼다
+function shrinkImage(file){
+  return new Promise((resolve, reject)=>{
+    const fr = new FileReader();
+    fr.onerror = ()=>reject(new Error('read'));
+    fr.onload = ()=>{
+      const img = new Image();
+      img.onerror = ()=>reject(new Error('decode'));
+      img.onload = ()=>{
+        const MAX = 800;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        let out = cv.toDataURL('image/jpeg', 0.6);
+        // 그래도 크면 품질을 더 낮춘다 (폰 저장 공간이 한정적이라)
+        if(out.length > 170000) out = cv.toDataURL('image/jpeg', 0.45);
+        if(out.length > 170000) out = cv.toDataURL('image/jpeg', 0.33);
+        resolve(out);
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+// 사진 줄. editable 이면 각 사진에 ✕ 가 붙는다.
+function photoStripHtml(log, editable){
+  const list = (log.diet && log.diet.photos) || [];
+  if(!list.length) return '';
+  return `<div class="photo-strip">${list.map((ph,i)=>`
+    <div class="photo-thumb" data-photoidx="${i}">
+      <img src="${ph.src}" alt="${MEAL_LABEL[ph.meal]||''} 사진" loading="lazy">
+      <span class="pm">${MEAL_LABEL[ph.meal]||''}</span>
+      ${editable ? `<button class="photo-del" data-photodel="${ph.id}" aria-label="사진 삭제">✕</button>` : ''}
+    </div>`).join('')}</div>`;
+}
+
+// 사진 고르기 → 줄여서 그날 기록에 넣기
+let photoInputEl = null;
+function pickPhoto(ds, meal){
+  const log = getLog(ds);
+  if(((log.diet.photos)||[]).length >= MAX_PHOTOS_PER_DAY){
+    showToast(`사진은 하루 ${MAX_PHOTOS_PER_DAY}장까지예요`); return;
+  }
+  if(!photoInputEl){
+    photoInputEl = document.createElement('input');
+    photoInputEl.type = 'file';
+    photoInputEl.accept = 'image/*';
+    photoInputEl.multiple = true;
+    photoInputEl.style.display = 'none';
+    document.body.appendChild(photoInputEl);
+  }
+  photoInputEl.value = '';
+  photoInputEl.onchange = async ()=>{
+    const files = [...(photoInputEl.files||[])];
+    if(!files.length) return;
+    showToast('사진을 줄이는 중…');
+    const added = [];
+    for(const f of files){
+      const cur = getLog(ds).diet.photos || [];
+      if(cur.length + added.length >= MAX_PHOTOS_PER_DAY) break;
+      try{
+        const src = await shrinkImage(f);
+        added.push({id:'ph-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),
+                    meal, src, at:new Date().toISOString()});
+      }catch(err){ showToast('사진을 읽지 못했어요'); }
+    }
+    if(!added.length) return;
+    const d = getLog(ds).diet;
+    queueSave(ds, {diet:{...d, photos:[...(d.photos||[]), ...added]}}, {refresh:true});
+    showToast(`사진 ${added.length}장 추가 · 저장을 눌러주세요`);
+  };
+  photoInputEl.click();
+}
+
+/* ---- 사진 크게 보기 (좌우 스와이프) ---- */
+let photoViewer = {list:[], idx:0};
+function openPhotoViewer(list, idx){
+  photoViewer = {list, idx};
+  const ov = document.getElementById('photoOverlay');
+  ov.classList.add('open');
+  renderPhotoViewer();
+}
+function closePhotoViewer(){ document.getElementById('photoOverlay').classList.remove('open'); }
+function renderPhotoViewer(){
+  const {list, idx} = photoViewer;
+  const ph = list[idx];
+  if(!ph) return closePhotoViewer();
+  document.getElementById('pvBadge').textContent = MEAL_LABEL[ph.meal] || '식단';
+  document.getElementById('pvCount').textContent = `${idx+1} / ${list.length}`;
+  document.getElementById('pvImg').src = ph.src;
+  document.getElementById('pvPrev').hidden = list.length < 2;
+  document.getElementById('pvNext').hidden = list.length < 2;
+}
+function stepPhoto(d){
+  const n = photoViewer.list.length;
+  if(n < 2) return;
+  photoViewer.idx = (photoViewer.idx + d + n) % n;
+  renderPhotoViewer();
+}
+
 function dietSummaryHtml(log){
   const d = log.diet;
   const rows = [['아침',d.breakfast],['점심',d.lunch],['저녁',d.dinner]]
     .concat((d.snacks||[]).map((sn,i)=>[`간식${(d.snacks.length>1)?' '+(i+1):''}`, sn]))
     .filter(([,m])=> m && m.text);
-  if(!rows.length) return `<div class="sum-empty">기록 없음</div>`;
+  if(!rows.length && !(log.diet.photos||[]).length) return `<div class="sum-empty">기록 없음</div>`;
   return `<div class="sum-meals">${rows.map(([lab,m])=>
     `<div class="sum-meal"><span class="lab">${lab}</span><span class="tm">${m.time||''}</span><span class="tx">${m.text.replace(/</g,'&lt;')}</span></div>`
-  ).join('')}</div>`;
+  ).join('')}</div>${photoStripHtml(log, false)}`;
 }
 
 // 영양제 요약 — 챙겨 먹은 것만 목록으로
 function supplementSummaryHtml(log){
   const taken = log.supplementsTaken || [];
-  if(!taken.length) return `<div class="sum-empty">기록 없음</div>`;
+  if(!taken.length) return `<div class="sum-supps"><span class="sum-supp none"><i></i>안 먹음</span></div>`;
   const label = k => (state.supplements.find(x=>x.id===k)||{}).name || k;
   return `<div class="sum-supps">${taken.map(k=>
     `<span class="sum-supp"><i></i>${String(label(k)).replace(/</g,'&lt;')}</span>`).join('')}</div>`;
@@ -2413,11 +2587,12 @@ function renderDaySheet(ds){
   const wHas = hasWorkoutContent(log), dHas = hasDietContent(log);
   const sHas = (log.supplementsTaken||[]).length > 0;
   const wEdit = isEditing('workout', wHas), dEdit = isEditing('diet', dHas);
-  const sEdit = isEditing('supp', sHas);
+  const sEdit = isEditing('supp', sHas), pEdit = isEditing('protein', log.protein.g>0);
   // 편집 중이면 그 상태를 붙잡아 둔다 — 운동을 추가해 내용이 생겼다고 도중에 접히면 안 된다
   if(wEdit) state.sectionEdit.workout = true;
   if(dEdit) state.sectionEdit.diet = true;
   if(sEdit) state.sectionEdit.supp = true;
+  if(pEdit) state.sectionEdit.protein = true;
 
   body.innerHTML = `
     <div class="section">
@@ -2453,37 +2628,28 @@ function renderDaySheet(ds){
         <label>${lab}</label>
         <input type="time" class="meal-time" data-meal="${k}" value="${log.diet[k].time||''}">
         <input type="text" class="meal-text" data-meal="${k}" placeholder="무엇을 드셨나요?" value="${(log.diet[k].text||'').replace(/"/g,'&quot;')}">
+        <button class="photo-btn" data-photoadd="${k}" aria-label="${lab} 사진 추가" title="사진 추가">${CAMERA_SVG}</button>
       </div>`).join('')}
       ${log.diet.snacks.map((sn,i)=>`
       <div class="snack-row">
         <label>간식${log.diet.snacks.length>1? ' '+(i+1):''}</label>
         <input type="time" class="snack-time" data-idx="${i}" value="${sn.time||''}">
         <input type="text" class="snack-text" data-idx="${i}" placeholder="무엇을 드셨나요?" value="${(sn.text||'').replace(/"/g,'&quot;')}">
+        <button class="photo-btn" data-photoadd="snack" aria-label="간식 사진 추가" title="사진 추가">${CAMERA_SVG}</button>
         <button class="snack-del" data-snackdel="${i}" aria-label="간식 삭제">✕</button>
       </div>`).join('')}
-      <button class="add-line-btn" id="addSnack">+ 간식 추가</button>`}
+      <button class="add-line-btn" id="addSnack">+ 간식 추가</button>
+      ${photoStripHtml(log, true)}`}
     </div>
 
     <div class="section">
-      ${sectionHeadHtml('var(--supp)','영양제','supp', sHas, sEdit)}
+      ${sectionHeadAlwaysHtml('var(--supp)','영양제','supp', sEdit)}
       ${!sEdit ? supplementSummaryHtml(log) : `
       <div class="chip-row" id="suppChipRow"></div>
       <div class="field-row" id="suppNewBox" style="display:none">
         <input type="text" id="suppNewInput" placeholder="영양제 이름을 직접 입력 (예: 밀크씨슬)">
         <button class="pick-btn" style="width:auto;white-space:nowrap" id="suppNewConfirm">추가</button>
       </div>`}
-    </div>
-
-    <div class="section">
-      <div class="section-head"><i class="dot" style="background:var(--protein)"></i><h4>단백질</h4></div>
-      <div class="water-row prot-row">
-        <button class="water-btn prot-btn" data-g="1">+1g</button>
-        <button class="water-btn prot-btn" data-g="5">+5g</button>
-        <button class="water-btn prot-btn" data-g="10">+10g</button>
-        <button class="water-btn prot-btn" data-g="20">+20g</button>
-        <span class="water-total"${log.protein.g? ' style="color:var(--protein)"':''}>${log.protein.g}<span style="font-size:12px;color:var(--text-faint)"> g</span></span>
-      </div>
-      <div class="water-goal">쉐이크·프로틴바 등 따로 챙겨 먹은 양${log.protein.g? ` · <a href="#" id="protReset" style="color:var(--text-faint)">초기화</a>` : ''}</div>
     </div>
 
     <div class="section">
@@ -2497,6 +2663,19 @@ function renderDaySheet(ds){
       </div>
       <div class="water-bar"><i style="width:${waterPct}%"></i></div>
       <div class="water-goal">목표 ${(log.water.goal/1000).toFixed(1)}L 중 ${waterPct}% · <a href="#" id="waterReset" style="color:var(--text-faint)">초기화</a></div>
+    </div>
+
+    <div class="section">
+      ${sectionHeadAlwaysHtml('var(--protein)','단백질','protein', pEdit)}
+      <div class="water-row prot-row">
+        ${pEdit ? `
+        <button class="water-btn prot-btn" data-g="1">+1g</button>
+        <button class="water-btn prot-btn" data-g="5">+5g</button>
+        <button class="water-btn prot-btn" data-g="10">+10g</button>
+        <button class="water-btn prot-btn" data-g="20">+20g</button>` : ''}
+        <span class="water-total"${log.protein.g? ' style="color:var(--protein)"':''}>${log.protein.g}<span style="font-size:12px;color:var(--text-faint)"> g</span></span>
+      </div>
+      ${pEdit ? `<div class="water-goal">쉐이크·프로틴바 등 따로 챙겨 먹은 양${log.protein.g? ` · <a href="#" id="protReset" style="color:var(--text-faint)">초기화</a>` : ''}</div>` : ''}
     </div>
 
     <div class="section">
@@ -2522,6 +2701,7 @@ function renderDaySheet(ds){
       const k = btn.dataset.secedit;
       const has = k==='workout' ? hasWorkoutContent(log)
                 : k==='diet'    ? hasDietContent(log)
+                : k==='protein' ? log.protein.g > 0
                 : (log.supplementsTaken||[]).length > 0;
       state.sectionEdit[k] = !isEditing(k, has);
       renderDaySheet(ds);
@@ -2604,7 +2784,22 @@ function renderDaySheet(ds){
       queueSave(ds, {water:{...cur.water, ml:cur.water.ml+Number(btn.dataset.ml)}}, {refresh:true});
     });
   });
-  body.querySelector('#waterReset').addEventListener('click', e=>{
+  // 식단 사진
+  body.querySelectorAll('[data-photoadd]').forEach(btn=>{
+    btn.addEventListener('click', ()=>pickPhoto(ds, btn.dataset.photoadd));
+  });
+  body.querySelectorAll('[data-photodel]').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.stopPropagation();
+      const d = getLog(ds).diet;
+      queueSave(ds, {diet:{...d, photos:(d.photos||[]).filter(x=>x.id!==btn.dataset.photodel)}}, {refresh:true});
+    });
+  });
+  body.querySelectorAll('[data-photoidx]').forEach(el=>{
+    el.addEventListener('click', ()=>openPhotoViewer(getLog(ds).diet.photos||[], Number(el.dataset.photoidx)));
+  });
+  const waterResetEl = body.querySelector('#waterReset');
+  if(waterResetEl) waterResetEl.addEventListener('click', e=>{
     e.preventDefault();
     queueSave(ds, {water:{...getLog(ds).water, ml:0}}, {refresh:true});
   });
@@ -3153,6 +3348,33 @@ function openRoutineList(){
 }
 function closeRoutineList(){ document.getElementById('routineListOverlay').classList.remove('open'); }
 document.getElementById('libRoutineBtn').addEventListener('click', openRoutineList);
+/* ---- 사진 뷰어 배선 (좌우 스와이프 + 화살표 + ESC) ---- */
+document.getElementById('pvClose').addEventListener('click', closePhotoViewer);
+document.getElementById('photoOverlay').addEventListener('click', e=>{
+  if(e.target.id==='photoOverlay' || e.target.id==='pvStage') closePhotoViewer();
+});
+document.getElementById('pvPrev').addEventListener('click', ()=>stepPhoto(-1));
+document.getElementById('pvNext').addEventListener('click', ()=>stepPhoto(1));
+(function(){
+  const stage = document.getElementById('pvStage');
+  let x0 = null, y0 = null;
+  stage.addEventListener('pointerdown', e=>{ x0 = e.clientX; y0 = e.clientY; });
+  stage.addEventListener('pointerup', e=>{
+    if(x0 == null) return;
+    const dx = e.clientX - x0, dy = e.clientY - y0;
+    x0 = null;
+    // 가로로 40px 넘게, 세로보다 많이 움직였을 때만 넘긴다
+    if(Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) stepPhoto(dx < 0 ? 1 : -1);
+  });
+  stage.addEventListener('pointercancel', ()=>{ x0 = null; });
+})();
+window.addEventListener('keydown', e=>{
+  if(!document.getElementById('photoOverlay').classList.contains('open')) return;
+  if(e.key === 'Escape') closePhotoViewer();
+  if(e.key === 'ArrowLeft') stepPhoto(-1);
+  if(e.key === 'ArrowRight') stepPhoto(1);
+});
+
 document.getElementById('routineListClose').addEventListener('click', closeRoutineList);
 document.getElementById('routineListOverlay').addEventListener('click', e=>{ if(e.target.id==='routineListOverlay') closeRoutineList(); });
 document.getElementById('routineClose').addEventListener('click', closeRoutineEditor);
