@@ -1850,7 +1850,8 @@ function normalizeDiet(raw){
   // 사진: {id, meal:'breakfast'|'lunch'|'dinner'|'snack', src:dataURL, at:ISO}
   const photos = (Array.isArray(d.photos) ? d.photos : [])
     .filter(x=>x && x.src).map(x=>({id:x.id||('ph-'+Math.random().toString(36).slice(2,9)),
-      meal:x.meal||'snack', src:x.src, at:x.at||''}));
+      meal:x.meal||'snack', snackIdx: Number.isInteger(x.snackIdx) ? x.snackIdx : null,
+      src:x.src, at:x.at||''}));
   return {
     breakfast: normalizeMeal(d.breakfast), lunch: normalizeMeal(d.lunch),
     dinner: normalizeMeal(d.dinner), snacks, memo: d.memo||'', photos,
@@ -2454,9 +2455,33 @@ function shrinkImage(file){
   });
 }
 
+/* 사진은 '올린 순서'가 아니라 그 끼니에 적어둔 **시간 순**으로 늘어놓는다.
+   시간을 안 적었으면 끼니의 보통 시간대를 대신 쓴다(아침→점심→간식→저녁). */
+const MEAL_RANK = {breakfast:0, lunch:1, snack:2, dinner:3};
+const MEAL_FALLBACK_MIN = {breakfast:8*60, lunch:12*60+30, snack:15*60, dinner:18*60+30};
+function mealTimeOf(log, ph){
+  const d = log.diet || {};
+  let t = '';
+  if(ph.meal === 'snack'){
+    const list = d.snacks || [];
+    const sn = Number.isInteger(ph.snackIdx) ? list[ph.snackIdx] : null;
+    t = (sn && sn.time) || (list.find(x=>x && x.time) || {}).time || '';
+  }else{
+    t = (d[ph.meal] && d[ph.meal].time) || '';
+  }
+  const m = /^(\d{1,2}):(\d{2})/.exec(t);
+  return m ? Number(m[1])*60 + Number(m[2]) : (MEAL_FALLBACK_MIN[ph.meal] ?? 12*60);
+}
+function sortedPhotos(log){
+  return ((log.diet && log.diet.photos) || [])
+    .map((ph,i)=>({ph, i, t:mealTimeOf(log, ph)}))
+    .sort((a,b)=> a.t-b.t || (MEAL_RANK[a.ph.meal]??9)-(MEAL_RANK[b.ph.meal]??9) || a.i-b.i)
+    .map(x=>x.ph);
+}
+
 // 사진 줄. editable 이면 각 사진에 ✕ 가 붙는다.
 function photoStripHtml(log, editable){
-  const list = (log.diet && log.diet.photos) || [];
+  const list = sortedPhotos(log);
   if(!list.length) return '';
   return `<div class="photo-strip">${list.map((ph,i)=>`
     <div class="photo-thumb" data-photoidx="${i}">
@@ -2468,7 +2493,7 @@ function photoStripHtml(log, editable){
 
 // 사진 고르기 → 줄여서 그날 기록에 넣기
 let photoInputEl = null;
-function pickPhoto(ds, meal){
+function pickPhoto(ds, meal, snackIdx){
   const log = getLog(ds);
   if(((log.diet.photos)||[]).length >= MAX_PHOTOS_PER_DAY){
     showToast(`사진은 하루 ${MAX_PHOTOS_PER_DAY}장까지예요`); return;
@@ -2493,7 +2518,8 @@ function pickPhoto(ds, meal){
       try{
         const src = await shrinkImage(f);
         added.push({id:'ph-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),
-                    meal, src, at:new Date().toISOString()});
+                    meal, snackIdx: Number.isInteger(snackIdx) ? snackIdx : null,
+                    src, at:new Date().toISOString()});
       }catch(err){ showToast('사진을 읽지 못했어요'); }
     }
     if(!added.length) return;
@@ -2635,7 +2661,7 @@ function renderDaySheet(ds){
         <label>간식${log.diet.snacks.length>1? ' '+(i+1):''}</label>
         <input type="time" class="snack-time" data-idx="${i}" value="${sn.time||''}">
         <input type="text" class="snack-text" data-idx="${i}" placeholder="무엇을 드셨나요?" value="${(sn.text||'').replace(/"/g,'&quot;')}">
-        <button class="photo-btn" data-photoadd="snack" aria-label="간식 사진 추가" title="사진 추가">${CAMERA_SVG}</button>
+        <button class="photo-btn" data-photoadd="snack" data-snackidx="${i}" aria-label="간식 사진 추가" title="사진 추가">${CAMERA_SVG}</button>
         <button class="snack-del" data-snackdel="${i}" aria-label="간식 삭제">✕</button>
       </div>`).join('')}
       <button class="add-line-btn" id="addSnack">+ 간식 추가</button>
@@ -2786,7 +2812,8 @@ function renderDaySheet(ds){
   });
   // 식단 사진
   body.querySelectorAll('[data-photoadd]').forEach(btn=>{
-    btn.addEventListener('click', ()=>pickPhoto(ds, btn.dataset.photoadd));
+    btn.addEventListener('click', ()=>pickPhoto(ds, btn.dataset.photoadd,
+      btn.dataset.snackidx != null ? Number(btn.dataset.snackidx) : null));
   });
   body.querySelectorAll('[data-photodel]').forEach(btn=>{
     btn.addEventListener('click', e=>{
@@ -2796,7 +2823,7 @@ function renderDaySheet(ds){
     });
   });
   body.querySelectorAll('[data-photoidx]').forEach(el=>{
-    el.addEventListener('click', ()=>openPhotoViewer(getLog(ds).diet.photos||[], Number(el.dataset.photoidx)));
+    el.addEventListener('click', ()=>openPhotoViewer(sortedPhotos(getLog(ds)), Number(el.dataset.photoidx)));
   });
   const waterResetEl = body.querySelector('#waterReset');
   if(waterResetEl) waterResetEl.addEventListener('click', e=>{
