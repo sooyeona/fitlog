@@ -283,7 +283,8 @@
   .sum-set.failed .v{color:var(--danger);text-decoration:line-through;}
   .sum-set .fx{font-size:11.5px;color:var(--danger);}
   .sum-set .mx{font-size:11.5px;color:var(--note-ink);}
-  .sum-note{font-size:12.5px;color:var(--text-muted);margin-top:6px;line-height:1.6;}
+  /* 저장 후 보기 상태의 메모·시간은 눈에 띄게 (두께는 기본) */
+  .sum-note{font-size:12.5px;color:var(--note-ink);margin-top:6px;line-height:1.6;}
   .sum-empty{font-size:13px;color:var(--text-faint);}
   .sum-meals{display:flex;flex-direction:column;gap:6px;}
   .sum-supps{display:flex;flex-wrap:wrap;gap:7px 12px;}
@@ -560,11 +561,9 @@
   .set-fail-reason{margin:2px 0 8px 38px;}
   .set-fail-reason input{font-size:12.5px;}
   .set-memo-row{margin:2px 0 8px 38px;}
-  .set-memo-row input{font-size:12.5px;color:var(--note-ink);border-color:var(--note-ink);font-weight:400;}
+  .set-memo-row input{font-size:12.5px;}
   .ex-note-row{margin-top:10px;}
-  /* 메모는 적어 넣은 값이 눈에 띄어야 한다 (두께는 그대로, 색만) */
-  input.ex-note, input.ex-minutes, #wtMemo{color:var(--note-ink);}
-  input.ex-note:focus, input.ex-minutes:focus, #wtMemo:focus{border-color:var(--note-ink);}
+  /* 입력칸은 항상 기본 글자색. 색은 저장 후 '보기' 상태에서만 쓴다. */
   .ex-note-row label{display:block;font-size:11.5px;color:var(--text-muted);margin-bottom:5px;font-family:var(--font-mono);}
   .rec-badge{flex:none;font-size:10px;font-family:var(--font-mono);border-radius:999px;padding:2px 7px;white-space:nowrap;}
   .rec-badge.pt{background:var(--accent);color:var(--on-accent);}
