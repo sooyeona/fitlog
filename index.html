@@ -51,6 +51,7 @@
     --day-tint:.17;          /* 달력에서 운동한 날 배경 진하기 */
 
     --brand:#E8899E;         /* 로고 — 아이콘 배경과 같은 분홍 (밝은 배경이라 한 톤 진하게) */
+    --note-ink:#2F5FD0;      /* 메모·운동시간 입력값 — 회색이라 잘 안 보인다고 해서 파랑으로 */
 
     /* 순서 바꾸기(드래그) 전용 색 */
     --drag-grip:#A9ACA9;
@@ -87,6 +88,7 @@
       --danger:#E28098;
       --day-tint:.3;
       --brand:#F5A3B4;
+      --note-ink:#84AEFF;
       --drag-grip:#BFC3BA;
       --drag-grip-bg:#3F3244;
       --drag-ink:#BFC3BA;
@@ -117,6 +119,7 @@
     --danger:#E28098;
     --day-tint:.3;
     --brand:#F5A3B4;
+    --note-ink:#84AEFF;
     --drag-grip:#BFC3BA;
     --drag-grip-bg:#3F3244;
     --drag-ink:#BFC3BA;
@@ -238,8 +241,17 @@
   .sheet{background:var(--surface);width:100%;max-width:640px;max-height:88vh;border-radius:20px 20px 0 0;box-shadow:var(--shadow-2);display:flex;flex-direction:column;transform:translateY(24px);transition:transform .2s;overflow:hidden;}
   .overlay.open .sheet{transform:translateY(0);}
   @media (min-width:720px){.sheet{border-radius:20px;margin-bottom:0;}}
-  .sheet-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line);flex:none;}
-  .sheet-head h3{margin:0;font-size:20px;}
+  .sheet-head{display:flex;align-items:center;gap:8px;padding:16px 16px;border-bottom:1px solid var(--line);flex:none;}
+  .sheet-head h3{margin:0;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .day-headmid{flex:1 1 auto;min-width:0;}
+  .day-nav{flex:none;width:26px;height:32px;border-radius:8px;border:1px solid var(--line);
+    background:var(--surface);color:var(--text-muted);font-size:16px;line-height:1;cursor:pointer;
+    font-family:inherit;padding:0;}
+  .day-nav:hover{color:var(--text);border-color:var(--text-faint);}
+  .day-kind{font-size:12px;margin-left:6px;white-space:nowrap;
+    font-family:var(--font-body);font-variant-emoji:text;}
+  .sheet-head .head-actions{flex:none;}
+  .sheet-head .save-status{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .sheet-head .save-status{font-size:11px;color:var(--text-faint);font-family:var(--font-mono);}
   .sheet-body{padding:20px 22px 28px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
   /* 시트가 열려 있는 동안 뒤 화면은 스크롤되지 않게 고정한다.
@@ -259,7 +271,7 @@
   /* 저장된 뒤 보이는 요약 */
   .sum-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
   .sum-kind{font-size:11.5px;font-weight:700;color:var(--on-accent);border-radius:999px;padding:3px 10px;}
-  .sum-dur{font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted);}
+  .sum-dur{font-family:var(--font-mono);font-size:12.5px;color:var(--note-ink);}
   .sum-ex{margin-bottom:12px;}
   .sum-ex + .sum-ex{border-top:1px solid var(--line);padding-top:11px;}
   .sum-ex-name{font-size:14px;font-weight:700;margin-bottom:5px;}
@@ -270,6 +282,7 @@
   .sum-set .v{font-family:var(--font-mono);}
   .sum-set.failed .v{color:var(--danger);text-decoration:line-through;}
   .sum-set .fx{font-size:11.5px;color:var(--danger);}
+  .sum-set .mx{font-size:11.5px;color:var(--note-ink);}
   .sum-note{font-size:12.5px;color:var(--text-muted);margin-top:6px;line-height:1.6;}
   .sum-empty{font-size:13px;color:var(--text-faint);}
   .sum-meals{display:flex;flex-direction:column;gap:6px;}
@@ -546,7 +559,12 @@
   .set-menu-back{position:fixed;inset:0;z-index:199;}
   .set-fail-reason{margin:2px 0 8px 38px;}
   .set-fail-reason input{font-size:12.5px;}
+  .set-memo-row{margin:2px 0 8px 38px;}
+  .set-memo-row input{font-size:12.5px;color:var(--note-ink);border-color:var(--note-ink);font-weight:400;}
   .ex-note-row{margin-top:10px;}
+  /* 메모는 적어 넣은 값이 눈에 띄어야 한다 (두께는 그대로, 색만) */
+  input.ex-note, input.ex-minutes, #wtMemo{color:var(--note-ink);}
+  input.ex-note:focus, input.ex-minutes:focus, #wtMemo:focus{border-color:var(--note-ink);}
   .ex-note-row label{display:block;font-size:11.5px;color:var(--text-muted);margin-bottom:5px;font-family:var(--font-mono);}
   .rec-badge{flex:none;font-size:10px;font-family:var(--font-mono);border-radius:999px;padding:2px 7px;white-space:nowrap;}
   .rec-badge.pt{background:var(--accent);color:var(--on-accent);}
@@ -639,6 +657,7 @@
   .ex-set-remove:hover{color:var(--danger);}
   .ex-set-nameline{display:flex;align-items:center;gap:4px;min-width:0;}
   .ex-set-nameline .ex-set-name{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ex-set-min{flex:none;font-family:var(--font-mono);font-size:12px;font-weight:400;color:var(--note-ink);}
   .ex-fold{flex:none;width:22px;height:22px;border:none;background:transparent;color:var(--text-faint);
     font-size:11px;line-height:1;cursor:pointer;font-family:inherit;transition:transform .15s;}
   .ex-set-card.collapsed .ex-fold{transform:rotate(-90deg);}
@@ -660,6 +679,7 @@
   .set-idx{font-size:12px;color:var(--text-faint);font-family:var(--font-mono);}
   .set-x{font-size:11px;color:var(--text-faint);text-align:center;}
   .set-reps,.set-kg{padding:7px 8px;font-size:13px;text-align:center;font-family:var(--font-mono);}
+  input.set-reps,input.set-kg{font-size:13px;}
   .set-del{width:22px;height:22px;border-radius:50%;border:none;background:transparent;color:var(--text-faint);cursor:pointer;font-size:10px;}
   .set-del:hover{color:var(--danger);}
   .set-add-btn{border:1px dashed var(--line);background:transparent;color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;margin-top:7px;width:100%;text-align:left;}
@@ -784,7 +804,9 @@
 <div class="overlay" id="dayOverlay">
   <div class="sheet">
     <div class="sheet-head">
-      <div>
+      <button class="day-nav" id="dayPrev" aria-label="어제">‹</button>
+      <button class="day-nav" id="dayNext" aria-label="내일">›</button>
+      <div class="day-headmid">
         <h3 id="dayTitle"></h3>
         <div class="save-status" id="saveStatus">&nbsp;</div>
       </div>
@@ -1063,7 +1085,8 @@ const EXERCISES = [
           '내릴 때는 어깨가 으쓱 올라가지 않게 천천히 내린다.'],
    angles:['팔꿈치는 몸통 라인 안쪽 유지','엄지 끝 = 손잡이 끝','기계 시작 중량 10lbs(4.5kg)']},
   {id:'hs-lateral-raise', name:'레터럴 레이즈 머신 (해머 스트렝스)', part:'shoulder', equip:'머신 · 해머 스트렝스', mine:true,
-   alias:['레터럴레이즈','래터럴 레이즈','사이드 레터럴','lateral raise','측면 삼각근 머신','어깨 벌리는 머신'],
+   alias:['레터럴레이즈','래터럴 레이즈','사이드 레터럴','lateral raise','측면 삼각근 머신','어깨 벌리는 머신',
+          '어깨 레이즈','어깨레이즈','숄더 레이즈','숄더레이즈'],
    muscle:'삼각근 측면(중간 삼각근)',
    steps:['시트 높이를 조절해 어깨 관절이 기계 회전축과 같은 높이에 오게 한다.',
           '등을 패드에 붙이고 앉아 팔꿈치를 살짝 굽힌 채 팔 패드 안쪽에 붙인다.',
@@ -1451,7 +1474,14 @@ function parseSetLine(line){
       if(mX[3]) count = Math.min(30, Math.max(1, parseInt(mX[3],10)));
     }
   }
-  if(reps === null) return null;         // 횟수가 없으면 세트로 치지 않는다
+  // "5kg x 할수있는 개수 최대" 처럼 숫자가 아닌 횟수도 세트로 본다.
+  // 단, 무게나 x 표시가 함께 있을 때만 — 안 그러면 "손목은 최대한 말아쥐고" 같은
+  // 설명 문장까지 세트로 잡아먹는다.
+  if(reps === null && (weight !== null || /[x×*]/i.test(t))
+     && /최대|가능한\s*만큼|할\s*수\s*있는|할수있는|max(?:imum)?|amrap/i.test(t)){
+    reps = '최대';
+  }
+  if(reps === null) return null;         // 횟수가 아예 없으면 세트로 치지 않는다
   return {weight, reps, count};
 }
 
@@ -1555,6 +1585,32 @@ function parseRoutineChunk(name, lines){
     start(t);                                  // 표시 없는 줄 = 운동 이름
   });
   push();
+
+  /* 운동 이름을 한 줄도 못 찾은 경우 —
+     "어깨 레이즈 / 1. … / - 5kg x 최대" 처럼 운동 하나짜리로 보내주면
+     그 한 줄이 루틴 제목으로 먹혀서 운동이 0개가 된다.
+     이럴 땐 루틴 제목을 그대로 운동 이름으로 쓴다. */
+  /* 운동 이름 없이 세트만 잡힌 경우도 같은 상황이다 — 루틴 제목이 곧 운동 이름이다. */
+  if(routine.items.length === 1 && routine.items[0].rawName === '(이름 없음)' && name){
+    const it = routine.items[0];
+    it.rawName = name;
+    it.exId = matchExerciseAny(name);
+    it.steps = [...routine.notes, ...it.steps];   // 번호 설명은 이 운동의 설명이다
+    routine.notes = [];
+  }
+  if(!routine.items.length && (routine.notes.length || name)){
+    const only = {rawName: name || '(이름 없음)', exId:null, sets:[], steps:[], notes:[]};
+    lines.forEach(t=>{
+      const numbered = t.match(/^(\d{1,2})\s*[.)](?!\d)\s*(.*)$/);
+      const body = numbered ? numbered[2].trim() : t.replace(/^[-–•*]\s*/, '').trim();
+      const set = parseSetLine(body);
+      if(set){ for(let k=0;k<set.count;k++) only.sets.push({weight:set.weight ?? '', reps:set.reps ?? ''}); }
+      else if(numbered) only.steps.push(body);
+      else only.notes.push(body);
+    });
+    routine.notes = [];
+    routine.items.push(finishItem(only));
+  }
   return routine;
 }
 
@@ -1819,6 +1875,7 @@ const state = {
   favLoaded:false,
   month:new Date(),
   selectedDate:null,
+  touched:{},        // 이번 편집에서 건드린 구역 (운동만 고쳤으면 저장해도 시트를 안 닫는다)
   pickerSelection:new Set(),
 };
 
@@ -1857,10 +1914,11 @@ function normalizeDiet(raw){
     dinner: normalizeMeal(d.dinner), snacks, memo: d.memo||'', photos,
   };
 }
-function emptySet(){ return {reps:'', weight:'', failed:false, failReason:''}; }
+function emptySet(){ return {reps:'', weight:'', failed:false, failReason:'', memo:''}; }
 function normalizeSet(x){
   const s = (x && typeof x==='object') ? x : {};
-  return {reps:s.reps??'', weight:s.weight??'', failed:!!s.failed, failReason:s.failReason||''};
+  return {reps:s.reps??'', weight:s.weight??'', failed:!!s.failed,
+          failReason:s.failReason||'', memo:s.memo||''};
 }
 // 저장된 기록을 현재 스키마로 맞춘다. 예전 버전이 쓴 문서(workout.exerciseIds)나
 // 필드가 빠진 문서를 열어도 화면이 깨지지 않게 하기 위한 이관/보정 단계.
@@ -1904,6 +1962,10 @@ let saveTimer=null;
 // immediately (use for button/toggle actions); leave false (default) for free-typing
 // inputs so the field the user is typing in never loses focus.
 function queueSave(date, patch, opts={}){
+  // 이번에 어느 구역을 건드렸는지 기억해 둔다 (저장 뒤 시트를 닫을지 판단용)
+  if(state.draft && date===state.draftDate){
+    Object.keys(patch||{}).forEach(k=>{ state.touched[k] = true; });
+  }
   const cur = getLog(date);
   const merged = {...cur, ...patch, date};
   // 편집 중인 날짜라면 사본만 바꾸고, 달력·서버에는 손대지 않는다.
@@ -2218,19 +2280,31 @@ function markDirty(on){
   document.getElementById('saveStatus').textContent = state.dirty ? '저장 안 된 변경사항' : '';
   if(!state.dirty) document.getElementById('dayDirtyBar').hidden = true;
 }
+// 시트 제목 — 날짜 옆에 그날 운동 종류를 글자색으로만 표시한다
+function renderDayTitle(ds){
+  const [y,mo,d] = ds.split('-').map(Number);
+  const dow = ['일','월','화','수','목','금','토'][new Date(y,mo-1,d).getDay()];
+  const log = (state.draft && state.draftDate===ds) ? state.draft : state.logs[ds];
+  const t = workoutLogged(log) ? log.workout.type : null;
+  const kind = t ? `<span class="day-kind" style="color:${t==='pt'?'var(--pt)':'var(--personal)'}">&check;&#xFE0E; ${t==='pt'?'PT':'개인운동'}</span>` : '';
+  document.getElementById('dayTitle').innerHTML = `${mo}월 ${d}일 (${dow})${kind}`;
+}
+
 function openDay(ds){
   state.selectedDate = ds;
   // 저장 전 편집 사본을 만든다. 이 사본을 고치는 동안 달력과 저장된 기록은 그대로다.
   state.draftDate = ds;
   state.draft = JSON.parse(JSON.stringify(normalizeLog(state.logs[ds], ds)));
   state.sectionEdit = {};   // 열 때는 요약부터 보여준다
+  state.touched = {};
   const [y,mo,d] = ds.split('-').map(Number);
   const dow = ['일','월','화','수','목','금','토'][new Date(y,mo-1,d).getDay()];
-  document.getElementById('dayTitle').textContent = `${mo}월 ${d}일 (${dow})`;
+  renderDayTitle(ds);
   document.getElementById('dayDirtyBar').hidden = true;
   // 시트를 먼저 띄운 뒤 그린다. 기록 데이터에 예상치 못한 값이 있어도
   // '아무 반응 없음' 대신 최소한 시트는 열리고 상황을 알려준다.
   document.getElementById('dayOverlay').classList.add('open');
+  document.getElementById('daySheetBody').scrollTop = 0;   // 열 때는 항상 맨 위부터
   try{
     renderDaySheet(ds);
   }catch(err){
@@ -2249,6 +2323,7 @@ function saveDay(opts={}){
   persist(ds, data);
   markDirty(false);
   state.sectionEdit = {};        // 저장 후에는 요약으로 접는다
+  state.touched = {};
   renderDayIfOpen(ds);
   renderCalendar();
   if(!opts.silent) showToast('저장했어요');
@@ -2266,9 +2341,30 @@ function closeDay(opts={}){
   renderCalendar();
 }
 // 저장을 누르면 그대로 시트를 닫는다 (저장했는데 계속 떠 있으면 저장된 건지 헷갈린다)
+// 하루 앞뒤로 이동. 저장 안 된 변경이 있으면 먼저 정리하게 한다.
+function shiftDay(delta){
+  if(!state.selectedDate) return;
+  if(state.dirty){
+    document.getElementById('dayDirtyBar').hidden = false;
+    showToast('저장 안 된 변경이 있어요');
+    return;
+  }
+  const [y,mo,d] = state.selectedDate.split('-').map(Number);
+  const nd = new Date(y, mo-1, d + delta);
+  state.month = new Date(nd.getFullYear(), nd.getMonth(), 1);
+  renderCalendar();
+  openDay(fmtDate(nd));
+}
+document.getElementById('dayPrev').addEventListener('click', ()=>shiftDay(-1));
+document.getElementById('dayNext').addEventListener('click', ()=>shiftDay(1));
+
+/* 저장을 누르면 시트를 닫는다.
+   단 운동만 고쳤을 때는 이어서 기록할 게 많아 닫지 않는다. */
 document.getElementById('daySave').addEventListener('click', ()=>{
+  const keys = Object.keys(state.touched);
+  const workoutOnly = keys.length > 0 && keys.every(k=>k==='workout');
   saveDay({silent:true});
-  closeDay({force:true});
+  if(!workoutOnly) closeDay({force:true});
   showToast('저장했어요');
 });
 document.getElementById('dirtySave').addEventListener('click', ()=>{ saveDay({silent:true}); closeDay({force:true}); showToast('저장하고 닫았어요'); });
@@ -2377,7 +2473,7 @@ function isEditing(key, hasContent){
   const v = state.sectionEdit[key];
   if(v !== undefined) return v;
   // 영양제·단백질은 항상 접힌 상태로 시작한다 (한 줄이면 충분한 정보라서)
-  if(key==='supp' || key==='protein') return false;
+  if(key==='supp' || key==='protein' || key==='ptpass') return false;
   return !hasContent;                        // 나머지는 내용이 없으면 바로 편집 상태
 }
 function sectionHeadAlwaysHtml(color, title, key, editing){
@@ -2406,13 +2502,14 @@ function workoutSummaryHtml(log){
     const rows = []
       .concat((en.warmupSets||[]).map((x,i)=>({n:'W'+(i+1), x})))
       .concat((en.workSets||[]).map((x,i)=>({n:(i+1)+'세트', x})))
-      .filter(r=> r.x.reps!=='' || r.x.weight!=='' || r.x.failed);
+      .filter(r=> r.x.reps!=='' || r.x.weight!=='' || r.x.failed || r.x.memo);
     return `<div class="sum-ex">
-      <div class="sum-ex-name">${ex.name}${en.mode==='pt'? ` <span class="sum-tag">선생님</span>`:''}</div>
+      <div class="sum-ex-name">${ex.name}${en.minutes? ` <span class="ex-set-min">${en.minutes}분</span>`:''}${en.mode==='pt'? ` <span class="sum-tag">선생님</span>`:''}</div>
       ${rows.length ? `<div class="sum-sets">${rows.map(r=>
         `<div class="sum-set${r.x.failed?' failed':''}"><span class="n">${r.n}</span><span class="v">${setLineText(r.x)}</span>${
-          r.x.failed ? `<span class="fx">실패${r.x.failReason? ' · '+r.x.failReason.replace(/</g,'&lt;') : ''}</span>` : ''}</div>`
-      ).join('')}</div>` : `<div class="sum-empty">세트 기록 없음</div>`}
+          r.x.failed ? `<span class="fx">실패${r.x.failReason? ' · '+r.x.failReason.replace(/</g,'&lt;') : ''}</span>` : ''}${
+          r.x.memo ? `<span class="mx">${r.x.memo.replace(/</g,'&lt;')}</span>` : ''}</div>`
+      ).join('')}</div>` : (en.minutes ? '' : `<div class="sum-empty">세트 기록 없음</div>`)}
       ${en.note ? `<div class="sum-note">${en.note.replace(/</g,'&lt;')}</div>` : ''}
     </div>`;
   }).join('');
@@ -2459,6 +2556,11 @@ function shrinkImage(file){
    시간을 안 적었으면 끼니의 보통 시간대를 대신 쓴다(아침→점심→간식→저녁). */
 const MEAL_RANK = {breakfast:0, lunch:1, snack:2, dinner:3};
 const MEAL_FALLBACK_MIN = {breakfast:8*60, lunch:12*60+30, snack:15*60, dinner:18*60+30};
+// 시간이 비면 끼니의 보통 시간대로 자리를 잡는다
+function mealSortKey(time, meal){
+  const m = /^(\d{1,2}):(\d{2})/.exec(time||'');
+  return m ? Number(m[1])*60 + Number(m[2]) : (MEAL_FALLBACK_MIN[meal] ?? 12*60);
+}
 function mealTimeOf(log, ph){
   const d = log.diet || {};
   let t = '';
@@ -2561,9 +2663,13 @@ function stepPhoto(d){
 
 function dietSummaryHtml(log){
   const d = log.diet;
-  const rows = [['아침',d.breakfast],['점심',d.lunch],['저녁',d.dinner]]
-    .concat((d.snacks||[]).map((sn,i)=>[`간식${(d.snacks.length>1)?' '+(i+1):''}`, sn]))
-    .filter(([,m])=> m && m.text);
+  // 사진과 마찬가지로 적어둔 시간 순으로 늘어놓는다 (간식이 아침보다 이를 수도 있다)
+  const rows = [['아침',d.breakfast,'breakfast'],['점심',d.lunch,'lunch'],['저녁',d.dinner,'dinner']]
+    .concat((d.snacks||[]).map((sn,i)=>[`간식${(d.snacks.length>1)?' '+(i+1):''}`, sn, 'snack']))
+    .filter(([,m])=> m && m.text)
+    .map((r,i)=>({r, i, t: mealSortKey(r[1].time, r[2])}))
+    .sort((a,b)=> a.t-b.t || a.i-b.i)
+    .map(x=>x.r);
   if(!rows.length && !(log.diet.photos||[]).length) return `<div class="sum-empty">기록 없음</div>`;
   return `<div class="sum-meals">${rows.map(([lab,m])=>
     `<div class="sum-meal"><span class="lab">${lab}</span><span class="tm">${m.time||''}</span><span class="tx">${m.text.replace(/</g,'&lt;')}</span></div>`
@@ -2577,6 +2683,15 @@ function supplementSummaryHtml(log){
   const label = k => (state.supplements.find(x=>x.id===k)||{}).name || k;
   return `<div class="sum-supps">${taken.map(k=>
     `<span class="sum-supp"><i></i>${String(label(k)).replace(/</g,'&lt;')}</span>`).join('')}</div>`;
+}
+
+// PT 회차권 한 줄 요약 (접혀 있을 때)
+function ptPassSummaryHtml(){
+  const info = ptPassLabel();
+  if(!info) return `<div class="pt-pass-now empty">아직 등록한 PT 회차권이 없어요.</div>`;
+  return `<div class="pt-pass-now"><b>${info.dateText}</b> 시작 · <b>${info.used}/${info.total}회</b>`
+       + (info.done ? ' · <span style="color:var(--danger)">다 썼어요</span>' : ` · ${info.left}회 남음`)
+       + `</div>`;
 }
 
 /* 날짜 시트의 'PT 등록' 칸.
@@ -2615,13 +2730,16 @@ function renderDaySheet(ds){
   const waterPct = Math.min(100, Math.round((log.water.ml/log.water.goal)*100));
   const wHas = hasWorkoutContent(log), dHas = hasDietContent(log);
   const sHas = (log.supplementsTaken||[]).length > 0;
+  renderDayTitle(ds);
   const wEdit = isEditing('workout', wHas), dEdit = isEditing('diet', dHas);
   const sEdit = isEditing('supp', sHas), pEdit = isEditing('protein', log.protein.g>0);
+  const ppEdit = isEditing('ptpass', false);
   // 편집 중이면 그 상태를 붙잡아 둔다 — 운동을 추가해 내용이 생겼다고 도중에 접히면 안 된다
   if(wEdit) state.sectionEdit.workout = true;
   if(dEdit) state.sectionEdit.diet = true;
   if(sEdit) state.sectionEdit.supp = true;
   if(pEdit) state.sectionEdit.protein = true;
+  if(ppEdit) state.sectionEdit.ptpass = true;
 
   body.innerHTML = `
     <div class="section">
@@ -2708,8 +2826,8 @@ function renderDaySheet(ds){
     </div>
 
     <div class="section">
-      <div class="section-head"><i class="dot" style="background:var(--pt)"></i><h4>PT 등록</h4></div>
-      ${ptSectionHtml(ds)}
+      ${sectionHeadAlwaysHtml('var(--pt)','PT 등록','ptpass', ppEdit)}
+      ${ppEdit ? ptSectionHtml(ds) : ptPassSummaryHtml()}
     </div>
 
     <div class="section">
@@ -2731,6 +2849,7 @@ function renderDaySheet(ds){
       const has = k==='workout' ? hasWorkoutContent(log)
                 : k==='diet'    ? hasDietContent(log)
                 : k==='protein' ? log.protein.g > 0
+                : k==='ptpass'  ? false
                 : (log.supplementsTaken||[]).length > 0;
       state.sectionEdit[k] = !isEditing(k, has);
       renderDaySheet(ds);
@@ -2892,6 +3011,7 @@ function renderExerciseCards(log){
         <div class="ex-set-titlewrap">
           <span class="ex-set-nameline">
             <span class="ex-set-name" data-detail="${entry.id}">${ex.name}</span>
+            ${(ex.custom && entry.minutes) ? `<span class="ex-set-min">${entry.minutes}분</span>` : ''}
             <button class="ex-fold" data-foldex="${entry.id}" aria-label="${collapsed?'펼치기':'접기'}">▾</button>
           </span>
           <span class="ex-set-muscle">${collapsed ? (setSummaryText(entry) || `${ex.equip} · ${ex.muscle}`) : `${ex.equip} · ${ex.muscle}`}</span>
@@ -2950,12 +3070,13 @@ function setRow(exId, kind, idx, s, label){
   const failed = !!s.failed;
   return `<div class="set-row" data-exid="${exId}" data-kind="${kind}" data-idx="${idx}">
     <span class="set-idx">${typeof label==='number'?label+'세트':label}</span>
-    <input type="number" inputmode="numeric" placeholder="회" class="set-reps" value="${s.reps??''}">
+    <input type="text" inputmode="numeric" placeholder="회" class="set-reps" value="${String(s.reps??'').replace(/"/g,'&quot;')}">
     <span class="set-x">×</span>
-    <input type="number" inputmode="decimal" placeholder="kg" class="set-kg" value="${s.weight??''}">
+    <input type="text" inputmode="decimal" placeholder="kg" class="set-kg" value="${String(s.weight??'').replace(/"/g,'&quot;')}">
     <button class="set-more ${failed?'on':''}" data-setmore="${exId}" data-kind2="${kind}" data-idx2="${idx}" aria-label="세트 더보기">⋯</button>
   </div>
-  ${failed? `<div class="set-fail-reason"><input type="text" class="set-fail-why" data-exid2="${exId}" data-kind4="${kind}" data-idx4="${idx}" placeholder="왜 못 했는지 (예: 마지막 2회 못 듦, 어깨 통증)" value="${(s.failReason||'').replace(/"/g,'&quot;')}"></div>`:''}`;
+  ${failed? `<div class="set-fail-reason"><input type="text" class="set-fail-why" data-exid2="${exId}" data-kind4="${kind}" data-idx4="${idx}" placeholder="왜 못 했는지 (예: 마지막 2회 못 듦, 어깨 통증)" value="${(s.failReason||'').replace(/"/g,'&quot;')}"></div>`:''}
+  ${(s.memo!=null && s.memo!=='') || s.memoOpen ? `<div class="set-memo-row"><input type="text" class="set-memo" data-exid5="${exId}" data-kind5="${kind}" data-idx5="${idx}" placeholder="이 세트 메모 (예: 그립 바꿔봄)" value="${(s.memo||'').replace(/"/g,'&quot;')}"></div>`:''}`;
 }
 /* ---- 세트 더보기 메뉴 ----
    실패 표시 / 운동 메모로 이동 / 세트 삭제. 화면 밖으로 안 나가게 위치를 보정한다. */
@@ -2975,7 +3096,7 @@ function openSetMenu(ds, btn){
   menu.className = 'set-menu';
   menu.innerHTML = `
     <button data-act="fail">${failed ? '실패 표시 해제' : '실패로 표시'}</button>
-    <button data-act="note">운동 메모 쓰기</button>
+    <button data-act="note">이 세트 메모</button>
     <button data-act="del" class="danger">이 세트 삭제</button>`;
   document.body.appendChild(back);
   document.body.appendChild(menu);
@@ -3005,10 +3126,16 @@ function openSetMenu(ds, btn){
         if(inp){ inp.focus(); }
       }
     }else if(act === 'note'){
+      // 이 세트에만 달리는 메모 — 아래 '운동 중 메모'와는 따로다
       state.cardFold[exId] = false;
+      mutateExercise(ds, exId, ex=>{
+        const c = ex[kind][idx];
+        ex[kind][idx] = {...c, memoOpen:true, memo:c.memo||''};
+        return ex;
+      });
       renderDaySheet(ds);
-      const note = document.querySelector(`.ex-note[data-noteex="${exId}"]`);
-      if(note){ note.scrollIntoView({block:'center', behavior:'smooth'}); note.focus(); }
+      const mi = document.querySelector(`.set-memo[data-exid5="${exId}"][data-kind5="${kind}"][data-idx5="${idx}"]`);
+      if(mi) mi.focus();
     }else if(act === 'del'){
       mutateExercise(ds, exId, ex=>{ ex[kind]=ex[kind].filter((_,i)=>i!==idx); return ex; });
       renderDaySheet(ds);
@@ -3134,6 +3261,12 @@ function wireExerciseCards(ds, body){
     });
     row.querySelector('.set-kg').addEventListener('input', e=>{
       mutateExercise(ds, exId, ex=>{ ex[kind][idx]={...ex[kind][idx], weight:e.target.value}; return ex; });
+    });
+  });
+  body.querySelectorAll('.set-memo').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      const kind=inp.dataset.kind5, idx=Number(inp.dataset.idx5);
+      mutateExercise(ds, inp.dataset.exid5, ex=>{ ex[kind][idx]={...ex[kind][idx], memo:e.target.value}; return ex; });
     });
   });
   body.querySelectorAll('.set-fail-why').forEach(inp=>{
