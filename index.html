@@ -760,7 +760,6 @@
         <span><i class="cellsw" style="background:var(--personal)"></i>개인운동</span>
         <span><i class="cellsw" style="background:var(--pt)"></i>PT</span>
         <span><i class="dot" style="background:var(--diet)"></i>식단</span>
-        <span><i class="dot" style="background:var(--water)"></i>물</span>
         <span><i class="dot" style="background:var(--supp)"></i>영양제</span>
         <span><i class="dot" style="background:var(--inbody)"></i>인바디 (날짜 옆)</span>
       </div>
@@ -2236,7 +2235,6 @@ function renderCalendar(){
         (Array.isArray(d.snacks) && d.snacks.some(sn=>sn && sn.text)) ||
         (typeof d.breakfast==='string' && (d.breakfast||d.lunch||d.dinner||d.snack)));
       if(hasDiet) marks.push({c:'var(--diet)', t:'식단'});
-      if(log.water && log.water.ml>0) marks.push({c:'var(--water)', t:'물'});
       if(log.supplementsTaken && log.supplementsTaken.length) marks.push({c:'var(--supp)', t:'영양제'});
     }
     // 좁은 화면은 칸이 작아 점 2개까지만 (그 이상은 +N)
