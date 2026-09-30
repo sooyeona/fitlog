@@ -1996,6 +1996,10 @@ const LS_KEY = 'fitlog.v1';
    localStorage 에는 글자 기록만 남긴다. */
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
+/* 창고에 확실히 들어간 사진 id.
+   여기에 없는 사진은 localStorage 에서 알맹이를 빼지 않는다 —
+   빼버리면 창고 쓰기가 실패했을 때 양쪽 다 사라진다. */
+const photoInIdb = new Set();
 function idbOpen(){
   return new Promise((res, rej)=>{
     if(_idb) return res(_idb);
@@ -2014,7 +2018,7 @@ async function idbPut(id, src){
   return new Promise((res, rej)=>{
     const t = d.transaction(IDB_STORE, 'readwrite');
     t.objectStore(IDB_STORE).put(src, id);
-    t.oncomplete = ()=>res(true);
+    t.oncomplete = ()=>{ photoInIdb.add(id); res(true); };
     t.onerror = ()=>rej(t.error);
   });
 }
@@ -2055,7 +2059,9 @@ function logsForStorage(){
   Object.entries(state.logs).forEach(([d, l])=>{
     const ps = l && l.diet && l.diet.photos;
     out[d] = (ps && ps.length)
-      ? {...l, diet:{...l.diet, photos: ps.map(({src, ...rest})=>rest)}}
+      // 창고에 확실히 들어간 것만 알맹이를 뺀다. 아직 못 들어간 건 그대로 둬야 안 잃는다.
+      ? {...l, diet:{...l.diet, photos: ps.map(ph=>
+          photoInIdb.has(ph.id) ? (({src, ...rest})=>rest)(ph) : ph)}}
       : l;
   });
   return out;
@@ -2142,8 +2148,9 @@ async function initDb(){
 /* 사진 알맹이 붙이기.
    예전 버전은 사진을 localStorage 안에 통째로 넣었다 → 있으면 IndexedDB 로 옮긴다. */
 async function attachPhotos(){
-  let map = new Map();
-  try{ map = await idbAll(); }catch(e){}
+  let map = new Map(), idbOk = true;
+  try{ map = await idbAll(); }catch(e){ idbOk = false; }
+  map.forEach((_v, k)=>photoInIdb.add(k));
   const moved = [];
   Object.values(state.logs).forEach(l=>{
     const d = l && l.diet;
@@ -2155,8 +2162,17 @@ async function attachPhotos(){
       return false;                       // 알맹이를 못 찾은 사진은 버린다
     });
   });
-  for(const [id, src] of moved){ try{ await idbPut(id, src); }catch(e){} }
-  if(moved.length) lsSave();              // 옮겼으면 localStorage 를 가볍게 다시 쓴다
+  if(!idbOk){
+    // 창고를 못 열면 예전처럼 localStorage 에 그대로 둔다 (잃는 것보다 낫다)
+    showToast('사진 저장소를 열지 못했어요 — 백업을 받아두세요');
+    return;
+  }
+  let failed = 0;
+  for(const [id, src] of moved){
+    try{ await idbPut(id, src); }catch(e){ failed++; }
+  }
+  if(moved.length) lsSave();              // 옮긴 만큼 localStorage 가 가벼워진다
+  if(failed) showToast(`사진 ${failed}장을 옮기지 못했어요 — 백업을 받아두세요`);
 }
 
 /* ---- 백업 내보내기 / 복원 ---- */
