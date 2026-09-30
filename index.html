@@ -589,7 +589,10 @@
     background:rgba(0,0,0,.55);color:#fff;font-size:9px;line-height:1;cursor:pointer;padding:0;}
 
   /* 사진 크게 보기 */
-  .photo-overlay{background:#0A0C0A;backdrop-filter:none;align-items:center;}
+  /* 사진 뷰어는 다른 시트 위에 떠야 한다.
+     z-index 가 같으면 DOM 에서 뒤에 있는 데이터 시트가 위로 올라와
+     '보기'를 눌러도 아무 일도 안 일어난 것처럼 보인다. */
+  .photo-overlay{background:#0A0C0A;backdrop-filter:none;align-items:center;z-index:300;}
   .photo-overlay .pv-wrap{width:100%;height:100%;display:flex;flex-direction:column;}
   .pv-top{display:flex;align-items:center;gap:10px;padding:14px 16px;
     padding-top:calc(14px + env(safe-area-inset-top));flex:none;}
@@ -2011,7 +2014,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-09-30 00:42';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-09-30 01:26';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
