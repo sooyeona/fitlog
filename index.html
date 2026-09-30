@@ -1877,6 +1877,7 @@ const state = {
   month:new Date(),
   selectedDate:null,
   touched:{},        // 이번 편집에서 건드린 구역 (운동만 고쳤으면 저장해도 시트를 안 닫는다)
+  saveFailed:false,  // 마지막 저장이 실패했는가 (저장 공간 꽉 참 등)
   pickerSelection:new Set(),
 };
 
@@ -1906,10 +1907,11 @@ function normalizeDiet(raw){
   let snacks = Array.isArray(d.snacks) ? d.snacks.map(normalizeMeal) : [];
   if(!snacks.length && d.snack) snacks = [normalizeMeal(d.snack)];
   // 사진: {id, meal:'breakfast'|'lunch'|'dinner'|'snack', src:dataURL, at:ISO}
+  // src(사진 알맹이)는 저장본에 없을 수 있다 — 앱을 켤 때 창고에서 붙여 준다
   const photos = (Array.isArray(d.photos) ? d.photos : [])
-    .filter(x=>x && x.src).map(x=>({id:x.id||('ph-'+Math.random().toString(36).slice(2,9)),
+    .filter(x=>x && (x.id || x.src)).map(x=>({id:x.id||('ph-'+Math.random().toString(36).slice(2,9)),
       meal:x.meal||'snack', snackIdx: Number.isInteger(x.snackIdx) ? x.snackIdx : null,
-      src:x.src, at:x.at||''}));
+      src:x.src||'', at:x.at||''}));
   return {
     breakfast: normalizeMeal(d.breakfast), lunch: normalizeMeal(d.lunch),
     dinner: normalizeMeal(d.dinner), snacks, memo: d.memo||'', photos,
@@ -1985,11 +1987,85 @@ function queueSave(date, patch, opts={}){
   saveTimer=setTimeout(()=>persist(date, merged), 350);
 }
 const LS_KEY = 'fitlog.v1';
+
+/* ---- 식단 사진 창고 (IndexedDB) ----
+   localStorage 는 아이폰에서 5MB 쯤이 한계라, 사진(한 장 약 60KB)을 거기 넣으면
+   스무 날치쯤에서 꽉 차 버린다. 꽉 차면 setItem 이 통째로 실패해서
+   "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
+   그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
+   localStorage 에는 글자 기록만 남긴다. */
+const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
+let _idb = null;
+function idbOpen(){
+  return new Promise((res, rej)=>{
+    if(_idb) return res(_idb);
+    if(!window.indexedDB) return rej(new Error('no-idb'));
+    const r = indexedDB.open(IDB_NAME, 1);
+    r.onupgradeneeded = ()=>{
+      const d = r.result;
+      if(!d.objectStoreNames.contains(IDB_STORE)) d.createObjectStore(IDB_STORE);
+    };
+    r.onsuccess = ()=>{ _idb = r.result; res(_idb); };
+    r.onerror   = ()=>rej(r.error);
+  });
+}
+async function idbPut(id, src){
+  const d = await idbOpen();
+  return new Promise((res, rej)=>{
+    const t = d.transaction(IDB_STORE, 'readwrite');
+    t.objectStore(IDB_STORE).put(src, id);
+    t.oncomplete = ()=>res(true);
+    t.onerror = ()=>rej(t.error);
+  });
+}
+async function idbAll(){
+  const d = await idbOpen();
+  return new Promise((res, rej)=>{
+    const out = new Map();
+    const t = d.transaction(IDB_STORE, 'readonly');
+    const cur = t.objectStore(IDB_STORE).openCursor();
+    cur.onsuccess = ()=>{
+      const c = cur.result;
+      if(c){ out.set(c.key, c.value); c.continue(); } else res(out);
+    };
+    cur.onerror = ()=>rej(cur.error);
+  });
+}
+// 어느 기록에서도 안 쓰는 사진은 지운다 (추가했다가 저장 안 하고 닫은 것 등)
+async function idbPrune(){
+  try{
+    const keep = new Set();
+    Object.values(state.logs).forEach(l=>
+      ((l.diet && l.diet.photos) || []).forEach(ph=>keep.add(ph.id)));
+    const d = await idbOpen();
+    await new Promise((res, rej)=>{
+      const t = d.transaction(IDB_STORE, 'readwrite');
+      const st = t.objectStore(IDB_STORE);
+      const cur = st.openCursor();
+      cur.onsuccess = ()=>{ const c = cur.result;
+        if(c){ if(!keep.has(c.key)) st.delete(c.key); c.continue(); } };
+      t.oncomplete = ()=>res(true);
+      t.onerror = ()=>rej(t.error);
+    });
+  }catch(e){}
+}
+// 저장할 때는 사진 알맹이를 뺀 기록만 남긴다
+function logsForStorage(){
+  const out = {};
+  Object.entries(state.logs).forEach(([d, l])=>{
+    const ps = l && l.diet && l.diet.photos;
+    out[d] = (ps && ps.length)
+      ? {...l, diet:{...l.diet, photos: ps.map(({src, ...rest})=>rest)}}
+      : l;
+  });
+  return out;
+}
+
 let lsWarned = false;
 function lsSave(){
   const payload = {
     v:1,
-    logs: state.logs,
+    logs: logsForStorage(),
     supplements: state.supplements,
     customExercises: state.customExercises,
     exImages: state.exImages,
@@ -2004,7 +2080,6 @@ function lsSave(){
     localStorage.setItem(LS_KEY, JSON.stringify(payload));
     return true;
   }catch(err){
-    if(!lsWarned){ lsWarned = true; showToast('저장 공간에 쓸 수 없어요. 백업을 받아두세요.'); }
     return false;
   }
 }
@@ -2016,10 +2091,10 @@ function lsLoad(){
 }
 async function persist(date, data){
   const ok = lsSave();
-  if(!ok){
-    const statusEl = document.getElementById('saveStatus');
-    if(statusEl) statusEl.textContent = '저장 실패 — 백업 필요';
-  }
+  state.saveFailed = !ok;
+  const statusEl = document.getElementById('saveStatus');
+  if(statusEl) statusEl.textContent = ok ? '' : '저장 실패 — 저장 공간 꽉 참';
+  if(ok) idbPrune();
 }
 async function addSupplement(name, ds){
   const id = 'sup-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
@@ -2044,6 +2119,7 @@ async function initDb(){
     state.ptPlans = (saved.ptPlans && typeof saved.ptPlans==='object')? saved.ptPlans : {};
     state.ptRoutines = Array.isArray(saved.ptRoutines)? saved.ptRoutines : [];
     state.suppOrder = Array.isArray(saved.suppOrder)? saved.suppOrder : [];
+    await attachPhotos();
     // 예전 백업에는 ptPass 가 없다 — 없으면 그냥 등록 안 한 상태로 둔다
     state.ptPass = (saved.ptPass && saved.ptPass.total && saved.ptPass.start)
                  ? {total:saved.ptPass.total, start:saved.ptPass.start} : null;
@@ -2063,20 +2139,89 @@ async function initDb(){
   if(statusEl) statusEl.textContent = '';
 }
 
+/* 사진 알맹이 붙이기.
+   예전 버전은 사진을 localStorage 안에 통째로 넣었다 → 있으면 IndexedDB 로 옮긴다. */
+async function attachPhotos(){
+  let map = new Map();
+  try{ map = await idbAll(); }catch(e){}
+  const moved = [];
+  Object.values(state.logs).forEach(l=>{
+    const d = l && l.diet;
+    if(!d || !Array.isArray(d.photos) || !d.photos.length) return;
+    d.photos = d.photos.filter(ph=>{
+      if(ph.src){ if(!map.has(ph.id)) moved.push([ph.id, ph.src]); return true; }
+      const src = map.get(ph.id);
+      if(src){ ph.src = src; return true; }
+      return false;                       // 알맹이를 못 찾은 사진은 버린다
+    });
+  });
+  for(const [id, src] of moved){ try{ await idbPut(id, src); }catch(e){} }
+  if(moved.length) lsSave();              // 옮겼으면 localStorage 를 가볍게 다시 쓴다
+}
+
 /* ---- 백업 내보내기 / 복원 ---- */
 function exportData(){
-  const payload = lsLoad() || {v:1, logs:state.logs, supplements:state.supplements,
-    customExercises:state.customExercises, exImages:state.exImages, favorites:[...state.favorites]};
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `fitlog-backup-${todayStr()}.json`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url), 2000);
-  showToast('백업 파일을 내려받았어요');
+  // 사진 알맹이는 IndexedDB 에 있으므로 localStorage 가 아니라 화면 상태에서 만든다
+  const payload = {
+    v:1, logs: state.logs, supplements: state.supplements,
+    customExercises: state.customExercises, exImages: state.exImages,
+    ptPlans: state.ptPlans, ptRoutines: state.ptRoutines,
+    suppOrder: state.suppOrder, ptPass: state.ptPass,
+    favorites: [...state.favorites], savedAt: new Date().toISOString(),
+  };
+  const text = JSON.stringify(payload, null, 2);
+  const name = `fitlog-backup-${todayStr()}.json`;
+  const blob = new Blob([text], {type:'application/json'});
+
+  /* 홈 화면 앱(standalone)에서는 a[download] 로 파일이 안 빠져나오는 경우가 많다.
+     iOS 는 공유 시트가 가장 확실하므로 그걸 먼저 쓰고, 안 되면 내려받기,
+     그것도 안 되면 글자로 보여줘서 직접 복사할 수 있게 한다. */
+  const fallbackDownload = ()=>{
+    try{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 2000);
+      showToast('백업 파일을 내려받았어요');
+    }catch(e){ showBackupText(text, name); }
+  };
+
+  try{
+    const file = new File([blob], name, {type:'application/json'});
+    if(navigator.canShare && navigator.canShare({files:[file]}) && navigator.share){
+      navigator.share({files:[file], title:name})
+        .then(()=>showToast('백업 파일을 공유했어요 — 파일 앱에 저장해두세요'))
+        .catch(err=>{ if(err && err.name !== 'AbortError') fallbackDownload(); });
+      return;
+    }
+  }catch(e){}
+  fallbackDownload();
+}
+
+// 마지막 수단 — 백업 내용을 글자로 띄워 직접 복사하게 한다
+function showBackupText(text, name){
+  const ov = document.getElementById('dataOverlay');
+  const body = document.getElementById('dataBody');
+  if(!body){ return; }
+  body.innerHTML = `<p style="font-size:13px;line-height:1.7">파일로 못 내보냈어요.
+    아래 내용을 <b>전체 선택해서 복사</b>한 뒤 메모장 등에 붙여 두세요.
+    나중에 <b>복원</b>에 그대로 붙여넣으면 됩니다.</p>
+    <div class="field-row" style="margin-top:8px">
+      <button class="pick-btn" id="bkCopy">전체 복사</button>
+    </div>
+    <textarea id="bkText" rows="10" style="font-size:12px" readonly></textarea>`;
+  const ta = document.getElementById('bkText');
+  ta.value = text;
+  document.getElementById('bkCopy').addEventListener('click', async ()=>{
+    try{
+      ta.select(); ta.setSelectionRange(0, text.length);
+      if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(text);
+      else document.execCommand('copy');
+      showToast('복사했어요');
+    }catch(e){ showToast('직접 길게 눌러서 복사해주세요'); }
+  });
+  if(ov) ov.classList.add('open');
 }
 function importData(text, mode){
   let data;
@@ -2099,6 +2244,15 @@ function importData(text, mode){
   if(data.ptPass && data.ptPass.total && data.ptPass.start)
     state.ptPass = {total:data.ptPass.total, start:data.ptPass.start};
   if(Array.isArray(data.favorites)) state.favorites = new Set(data.favorites);
+  // 사진 알맹이는 IndexedDB 로 옮겨 담는다
+  (async ()=>{
+    for(const l of Object.values(state.logs)){
+      for(const ph of ((l.diet && l.diet.photos) || [])){
+        if(ph.src){ try{ await idbPut(ph.id, ph.src); }catch(e){} }
+      }
+    }
+    lsSave();
+  })();
   lsSave();
   renderCalendar(); renderLibrary(); renderSupplementChips(); renderPtPassBar();
   const v = document.querySelector('.tab-btn.active')?.dataset.view;
@@ -2341,6 +2495,24 @@ function closeDay(opts={}){
   renderCalendar();
 }
 // 저장을 누르면 그대로 시트를 닫는다 (저장했는데 계속 떠 있으면 저장된 건지 헷갈린다)
+/* 저장 공간이 꽉 차서 못 썼을 때.
+   예전에는 '저장했어요' 토스트만 뜨고 시트가 닫혀서, 앱을 다시 켜면
+   기록이 통째로 사라진 것처럼 보였다. 이제는 시트를 닫지 않고 크게 알린다. */
+function showStorageError(){
+  const bar = document.getElementById('dayDirtyBar');
+  if(bar){
+    bar.hidden = false;
+    bar.innerHTML = `<span style="color:var(--danger);font-weight:700">저장 공간이 꽉 차서 저장되지 않았어요.</span>`
+      + `<button class="db-primary" id="seBackup">백업 받기</button>`
+      + `<button class="db-ghost" id="seRetry">다시 시도</button>`;
+    const bk = document.getElementById('seBackup');
+    if(bk) bk.addEventListener('click', ()=>{ try{ exportData(); }catch(e){} });
+    const rt = document.getElementById('seRetry');
+    if(rt) rt.addEventListener('click', ()=>saveDay());
+  }
+  showToast('저장 실패 — 저장 공간이 꽉 찼어요');
+}
+
 // 하루 앞뒤로 이동. 저장 안 된 변경이 있으면 먼저 정리하게 한다.
 function shiftDay(delta){
   if(!state.selectedDate) return;
@@ -2364,10 +2536,15 @@ document.getElementById('daySave').addEventListener('click', ()=>{
   const keys = Object.keys(state.touched);
   const workoutOnly = keys.length > 0 && keys.every(k=>k==='workout');
   saveDay({silent:true});
+  if(state.saveFailed){ showStorageError(); return; }   // 실패하면 닫지 않는다
   if(!workoutOnly) closeDay({force:true});
   showToast('저장했어요');
 });
-document.getElementById('dirtySave').addEventListener('click', ()=>{ saveDay({silent:true}); closeDay({force:true}); showToast('저장하고 닫았어요'); });
+document.getElementById('dirtySave').addEventListener('click', ()=>{
+  saveDay({silent:true});
+  if(state.saveFailed){ showStorageError(); return; }
+  closeDay({force:true}); showToast('저장하고 닫았어요');
+});
 document.getElementById('dirtyDiscard').addEventListener('click', ()=>{ closeDay({force:true}); showToast('변경사항을 버렸어요'); });
 document.getElementById('dayClose').addEventListener('click', ()=>closeDay());
 document.getElementById('dayOverlay').addEventListener('click', e=>{ if(e.target.id==='dayOverlay') closeDay(); });
@@ -2583,7 +2760,7 @@ function sortedPhotos(log){
 
 // 사진 줄. editable 이면 각 사진에 ✕ 가 붙는다.
 function photoStripHtml(log, editable){
-  const list = sortedPhotos(log);
+  const list = sortedPhotos(log).filter(ph=>ph.src);
   if(!list.length) return '';
   return `<div class="photo-strip">${list.map((ph,i)=>`
     <div class="photo-thumb" data-photoidx="${i}">
@@ -2625,6 +2802,10 @@ function pickPhoto(ds, meal, snackIdx){
       }catch(err){ showToast('사진을 읽지 못했어요'); }
     }
     if(!added.length) return;
+    // 사진 알맹이는 따로 보관한다 (사파리 빌드는 IndexedDB, 아티팩트 빌드는 그대로 둔다)
+    if(typeof idbPut === 'function'){
+      for(const ph of added){ try{ await idbPut(ph.id, ph.src); }catch(e){} }
+    }
     const d = getLog(ds).diet;
     queueSave(ds, {diet:{...d, photos:[...(d.photos||[]), ...added]}}, {refresh:true});
     showToast(`사진 ${added.length}장 추가 · 저장을 눌러주세요`);
@@ -2945,7 +3126,7 @@ function renderDaySheet(ds){
     });
   });
   body.querySelectorAll('[data-photoidx]').forEach(el=>{
-    el.addEventListener('click', ()=>openPhotoViewer(sortedPhotos(getLog(ds)), Number(el.dataset.photoidx)));
+    el.addEventListener('click', ()=>openPhotoViewer(sortedPhotos(getLog(ds)).filter(ph=>ph.src), Number(el.dataset.photoidx)));
   });
   const waterResetEl = body.querySelector('#waterReset');
   if(waterResetEl) waterResetEl.addEventListener('click', e=>{
