@@ -159,9 +159,14 @@
   .week-strip{display:flex;gap:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);}
   .week-strip b{color:var(--text);font-weight:600;}
   .tabs{display:flex;gap:6px;margin-top:16px;background:var(--surface-2);padding:4px;border-radius:12px;width:fit-content;}
-  .tab-btn{border:none;background:transparent;padding:9px 18px;border-radius:9px;font-size:14px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:background .15s,color .15s;}
+  .tab-btn{border:none;background:transparent;padding:9px 18px;border-radius:9px;font-size:14px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;flex:none;}
   .tab-btn.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-1);}
   .tab-btn:hover:not(.active){color:var(--text);}
+  /* 탭이 네 개라 좁은 화면에서는 좌우 여백만 줄인다 (글자 크기는 그대로) */
+  @media (max-width:430px){
+    .tabs{gap:5px;padding:3px;}
+    .tab-btn{padding:9px 10px;}
+  }
 
   .view{display:none;}
   .view.active{display:block;}
@@ -299,6 +304,19 @@
   .sum-meal .lab{color:var(--text-muted);width:46px;flex:none;font-size:12.5px;}
   .sum-meal .tm{font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);width:42px;flex:none;}
   .sum-meal .tx{flex:1;min-width:0;}
+
+  /* 식단 모아보기 탭 */
+  .diet-tab-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin:22px 0 18px;flex-wrap:wrap;}
+  .diet-tab-head h2{margin:0 0 4px;font-size:26px;}
+  .diet-tab-sub{margin:0;font-size:13px;color:var(--text-faint);}
+  .diet-feed{display:flex;flex-direction:column;gap:12px;}
+  .diet-card{border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface);padding:14px 16px;cursor:pointer;transition:border-color .12s;}
+  .diet-card:hover{border-color:var(--diet);}
+  .diet-card-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .diet-card-date{font-size:13.5px;font-weight:700;}
+  .diet-card-dow{font-size:12px;color:var(--text-faint);}
+  .diet-card-ym{font-size:11.5px;color:var(--text-faint);font-family:var(--font-mono);margin-left:auto;}
+  .diet-more{margin-top:14px;display:flex;justify-content:center;}
 
   .segmented{display:flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:2px;}
   .segmented button{flex:1;border:none;background:transparent;padding:8px 6px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;}
@@ -757,6 +775,7 @@
     </div>
     <nav class="tabs" style="align-items:center">
       <button class="tab-btn active" data-view="calendar">달력</button>
+      <button class="tab-btn" data-view="diet">식단</button>
       <button class="tab-btn" data-view="library">운동 도감</button>
       <button class="tab-btn" data-view="inbody">인바디</button>
       <button class="data-btn" id="dataBtn" title="데이터 · 백업" aria-label="데이터 · 백업">⇅</button>
@@ -788,6 +807,18 @@
       </div>
 
       <div class="pt-pass" id="ptPassBar" hidden></div>
+    </section>
+
+    <!-- 식단 모아보기 뷰 -->
+    <section class="view" id="view-diet">
+      <div class="diet-tab-head">
+        <div>
+          <h2>식단</h2>
+          <p class="diet-tab-sub">날짜별 식단 기록 모아보기</p>
+        </div>
+        <button class="primary-btn" id="dietAddBtn" style="width:auto;padding:11px 18px">+ 식단 등록</button>
+      </div>
+      <div id="dietFeed"></div>
     </section>
 
     <!-- 운동 도감 뷰 -->
@@ -2014,7 +2045,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-09-30 01:26';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-10-15 식단탭';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
@@ -2625,6 +2656,7 @@ function saveDay(opts={}){
   state.touched = {};
   renderDayIfOpen(ds);
   renderCalendar();
+  refreshDietTabIfOpen();
   if(!opts.silent) showToast('저장했어요');
 }
 function closeDay(opts={}){
@@ -4859,16 +4891,98 @@ function commitCsvImport(){
 }
 
 /* =========================================================
+   식단 모아보기 탭 — 날짜별 식단을 한 줄로 쭉 내려보는 화면
+   ========================================================= */
+const DIET_PAGE = 30;          // 한 번에 보여줄 날짜 수
+let dietShown = DIET_PAGE;
+
+function dietDays(){
+  return Object.keys(state.logs)
+    .map(ds=>({ds, log: normalizeLog(state.logs[ds], ds)}))
+    .filter(x=>hasDietContent(x.log))
+    .sort((a,b)=> a.ds < b.ds ? 1 : -1);     // 최신 날짜부터
+}
+
+function renderDietTab(){
+  const feed = document.getElementById('dietFeed');
+  if(!feed) return;
+  const days = dietDays();
+  if(!days.length){
+    feed.innerHTML = `<div class="ib-empty">아직 식단 기록이 없어요.<br><small>위 ‘+ 식단 등록’ 으로 오늘 식단을 적어보세요.</small></div>`;
+    return;
+  }
+  if(dietShown < DIET_PAGE) dietShown = DIET_PAGE;
+  const page = days.slice(0, dietShown);
+  feed.innerHTML = `<div class="diet-feed">${page.map(({ds, log})=>{
+      const [y,mo,d] = ds.split('-').map(Number);
+      const dow = ['일','월','화','수','목','금','토'][new Date(y,mo-1,d).getDay()];
+      return `<div class="diet-card" data-dietday="${ds}">
+        <div class="diet-card-head">
+          <i class="dot" style="background:var(--diet)"></i>
+          <span class="diet-card-date">${mo}월 ${d}일</span>
+          <span class="diet-card-dow">(${dow})</span>
+          <span class="diet-card-ym">${y}</span>
+        </div>
+        ${dietSummaryHtml(log)}
+      </div>`;
+    }).join('')}</div>`
+    + (days.length > dietShown
+        ? `<div class="diet-more"><button class="ghost-btn" id="dietMoreBtn">더 보기 (${days.length - dietShown}일 남음)</button></div>`
+        : '');
+
+  // 사진을 누르면 카드가 아니라 사진 보기가 열린다
+  feed.querySelectorAll('[data-photoidx]').forEach(el=>{
+    el.addEventListener('click', ev=>{
+      ev.stopPropagation();
+      const card = el.closest('[data-dietday]');
+      if(!card) return;
+      const ds = card.dataset.dietday;
+      const list = sortedPhotos(normalizeLog(state.logs[ds], ds)).filter(ph=>ph.src);
+      if(list.length) openPhotoViewer(list, Number(el.dataset.photoidx));
+    });
+  });
+  feed.querySelectorAll('[data-dietday]').forEach(card=>{
+    card.addEventListener('click', ()=>openDietDay(card.dataset.dietday, false));
+  });
+  const more = document.getElementById('dietMoreBtn');
+  if(more) more.addEventListener('click', ()=>{ dietShown += DIET_PAGE; renderDietTab(); });
+}
+
+// 식단 탭에서 하루 기록 시트를 연다. edit 이면 식단 칸을 펼친 채로 연다.
+function openDietDay(ds, edit){
+  openDay(ds);
+  if(edit){
+    state.sectionEdit.diet = true;
+    renderDaySheet(ds);
+  }
+  // 식단 칸이 바로 보이도록 스크롤
+  requestAnimationFrame(()=>{
+    const body = document.getElementById('daySheetBody');
+    if(!body) return;
+    const sec = Array.from(body.querySelectorAll('.section'))
+      .find(s=>{ const h = s.querySelector('h4'); return h && h.textContent.trim()==='식단'; });
+    if(sec) body.scrollTop += sec.getBoundingClientRect().top - body.getBoundingClientRect().top - 8;
+  });
+}
+
+// 식단 탭을 보고 있을 때만 다시 그린다
+function refreshDietTabIfOpen(){
+  if(document.querySelector('.tab-btn.active')?.dataset.view === 'diet') renderDietTab();
+}
+
+/* =========================================================
    tabs
    ========================================================= */
 function switchTab(view){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view));
   if(view==='inbody') renderInbodyTab();
+  if(view==='diet'){ dietShown = DIET_PAGE; renderDietTab(); }
 }
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>switchTab(btn.dataset.view));
 });
+document.getElementById('dietAddBtn').addEventListener('click', ()=>openDietDay(todayStr(), true));
 document.getElementById('dataBtn').addEventListener('click', openDataModal);
 document.getElementById('dataClose').addEventListener('click', closeDataModal);
 document.getElementById('dataOverlay').addEventListener('click', e=>{ if(e.target.id==='dataOverlay') closeDataModal(); });
