@@ -312,10 +312,13 @@
   .diet-feed{display:flex;flex-direction:column;gap:12px;}
   .diet-card{border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface);padding:14px 16px;cursor:pointer;transition:border-color .12s;}
   .diet-card:hover{border-color:var(--diet);}
-  .diet-card-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .diet-card-head{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-bottom:10px;}
   .diet-card-date{font-size:13.5px;font-weight:700;}
   .diet-card-dow{font-size:12px;color:var(--text-faint);}
-  .diet-card-ym{font-size:11.5px;color:var(--text-faint);font-family:var(--font-mono);margin-left:auto;}
+  .diet-card-meta{margin-left:auto;display:flex;align-items:baseline;gap:8px;font-family:var(--font-mono);font-size:11.5px;white-space:nowrap;}
+  .diet-card-meta .wt{color:var(--water);}
+  .diet-card-meta .pr{color:var(--protein);}
+  .diet-card-ym{font-size:11.5px;color:var(--text-faint);font-family:var(--font-mono);}
   .diet-more{margin-top:14px;display:flex;justify-content:center;}
 
   .segmented{display:flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:2px;}
@@ -2045,7 +2048,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-10-15 식단탭';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-10-16 식단탭';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
@@ -4903,6 +4906,17 @@ function dietDays(){
     .sort((a,b)=> a.ds < b.ds ? 1 : -1);     // 최신 날짜부터
 }
 
+// 날짜 옆 간략 표기 — 물(L)·단백질(g). 0 이면 아예 안 쓴다.
+function dietMetaHtml(log){
+  const ml = (log.water && log.water.ml) || 0;
+  const g  = (log.protein && log.protein.g) || 0;
+  if(!ml && !g) return '';
+  const parts = [];
+  if(ml) parts.push(`<span class="wt">물 ${(ml/1000).toFixed(1)}L</span>`);
+  if(g)  parts.push(`<span class="pr">단백질 ${g}g</span>`);
+  return `<span class="diet-card-meta">${parts.join('')}</span>`;
+}
+
 function renderDietTab(){
   const feed = document.getElementById('dietFeed');
   if(!feed) return;
@@ -4921,6 +4935,7 @@ function renderDietTab(){
           <i class="dot" style="background:var(--diet)"></i>
           <span class="diet-card-date">${mo}월 ${d}일</span>
           <span class="diet-card-dow">(${dow})</span>
+          ${dietMetaHtml(log)}
           <span class="diet-card-ym">${y}</span>
         </div>
         ${dietSummaryHtml(log)}
