@@ -320,13 +320,15 @@
   .diet-feed{display:flex;flex-direction:column;gap:12px;}
   .diet-card{border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface);padding:14px 16px;cursor:pointer;transition:border-color .12s;}
   .diet-card:hover{border-color:var(--diet);}
-  .diet-card-head{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-bottom:10px;}
+  .diet-card-head{display:flex;align-items:center;flex-wrap:wrap;gap:3px 6px;margin-bottom:10px;}
   .diet-card-date{font-size:13.5px;font-weight:700;}
   .diet-card-dow{font-size:12px;color:var(--text-faint);}
-  .diet-card-meta{margin-left:auto;display:flex;align-items:baseline;gap:8px;font-family:var(--font-mono);font-size:11.5px;white-space:nowrap;}
+  .diet-card-meta{margin-left:auto;display:flex;align-items:baseline;gap:7px;font-family:var(--font-mono);font-size:11.5px;white-space:nowrap;flex:none;}
+  .diet-card-meta>span{flex:none;}
   .diet-card-meta .wt{color:var(--water);}
   .diet-card-meta .pr{color:var(--protein);}
-  .diet-card-meta .sp{color:var(--supp);}
+  .diet-card-meta .sp{color:var(--supp);display:inline-flex;align-items:center;gap:5px;}
+  .diet-card-meta .sp::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--supp);flex:none;}
   .diet-card-ym{font-size:11.5px;color:var(--text-faint);font-family:var(--font-mono);}
   .diet-more{margin-top:14px;display:flex;justify-content:center;}
 
@@ -2057,7 +2059,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-10-22 스와이프';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-10-22 영양제명2';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
@@ -4953,7 +4955,52 @@ function dietDays(){
     .sort((a,b)=> a.ds < b.ds ? 1 : -1);     // 최신 날짜부터
 }
 
-// 날짜 옆 간략 표기 — 물(L)·단백질(g). 0 이면 아예 안 쓴다.
+// 그날 먹은 영양제 이름 (기본 목록 순서대로)
+function supNames(log){
+  const taken = log.supplementsTaken || [];
+  const label = k => (state.supplements.find(x=>x.id===k)||{}).name || k;
+  const order = orderedSupplements().map(o=>o.key);
+  return taken.slice()
+    .sort((a,b)=>{ const ia=order.indexOf(a), ib=order.indexOf(b);
+                   return (ia<0?999:ia) - (ib<0?999:ib); })
+    .map(k=>String(label(k)));
+}
+function supNamesAttr(log){
+  return JSON.stringify(supNames(log))
+    .replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/</g,'&lt;');
+}
+
+/* 영양제 이름이 한 줄에 다 안 들어가면 들어가는 데까지만 쓰고 '외 n개'.
+   실제로 그려 보고 줄이 접히는지(높이가 늘어나는지)로 판단한다. */
+function fitDietSupNames(){
+  document.querySelectorAll('#dietFeed .diet-card-head').forEach(head=>{
+    const el = head.querySelector('.sp[data-sup]');
+    if(!el) return;
+    let names;
+    try{ names = JSON.parse(el.dataset.sup); }catch(e){ return; }
+    if(!names || !names.length) return;
+    const dateEl = head.querySelector('.diet-card-date');
+    const oneLine = dateEl ? dateEl.getBoundingClientRect().height : 18;
+    const put = k => {
+      const rest = names.length - k;
+      el.textContent = names.slice(0,k).join('·') + (rest ? ' 외 ' + rest + '개' : '');
+    };
+    // 줄 수뿐 아니라 가로로 삐져나왔는지도 본다
+    // (글자가 nowrap 이라 넘쳐도 높이는 안 늘어난다 — 높이만 보면 못 잡는다)
+    const ok = lines => {
+      const hb = head.getBoundingClientRect(), mb = el.getBoundingClientRect();
+      return hb.height <= oneLine*lines + (lines > 1 ? 8 : 4)
+          && mb.right <= hb.right + 0.5 && mb.left >= hb.left - 0.5;
+    };
+    // ① 한 줄에 들어가는 만큼 이름을 적는다
+    for(let k = names.length; k >= 1; k--){ put(k); if(ok(1)) return; }
+    // ② 한 줄로는 안 되면 두 줄까지 허용하고, 그 안에서 다시 최대한 적는다
+    for(let k = names.length; k >= 1; k--){ put(k); if(ok(2)) return; }
+    put(1);   // '영양제 3개' 같은 개수 표기는 쓰지 않는다 — 이름 하나는 반드시 남긴다
+  });
+}
+
+// 날짜 옆 간략 표기 — 물(L)·단백질(g)·영양제. 0 이면 아예 안 쓴다.
 function dietMetaHtml(log){
   const ml = (log.water && log.water.ml) || 0;
   const g  = (log.protein && log.protein.g) || 0;
@@ -4962,7 +5009,7 @@ function dietMetaHtml(log){
   const parts = [];
   if(ml) parts.push(`<span class="wt">물 ${(ml/1000).toFixed(1)}L</span>`);
   if(g)  parts.push(`<span class="pr">단백질 ${g}g</span>`);
-  if(n)  parts.push(`<span class="sp">영양제 ${n}개</span>`);
+  if(n)  parts.push(`<span class="sp" data-sup='${supNamesAttr(log)}'>${supNames(log).map(x=>x.replace(/</g,'&lt;')).join('·')}</span>`);
   return `<span class="diet-card-meta">${parts.join('')}</span>`;
 }
 
@@ -4993,6 +5040,8 @@ function renderDietTab(){
     + (days.length > dietShown
         ? `<div class="diet-more"><button class="ghost-btn" id="dietMoreBtn">더 보기 (${days.length - dietShown}일 남음)</button></div>`
         : '');
+
+  fitDietSupNames();
 
   // 사진을 누르면 카드가 아니라 사진 보기가 열린다
   feed.querySelectorAll('[data-photoidx]').forEach(el=>{
@@ -5028,6 +5077,12 @@ function openDietDay(ds, edit){
     if(sec) body.scrollTop += sec.getBoundingClientRect().top - body.getBoundingClientRect().top - 8;
   });
 }
+
+let dietFitTimer = null;
+window.addEventListener('resize', ()=>{
+  clearTimeout(dietFitTimer);
+  dietFitTimer = setTimeout(()=>{ if(document.getElementById('dietFeed')) fitDietSupNames(); }, 150);
+});
 
 // 식단 탭을 보고 있을 때만 다시 그린다
 function refreshDietTabIfOpen(){
