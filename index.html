@@ -136,7 +136,7 @@
   /* 어떤 이유로든 가로로 넘치더라도 화면이 옆으로 밀리지 않게 막는다 */
   html,body{max-width:100%;overflow-x:hidden;}
   .app{overflow-x:clip;}
-  .tabs{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .tabs{max-width:100%;overflow-x:auto;}
   @media (max-width:420px){
     .app{padding-left:14px;padding-right:14px;}
     .topbar h1,.cal-head h2{font-size:clamp(20px,7vw,30px);}
@@ -246,7 +246,7 @@
   .overlay{position:fixed;inset:0;background:rgba(15,18,15,.5);backdrop-filter:blur(2px);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .18s;}
   .overlay.open{opacity:1;pointer-events:auto;}
   @media (min-width:720px){.overlay{align-items:center;}}
-  .sheet{background:var(--surface);width:100%;max-width:640px;max-height:88vh;border-radius:20px 20px 0 0;box-shadow:var(--shadow-2);display:flex;flex-direction:column;transform:translateY(24px);transition:transform .2s;overflow:hidden;}
+  .sheet{background:var(--surface);width:100%;max-width:640px;max-height:88vh;max-height:88dvh;border-radius:20px 20px 0 0;box-shadow:var(--shadow-2);display:flex;flex-direction:column;transform:translateY(24px);transition:transform .2s;overflow:hidden;}
   .overlay.open .sheet{transform:translateY(0);}
   @media (min-width:720px){.sheet{border-radius:20px;margin-bottom:0;}}
   .sheet-head{display:flex;align-items:center;gap:8px;padding:16px 16px;border-bottom:1px solid var(--line);flex:none;}
@@ -261,7 +261,7 @@
   .sheet-head .head-actions{flex:none;}
   .sheet-head .save-status{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .sheet-head .save-status{font-size:11px;color:var(--text-faint);font-family:var(--font-mono);}
-  .sheet-body{padding:20px 22px 28px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;}
+  .sheet-body{padding:20px 22px 28px;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;}
   /* 좌우 스와이프로 날짜를 넘길 때 내용이 살짝 밀려 들어온다 */
   @keyframes daySlidePrev{from{opacity:.4;transform:translateX(-20px);}to{opacity:1;transform:none;}}
   @keyframes daySlideNext{from{opacity:.4;transform:translateX(20px);}to{opacity:1;transform:none;}}
@@ -611,7 +611,7 @@
 
   /* 사진 줄 */
   .photo-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 2px;margin-top:10px;
-    -webkit-overflow-scrolling:touch;scrollbar-width:thin;touch-action:pan-x;}
+    scrollbar-width:thin;touch-action:pan-x pan-y;}
   .photo-thumb{position:relative;flex:none;width:72px;height:72px;border-radius:11px;overflow:hidden;
     border:1px solid var(--line);background:var(--surface-2);cursor:pointer;}
   .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -737,7 +737,7 @@
      글자 크기를 16px 로 올리면 좁은 화면에서 레이아웃이 깨져서 그 방법은 안 쓴다. */
   /* 확대된 채로 남아 가로 스크롤이 생기는 것 방지 */
   html,body{max-width:100%;overflow-x:hidden;}
-  .ib-hist,.ex-ref{-webkit-overflow-scrolling:touch;}
+
 
   /* ---- 실제 동작 이미지(GIF) 스테이지 ---- */
   .img-stage{background:#FFFFFF;padding:0;display:block;}
@@ -2059,7 +2059,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-10-22 영양제명2';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-10-23 스크롤수정';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
@@ -2522,11 +2522,41 @@ function updateBodyScrollLock(){
 }
 // 시트를 여닫는 곳이 여러 군데라, 각 호출부를 고치는 대신 class 변화를 지켜본다
 (function watchOverlays(){
-  const obs = new MutationObserver(updateBodyScrollLock);
-  document.querySelectorAll('.overlay').forEach(el=>
-    obs.observe(el, {attributes:true, attributeFilter:['class']}));
+  // 나중에 생기는 오버레이까지 보려면 바깥을 통째로 지켜본다.
+  // class 변화는 아주 자주 일어나므로 한 프레임에 한 번만 확인한다.
+  let pending = false;
+  const obs = new MutationObserver(()=>{
+    if(pending) return;
+    pending = true;
+    requestAnimationFrame(()=>{ pending = false; updateBodyScrollLock(); });
+  });
+  obs.observe(document.body, {attributes:true, attributeFilter:['class'], subtree:true});
   updateBodyScrollLock();
 })();
+
+/* 아이폰에서 스크롤이 먹통이 되던 것 막기.
+   입력칸을 누르면 키보드가 올라오면서 iOS 가 문서 자체를 위로 밀어 올리는데,
+   body 가 position:fixed 라 그 상태가 그대로 굳어 시트가 안 움직이는 것처럼 보인다.
+   키보드가 내려가는 순간(또는 앱으로 돌아오는 순간) 원래대로 되돌려 준다. */
+function unstickScroll(){
+  // 잠겨 있을 때만 건드린다 — 평소 화면 스크롤 위치는 절대 움직이지 않는다
+  if(document.body.classList.contains('modal-open')){
+    const se = document.scrollingElement || document.documentElement;
+    if(se && se.scrollTop) se.scrollTop = 0;
+  }
+  updateBodyScrollLock();        // 열린 시트가 없는데 잠겨 있으면 여기서 풀린다
+}
+document.addEventListener('focusout', ()=>setTimeout(unstickScroll, 60));
+window.addEventListener('pageshow', unstickScroll);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) unstickScroll(); });
+if(window.visualViewport){
+  let lastH = window.visualViewport.height;
+  window.visualViewport.addEventListener('resize', ()=>{
+    const h = window.visualViewport.height;
+    if(h > lastH + 40) setTimeout(unstickScroll, 60);   // 키보드가 내려갔다
+    lastH = h;
+  });
+}
 
 /* =========================================================
    calendar
