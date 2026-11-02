@@ -164,8 +164,8 @@
   .tab-btn:hover:not(.active){color:var(--text);}
   /* 탭이 네 개라 좁은 화면에서는 좌우 여백만 줄인다 (글자 크기는 그대로) */
   @media (max-width:430px){
-    .tabs{gap:5px;padding:3px;}
-    .tab-btn{padding:9px 10px;}
+    .tabs{gap:4px;padding:3px;}
+    .tab-btn{padding:9px 8px;}
   }
 
   .view{display:none;}
@@ -331,6 +331,29 @@
   .diet-card-meta .sp::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--supp);flex:none;}
   .diet-card-ym{font-size:11.5px;color:var(--text-faint);font-family:var(--font-mono);}
   .diet-more{margin-top:14px;display:flex;justify-content:center;}
+  /* 식단 모아보기의 사진은 날짜 시트보다 조금 작게 (72px 의 80%) */
+  #dietFeed .photo-thumb{width:58px;height:58px;border-radius:9px;}
+  #dietFeed .photo-thumb .pm{font-size:9px;padding:7px 4px 2px;}
+  /* 날짜 옆 운동 표기 — 글자색으로만, 두께는 기본 */
+  .diet-card-w{font-size:11.5px;}
+
+  /* 운동 모아보기 — 한 화면에 최대한 많이 들어오도록 요약을 한 줄로 눕힌다 */
+  .wk-card{border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface);
+    padding:12px 14px;cursor:pointer;transition:border-color .12s;}
+  .wk-card:hover{border-color:var(--text-faint);}
+  .wk-head{display:flex;align-items:center;flex-wrap:wrap;gap:3px 7px;margin-bottom:8px;}
+  .wk-date{font-size:13.5px;font-weight:700;}
+  .wk-dow{font-size:12px;color:var(--text-faint);}
+  .wk-kind{font-size:11.5px;}
+  .wk-dur{margin-left:auto;font-family:var(--font-mono);font-size:11.5px;color:var(--note-ink);}
+  .wk-ym{font-size:11.5px;color:var(--text-faint);font-family:var(--font-mono);}
+  /* 모아보기 카드 안의 운동 요약은 날짜 시트와 같은 모양(여러 줄)이되 살짝 촘촘하게 */
+  .wk-card .sum-ex{margin-bottom:10px;}
+  .wk-card .sum-ex:last-child{margin-bottom:0;}
+  .wk-card .sum-ex + .sum-ex{padding-top:9px;}
+  .wk-card .sum-ex-name{margin-bottom:4px;}
+  .wk-card .sum-note{margin-top:4px;}
+  .wk-none{font-size:12.5px;color:var(--text-faint);}
 
   .segmented{display:flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:2px;}
   .segmented button{flex:1;border:none;background:transparent;padding:8px 6px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;}
@@ -716,7 +739,13 @@
   .set-idx{font-size:12px;color:var(--text-faint);font-family:var(--font-mono);}
   .set-x{font-size:11px;color:var(--text-faint);text-align:center;}
   .set-reps,.set-kg{padding:7px 8px;font-size:13px;text-align:center;font-family:var(--font-mono);}
-  input.set-reps,input.set-kg{font-size:13px;}
+  input.set-reps,input.set-kg{font-size:13px;padding-right:22px;}
+  /* 숫자만 있으면 어느 칸이 횟수고 어느 칸이 무게인지 헷갈려서 단위를 붙여 둔다.
+     값이 아니라 입력칸 위에 얹은 라벨이라 지워지지 않는다. 비어 있을 땐 플레이스홀더에 맡긴다. */
+  .set-f{position:relative;display:block;min-width:0;}
+  .set-unit{position:absolute;right:7px;top:50%;transform:translateY(-50%);pointer-events:none;
+    font-size:11px;font-style:normal;color:var(--text-faint);font-family:var(--font-body);}
+  .set-f input:placeholder-shown + .set-unit{opacity:0;}
   .set-del{width:22px;height:22px;border-radius:50%;border:none;background:transparent;color:var(--text-faint);cursor:pointer;font-size:10px;}
   .set-del:hover{color:var(--danger);}
   .set-add-btn{border:1px dashed var(--line);background:transparent;color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;margin-top:7px;width:100%;text-align:left;}
@@ -790,6 +819,7 @@
     <nav class="tabs" style="align-items:center">
       <button class="tab-btn active" data-view="calendar">달력</button>
       <button class="tab-btn" data-view="diet">식단</button>
+      <button class="tab-btn" data-view="workout">운동</button>
       <button class="tab-btn" data-view="library">운동 도감</button>
       <button class="tab-btn" data-view="inbody">인바디</button>
       <button class="data-btn" id="dataBtn" title="데이터 · 백업" aria-label="데이터 · 백업">⇅</button>
@@ -833,6 +863,18 @@
         <button class="primary-btn" id="dietAddBtn" style="width:auto;padding:11px 18px">+ 식단 등록</button>
       </div>
       <div id="dietFeed"></div>
+    </section>
+
+    <!-- 운동 모아보기 뷰 -->
+    <section class="view" id="view-workout">
+      <div class="diet-tab-head">
+        <div>
+          <h2>운동</h2>
+          <p class="diet-tab-sub">날짜별 운동 기록 모아보기</p>
+        </div>
+        <button class="primary-btn" id="wkAddBtn" style="width:auto;padding:11px 18px">+ 운동 등록</button>
+      </div>
+      <div id="workoutFeed"></div>
     </section>
 
     <!-- 운동 도감 뷰 -->
@@ -2059,7 +2101,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-10-23 스크롤수정';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-11-02 세트단위';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
@@ -2701,6 +2743,7 @@ function saveDay(opts={}){
   renderDayIfOpen(ds);
   renderCalendar();
   refreshDietTabIfOpen();
+  refreshWorkoutTabIfOpen();
   if(!opts.silent) showToast('저장했어요');
 }
 function closeDay(opts={}){
@@ -2923,8 +2966,13 @@ function sectionHeadHtml(color, title, key, hasContent, editing){
   return `<div class="section-head"><i class="dot" style="background:${color}"></i><h4>${title}</h4>${btn}</div>`;
 }
 function setLineText(x){
-  const w = x.weight===''||x.weight==null ? '' : (x.weight==='빈봉' ? '빈봉' : x.weight+'kg');
-  const r = x.reps===''||x.reps==null ? '' : x.reps+'회';
+  const noReps = x.reps===''||x.reps==null, noWeight = x.weight===''||x.weight==null;
+  if(noReps && noWeight) return '—';            // 둘 다 안 적은 세트
+  // 무게를 안 적었으면 빈봉으로 읽는다 (맨몸·빈 봉으로 한 세트)
+  const w = noWeight ? '빈봉' : (x.weight==='빈봉' ? '빈봉' : x.weight+'kg');
+  // '최대' 처럼 숫자가 아닌 횟수에는 '회' 를 붙이지 않는다 ('최대회' 가 되어버린다)
+  const r = x.reps===''||x.reps==null ? ''
+          : (/^\d+(\.\d+)?$/.test(String(x.reps)) ? x.reps+'회' : String(x.reps));
   return [r, w].filter(Boolean).join(' × ') || '—';
 }
 function workoutSummaryHtml(log){
@@ -2932,6 +2980,12 @@ function workoutSummaryHtml(log){
   const kind = w.type==='pt' ? 'PT' : '개인운동';
   const head = `<div class="sum-top"><span class="sum-kind" style="background:${w.type==='pt'?'var(--pt)':'var(--personal)'}">${kind}</span>${
     w.durationMin ? `<span class="sum-dur">${w.durationMin}분</span>` : ''}</div>`;
+  return head + workoutExsHtml(log);
+}
+// 운동 목록 부분만 — 운동 모아보기 탭도 이걸 그대로 쓴다
+// (세트별 실패 사유·세트 메모·운동 중 메모·전체 메모가 다 들어 있다)
+function workoutExsHtml(log){
+  const w = log.workout;
   const exs = (w.exercises||[]).map(en=>{
     const ex = getEx(en.id);
     if(!ex) return '';
@@ -2949,7 +3003,7 @@ function workoutSummaryHtml(log){
       ${en.note ? `<div class="sum-note">${en.note.replace(/</g,'&lt;')}</div>` : ''}
     </div>`;
   }).join('');
-  return head + (exs || `<div class="sum-empty">선택한 운동 없음</div>`)
+  return (exs || `<div class="sum-empty">선택한 운동 없음</div>`)
     + (w.memo ? `<div class="sum-note">메모 · ${w.memo.replace(/</g,'&lt;')}</div>` : '');
 }
 /* =========================================================
@@ -3490,7 +3544,9 @@ function setSummaryText(entry){
   sets.forEach(x=>{ const k=`${x.weight||'-'}|${x.reps||'-'}`; g[k]=(g[k]||0)+1; });
   const parts = Object.entries(g).map(([k,c])=>{
     const [w,r]=k.split('|');
-    return `${w!=='-'? (w==='빈봉'?'빈봉':w+'kg') : ''}${r!=='-'? ' '+r+'회':''} ×${c}`.trim();
+    const ws = (w==='-' || w==='빈봉') ? '빈봉' : w+'kg';      // 무게를 안 적었으면 빈봉
+    const rs = r==='-' ? '' : (/^\d+(\.\d+)?$/.test(r) ? ' '+r+'회' : ' '+r);
+    return `${ws}${rs} ×${c}`.trim();
   });
   return `${sets.length}세트 · ${parts.join(' · ')}`;
 }
@@ -3510,9 +3566,9 @@ function setRow(exId, kind, idx, s, label){
   const failed = !!s.failed;
   return `<div class="set-row" data-exid="${exId}" data-kind="${kind}" data-idx="${idx}">
     <span class="set-idx">${typeof label==='number'?label+'세트':label}</span>
-    <input type="text" inputmode="numeric" placeholder="회" class="set-reps" value="${String(s.reps??'').replace(/"/g,'&quot;')}">
+    <span class="set-f"><input type="text" inputmode="numeric" placeholder="회" class="set-reps" value="${String(s.reps??'').replace(/"/g,'&quot;')}"><i class="set-unit">회</i></span>
     <span class="set-x">×</span>
-    <input type="text" inputmode="decimal" placeholder="kg" class="set-kg" value="${String(s.weight??'').replace(/"/g,'&quot;')}">
+    <span class="set-f"><input type="text" inputmode="decimal" placeholder="kg" class="set-kg" value="${String(s.weight??'').replace(/"/g,'&quot;')}"><i class="set-unit">kg</i></span>
     <button class="set-more ${failed?'on':''}" data-setmore="${exId}" data-kind2="${kind}" data-idx2="${idx}" aria-label="세트 더보기">⋯</button>
   </div>
   ${failed? `<div class="set-fail-reason"><input type="text" class="set-fail-why" data-exid2="${exId}" data-kind4="${kind}" data-idx4="${idx}" placeholder="왜 못 했는지 (예: 마지막 2회 못 듦, 어깨 통증)" value="${(s.failReason||'').replace(/"/g,'&quot;')}"></div>`:''}
@@ -4985,6 +5041,80 @@ function dietDays(){
     .sort((a,b)=> a.ds < b.ds ? 1 : -1);     // 최신 날짜부터
 }
 
+// 그날 운동했으면 작게 표기 (글자색으로만, 두께는 기본)
+function workoutChipHtml(log){
+  if(!workoutLogged(log)) return '';
+  const pt = log.workout.type === 'pt';
+  return `<span class="diet-card-w" style="color:${pt?'var(--pt)':'var(--personal)'}">&check;&#xFE0E; ${pt?'PT':'개인운동'}</span>`;
+}
+
+/* =========================================================
+   운동 모아보기 탭 — 날짜별 운동을 쭉 내려보는 화면.
+   날짜 시트의 요약보다 한 줄로 눕혀서 한 화면에 많이 들어오게 한다.
+   ========================================================= */
+const WK_PAGE = 30;
+let wkShown = WK_PAGE;
+
+function workoutDays(){
+  return Object.keys(state.logs)
+    .map(ds=>({ds, log: normalizeLog(state.logs[ds], ds)}))
+    .filter(x=>workoutLogged(x.log))
+    .sort((a,b)=> a.ds < b.ds ? 1 : -1);      // 최신 날짜부터
+}
+
+function renderWorkoutTab(){
+  const feed = document.getElementById('workoutFeed');
+  if(!feed) return;
+  const days = workoutDays();
+  if(!days.length){
+    feed.innerHTML = `<div class="ib-empty">아직 운동 기록이 없어요.<br><small>위 ‘+ 운동 등록’ 으로 오늘 운동을 적어보세요.</small></div>`;
+    return;
+  }
+  if(wkShown < WK_PAGE) wkShown = WK_PAGE;
+  const page = days.slice(0, wkShown);
+  feed.innerHTML = `<div class="diet-feed">${page.map(({ds, log})=>{
+      const [y,mo,d] = ds.split('-').map(Number);
+      const dow = ['일','월','화','수','목','금','토'][new Date(y,mo-1,d).getDay()];
+      const w = log.workout, pt = w.type === 'pt';
+      const col = pt ? 'var(--pt)' : 'var(--personal)';
+      return `<div class="wk-card" data-wkday="${ds}">
+        <div class="wk-head">
+          <i class="dot" style="background:${col}"></i>
+          <span class="wk-date">${mo}월 ${d}일</span>
+          <span class="wk-dow">(${dow})</span>
+          <span class="wk-kind" style="color:${col}">${pt ? 'PT' : '개인운동'}</span>
+          ${y === new Date().getFullYear() ? '' : `<span class="wk-ym">${y}</span>`}
+          ${w.durationMin ? `<span class="wk-dur">${w.durationMin}분</span>` : ''}
+        </div>
+        ${(w.exercises||[]).length || w.memo
+            ? workoutExsHtml(log)
+            : `<div class="wk-none">세부 기록 없음</div>`}
+      </div>`;
+    }).join('')}</div>`
+    + (days.length > wkShown
+        ? `<div class="diet-more"><button class="ghost-btn" id="wkMoreBtn">더 보기 (${days.length - wkShown}일 남음)</button></div>`
+        : '');
+
+  feed.querySelectorAll('[data-wkday]').forEach(card=>{
+    card.addEventListener('click', ()=>openWorkoutDay(card.dataset.wkday, false));
+  });
+  const more = document.getElementById('wkMoreBtn');
+  if(more) more.addEventListener('click', ()=>{ wkShown += WK_PAGE; renderWorkoutTab(); });
+}
+
+// 운동 탭에서 하루 기록 시트를 연다. edit 이면 운동 칸을 펼친 채로.
+function openWorkoutDay(ds, edit){
+  openDay(ds);
+  if(edit){
+    state.sectionEdit.workout = true;
+    renderDaySheet(ds);
+  }
+  scrollSheetToSection('운동');
+}
+function refreshWorkoutTabIfOpen(){
+  if(document.querySelector('.tab-btn.active')?.dataset.view === 'workout') renderWorkoutTab();
+}
+
 // 그날 먹은 영양제 이름 (기본 목록 순서대로)
 function supNames(log){
   const taken = log.supplementsTaken || [];
@@ -5061,6 +5191,7 @@ function renderDietTab(){
           <i class="dot" style="background:var(--diet)"></i>
           <span class="diet-card-date">${mo}월 ${d}일</span>
           <span class="diet-card-dow">(${dow})</span>
+          ${workoutChipHtml(log)}
           ${dietMetaHtml(log)}
           ${y === new Date().getFullYear() ? '' : `<span class="diet-card-ym">${y}</span>`}
         </div>
@@ -5091,6 +5222,17 @@ function renderDietTab(){
   if(more) more.addEventListener('click', ()=>{ dietShown += DIET_PAGE; renderDietTab(); });
 }
 
+// 날짜 시트에서 해당 칸이 바로 보이도록 스크롤
+function scrollSheetToSection(title){
+  requestAnimationFrame(()=>{
+    const body = document.getElementById('daySheetBody');
+    if(!body) return;
+    const sec = Array.from(body.querySelectorAll('.section'))
+      .find(s=>{ const h = s.querySelector('h4'); return h && h.textContent.trim() === title; });
+    if(sec) body.scrollTop += sec.getBoundingClientRect().top - body.getBoundingClientRect().top - 8;
+  });
+}
+
 // 식단 탭에서 하루 기록 시트를 연다. edit 이면 식단 칸을 펼친 채로 연다.
 function openDietDay(ds, edit){
   openDay(ds);
@@ -5098,14 +5240,7 @@ function openDietDay(ds, edit){
     state.sectionEdit.diet = true;
     renderDaySheet(ds);
   }
-  // 식단 칸이 바로 보이도록 스크롤
-  requestAnimationFrame(()=>{
-    const body = document.getElementById('daySheetBody');
-    if(!body) return;
-    const sec = Array.from(body.querySelectorAll('.section'))
-      .find(s=>{ const h = s.querySelector('h4'); return h && h.textContent.trim()==='식단'; });
-    if(sec) body.scrollTop += sec.getBoundingClientRect().top - body.getBoundingClientRect().top - 8;
-  });
+  scrollSheetToSection('식단');
 }
 
 let dietFitTimer = null;
@@ -5127,11 +5262,13 @@ function switchTab(view){
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view));
   if(view==='inbody') renderInbodyTab();
   if(view==='diet'){ dietShown = DIET_PAGE; renderDietTab(); }
+  if(view==='workout'){ wkShown = WK_PAGE; renderWorkoutTab(); }
 }
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>switchTab(btn.dataset.view));
 });
 document.getElementById('dietAddBtn').addEventListener('click', ()=>openDietDay(todayStr(), true));
+document.getElementById('wkAddBtn').addEventListener('click', ()=>openWorkoutDay(todayStr(), true));
 document.getElementById('dataBtn').addEventListener('click', openDataModal);
 document.getElementById('dataClose').addEventListener('click', closeDataModal);
 document.getElementById('dataOverlay').addEventListener('click', e=>{ if(e.target.id==='dataOverlay') closeDataModal(); });
