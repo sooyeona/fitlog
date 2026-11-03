@@ -515,32 +515,6 @@
   .ib-stat-tile .delta{font-size:11px;color:var(--text-muted);margin-top:2px;font-family:var(--font-mono);white-space:nowrap;}
   @media (min-width:620px){ .ib-stat-grid{grid-template-columns:repeat(5,minmax(0,1fr));} }
 
-  /* 체성분 균형(CID) 한 줄 */
-  .ib-cid{background:var(--surface);border:1px solid var(--line);
-    border-radius:var(--radius-md);padding:11px 12px;margin-bottom:18px;}
-  .ib-cid .cid-top{display:flex;align-items:baseline;gap:10px;}
-  .ib-cid .k{font-size:11.5px;color:var(--text-faint);}
-  .ib-cid .v{margin-left:auto;font-size:14px;}
-  .ib-cid .v .g{font-size:12px;color:var(--text-muted);}
-  .ib-cid .v.none{color:var(--text-faint);font-size:12.5px;}
-  .ib-cid .ch{font-size:11px;color:var(--text-faint);}
-  /* 용지의 근육-지방 막대 그래프 */
-  .cid-chart{margin-top:10px;}
-  .cid-row{display:flex;align-items:center;gap:8px;margin-top:5px;}
-  .cid-row .l{flex:none;width:52px;font-size:11.5px;color:var(--text-muted);}
-  .cid-row .t{position:relative;flex:1;min-width:0;height:13px;background:var(--surface-2);border-radius:3px;}
-  .cid-row .t::after{content:"";position:absolute;left:var(--p100);top:-3px;bottom:-3px;width:1.5px;background:var(--text);opacity:.55;}
-  .cid-row .t > i{display:block;height:100%;background:var(--text-faint);border-radius:3px;}
-  .cid-row .t.over > i{background:var(--text-muted);}
-  .cid-row .p{flex:none;width:40px;text-align:right;font-family:var(--font-mono);font-size:11.5px;color:var(--text);}
-  .cid-row .p small{font-size:9.5px;color:var(--text-faint);}
-  /* 눈금 — 가운데 세로선이 표준(100%)이라는 걸 글자로도 알려준다 */
-  .cid-axis{position:relative;height:13px;margin:3px 0 0 60px;margin-right:48px;font-size:9.5px;
-    color:var(--text-faint);font-family:var(--font-mono);}
-  .cid-axis span{position:absolute;top:0;white-space:nowrap;}
-  .cid-axis .mid{transform:translateX(-50%);font-family:var(--font-body);color:var(--text-muted);}
-  .cid-foot{margin-top:5px;font-size:10.5px;color:var(--text-faint);}
-
   .ib-chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:8px;margin-bottom:20px;}
   /* 측정일 줄 */
   .ib-when{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-faint);margin-bottom:8px;}
@@ -2129,7 +2103,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-11-03 체형판정';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-11-03 CID제거';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
@@ -4566,11 +4540,6 @@ const IB_FIELDS = [
   {key:'abdFatRatio',  label:'복부지방률',      unit:'',      dec:2, group:'muscleFat', form:true, hist:true, short:'복부지방률', aliases:['복부지방률','whr','waisthipratio']},
   {key:'waist',        label:'허리둘레',        unit:'cm',    dec:1, group:'muscleFat', aliases:['허리둘레','waistcircumference','waist']},
   {key:'smi',          label:'SMI (골격근지수)',unit:'kg/㎡', dec:2, group:'muscleFat', aliases:['smi','골격근지수']},
-  // ---- 용지의 막대 그래프 (표준값 대비 %) ----
-  // 이 셋을 한 번만 적어두면 표준값을 역산해서 다른 측정일 그래프까지 정확해진다
-  {key:'weightPct',    label:'표준 대비 체중',      unit:'%', dec:0, group:'muscleFat',  aliases:['체중백분율','표준체중대비','weightpercent']},
-  {key:'smmPct',       label:'표준 대비 골격근량',  unit:'%', dec:0, group:'muscleFat',  aliases:['골격근량백분율','표준골격근량대비','smmpercent']},
-  {key:'fatPct',       label:'표준 대비 체지방량',  unit:'%', dec:0, group:'muscleFat',  aliases:['체지방량백분율','표준체지방량대비','bfmpercent']},
   // ---- 체수분 ----
   {key:'tbw',          label:'체수분 (총 수분량)', unit:'L', dec:1, group:'water', form:true, hist:true, short:'체수분', aliases:['체수분','수분량','totalbodywater','tbw']},
   {key:'icw',          label:'세포내수분',      unit:'L',     dec:1, group:'water', form:true, aliases:['세포내수분','intracellularwater','icw']},
@@ -4578,9 +4547,6 @@ const IB_FIELDS = [
   {key:'ecwRatio',     label:'세포외수분비',    unit:'',      dec:3, group:'water', form:true, aliases:['세포외수분비','ecwtbw']},
   // ---- 영양 · 균형 ----
   {key:'protein',      label:'단백질',          unit:'kg',    dec:2, group:'nutri', form:true, hist:true, short:'단백질', aliases:['단백질','protein']},
-  // 체성분 균형(CID) — 인바디 용지에 찍혀 나오는 체형 판정. 숫자가 아니라 고르는 값이다.
-  {key:'cid',          label:'체성분 균형 (CID)', unit:'',    dec:0, group:'nutri',  hist:true, short:'CID',
-   type:'select', options:['C형','I형','D형'], aliases:['cid','cid유형','체형','체형판정','체성분균형','체성분균형유형']},
   {key:'mineral',      label:'무기질',          unit:'kg',    dec:2, group:'nutri', form:true, aliases:['무기질','minerals','mineral']},
   {key:'boneMineral',  label:'골무기질량',      unit:'kg',    dec:2, group:'nutri', aliases:['골무기질량','bonemineralcontent','bmc']},
   {key:'bcm',          label:'체세포량',        unit:'kg',    dec:1, group:'nutri', aliases:['체세포량','bodycellmass','bcm']},
@@ -4611,7 +4577,7 @@ const IB_FIELDS = [
 ];
 const IB_VALUE_FIELDS = IB_FIELDS.filter(f=>f.key!=='date');
 const IB_BY_KEY = Object.fromEntries(IB_FIELDS.map(f=>[f.key,f]));
-const IB_HIST_ORDER = ['weight','smm','bodyFatMass','bodyFatPct','protein','tbw','bmr','abdFatRatio','visceral','bmi','cid','score'];
+const IB_HIST_ORDER = ['weight','smm','bodyFatMass','bodyFatPct','protein','tbw','bmr','abdFatRatio','visceral','bmi','score'];
 const IB_HIST_FIELDS = IB_HIST_ORDER.map(k=>IB_BY_KEY[k]).filter(Boolean);
 
 function inbodyEntries(){
@@ -4637,42 +4603,6 @@ function deltaStr(entriesDesc,key,decimals,idx){
   if(Math.abs(d) < Math.pow(10,-dec)/2) return '그대로';   // 자릿수에 맞춰 '변화 없음'을 판단
   return (d>0?'▲':'▼')+Math.abs(d).toFixed(dec);
 }
-// 체성분 균형(CID) 한 줄. 인바디 용지에 적힌 체형을 그대로 골라 두는 값이다.
-function cidRowHtml(latest, prev, std){
-  const wPct = ibPct(latest, std, 'weight');
-  const sPct = ibPct(latest, std, 'smm');
-  const fPct = ibPct(latest, std, 'fat', 'bodyFatMass');
-  const rows = [['체중', wPct, latest.weight], ['골격근량', sPct, latest.smm], ['체지방량', fPct, latest.bodyFatMass]];
-  const drawable = rows.every(r=>r[1]>0);
-  const auto = ibBodyType(wPct, sPct, fPct);
-  // 직접 골라둔 값이 있으면 그게 우선, 없으면 그래프로 판정한 값
-  const manual = latest.cid;
-  const verdict = manual ? `${manual.replace('형','자형')} · ${CID_LABEL[manual]||''}` : (auto ? auto.text : null);
-  const prevAuto = prev ? ibBodyType(ibPct(prev,std,'weight'), ibPct(prev,std,'smm'), ibPct(prev,std,'fat','bodyFatMass')) : null;
-  const prevLetter = prev && prev.cid ? prev.cid[0] : (prevAuto ? prevAuto.letter : null);
-  const curLetter = manual ? manual[0] : (auto ? auto.letter : null);
-  // 가로 축: 40% ~ 160% — 표준 100% 가 한가운데 오게 잡았다
-  const LO = 40, HI = 160;
-  const pos = p => Math.max(0, Math.min(100, (Math.min(Math.max(p,LO),HI)-LO)/(HI-LO)*100));
-  return `<div class="ib-cid">
-    <div class="cid-top">
-      <span class="k">체성분 균형 (CID)</span>
-      ${verdict ? `<span class="v">${verdict}</span>${
-          prevLetter && curLetter && prevLetter!==curLetter ? `<span class="ch">이전 ${prevLetter}자형</span>` : ''}`
-        : `<span class="v none">체중·골격근량·체지방량이 있어야 판정돼요</span>`}
-    </div>
-    ${drawable ? `<div class="cid-chart" style="--p100:${pos(100)}%">
-      ${rows.map(([lab,pct])=>`
-        <div class="cid-row">
-          <span class="l">${lab}</span>
-          <span class="t${pct>=100?' over':''}"><i style="width:${pos(pct)}%"></i></span>
-          <span class="p">${Math.round(pct)}<small>%</small></span>
-        </div>`).join('')}
-      <div class="cid-axis"><span style="left:0">${LO}</span><span style="left:${pos(100)}%" class="mid">표준 100%</span><span style="right:0">${HI}</span></div>
-      ${std && std.src==='est' ? `<div class="cid-foot">표준값은 신장 ${std.height.toFixed(1)}cm 기준</div>` : ''}
-    </div>` : ''}
-  </div>`;
-}
 function renderInbodyTab(){
   const entriesDesc = inbodyEntries();
   const body = document.getElementById('ibTabBody');
@@ -4694,7 +4624,6 @@ function renderInbodyTab(){
       <div class="ib-chart-card" id="chartTbw"></div>
       <div class="ib-chart-card" id="chartProtein"></div>
     </div>
-    <div id="ibCidBox"></div>
     <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px">
       <h4 style="margin:0;font-size:14px;white-space:nowrap">측정 기록 (${entriesDesc.length}건)</h4>
       <span style="font-size:11.5px;color:var(--text-faint)">행을 누르면 그 날짜 전체 항목</span>
@@ -4734,8 +4663,6 @@ function renderIbTopStats(entriesDesc){
       ${statTile('인바디점수', cur.score, '점', deltaStr(entriesDesc,'score',0,idx), 0)}
     </div>
     `;
-  const cidBox = document.getElementById('ibCidBox');
-  if(cidBox) cidBox.innerHTML = cidRowHtml(cur, entriesDesc[idx+1], ibStandards(entriesDesc));
   const bt = document.getElementById('ibToLatest');
   if(bt) bt.addEventListener('click', ()=>{ ibSelDate = null; renderIbTopStats(entriesDesc); drawIbCharts(entriesDesc); });
 }
@@ -4966,56 +4893,8 @@ function drawTrendChart(container, ascEntries, key, opts){
 
 // ---- add / edit single entry ----
 let ibEntryDate = null;
-/* 막대 그래프는 '표준값 대비 %' 라서 표준값이 필요하다. 사용자가 따로 적는 일이 없도록
-   가진 값에서 알아서 구한다.
-   키: 기록된 신장 → 없으면 BMI 와 체중으로 역산(BMI = 체중/키(m)²) → 그래도 없으면 기본값.
-   표준값: 표준체중 = BMI 21 × 키(m)² (여성), 표준체지방량 = 표준체중 × 23%,
-          표준골격근량 = 제지방량 × 0.55.
-   CSV 에 용지의 % 가 들어 있으면 그쪽이 더 정확하므로 그걸로 역산해서 쓴다. */
-const IB_DEFAULT_HEIGHT = 159.7;          // 사용자 신장
-function ibHeight(entriesDesc){
-  const rec = (entriesDesc.find(e=>e.height>0)||{}).height;
-  return {cm: rec>0 ? rec : IB_DEFAULT_HEIGHT, src: rec>0?'rec':'def'};
-}
-function ibStandards(entriesDesc){
-  for(const e of entriesDesc){
-    if(e.weightPct>0 && e.smmPct>0 && e.fatPct>0 && e.weight>0 && e.smm>0 && e.bodyFatMass>0){
-      return {src:'sheet', weight:e.weight/e.weightPct*100, smm:e.smm/e.smmPct*100, fat:e.bodyFatMass/e.fatPct*100};
-    }
-  }
-  const h = ibHeight(entriesDesc);
-  const m = h.cm/100, w = 21*m*m, fat = w*0.23;
-  return {src:'est', height:h.cm, weight:w, smm:(w-fat)*0.55, fat};
-}
-function ibPct(e, std, key, stdKey){
-  const direct = e[key+'Pct'];
-  if(direct>0) return direct;
-  if(!std || !(e[stdKey!==undefined?stdKey:key]>0)) return null;
-  const v = e[stdKey!==undefined?stdKey:key];
-  const base = key==='weight' ? std.weight : (key==='smm' ? std.smm : std.fat);
-  return base>0 ? v/base*100 : null;
-}
-
-// 인바디 체형 판정 — 용지의 막대 세 개(체중·골격근량·체지방량) 모양으로 정해진다
-const CID_LABEL = {'C형':'허약형', 'I형':'표준형', 'D형':'강인형'};
-/* 용지처럼 '표준체중 일반형(I자)' 식으로 읽어준다.
-   앞말은 체중 %(저체중 85 미만 / 표준체중 85~115 / 과체중 115 초과),
-   뒷말은 막대 모양 — 골격근량이 체지방량보다 길면 D자(강인형),
-   반대면 C자(허약형), 10%p 안쪽으로 비슷하면 I자(일반형). */
-function ibBodyType(wPct, sPct, fPct){
-  if(!(wPct>0 && sPct>0 && fPct>0)) return null;
-  const wLab = wPct < 85 ? '저체중' : (wPct > 115 ? '과체중' : '표준체중');
-  const d = sPct - fPct;
-  const [letter, shape] = d >= 10 ? ['D','강인형'] : (d <= -10 ? ['C','허약형'] : ['I','일반형']);
-  return {letter, text:`${wLab} ${shape}(${letter}자)`, short:`${letter}자형 · ${shape}`};
-}
 function ibFieldsFormHtml(ib){
-  const f=(fd)=>`<div class="ib-field"><label>${fd.label}${fd.unit?` (${fd.unit})`:''}</label>${
-    fd.type==='select'
-      ? `<select id="ibf_${fd.key}"><option value="">선택 안 함</option>${
-          fd.options.map(o=>`<option value="${o}"${ib[fd.key]===o?' selected':''}>${o} · ${CID_LABEL[o]||''}</option>`).join('')}</select>`
-      : `<input type="number" step="${fd.dec===0?'1':(fd.dec>=3?'0.001':'0.01')}" id="ibf_${fd.key}" value="${ib[fd.key]??''}">`
-  }</div>`;
+  const f=(fd)=>`<div class="ib-field"><label>${fd.label}${fd.unit?` (${fd.unit})`:''}</label><input type="number" step="${fd.dec===0?'1':(fd.dec>=3?'0.001':'0.01')}" id="ibf_${fd.key}" value="${ib[fd.key]??''}"></div>`;
   const main = IB_VALUE_FIELDS.filter(fd=>fd.form);
   const extra = IB_VALUE_FIELDS.filter(fd=>!fd.form);
   return `<div class="inbody-grid">${main.map(f).join('')}</div>
@@ -5044,8 +4923,7 @@ document.getElementById('ibAddBtn').addEventListener('click', ()=>openInbodyEntr
 document.getElementById('ibEntrySave').addEventListener('click', ()=>{
   const newDate = document.getElementById('ibEntryDate').value;
   if(!newDate){ showToast('측정일을 선택해주세요'); return; }
-  const TEXT_KEYS = ['memo','cid'];
-  const get=(k)=>{ const el=document.getElementById('ibf_'+k); if(!el) return undefined; const v=el.value; return v===''? undefined : (TEXT_KEYS.includes(k)? v : Number(v)); };
+  const get=(k)=>{ const el=document.getElementById('ibf_'+k); if(!el) return undefined; const v=el.value; return v===''? undefined : (k==='memo'? v : Number(v)); };
   const ib = {};
   IB_VALUE_FIELDS.map(f=>f.key).concat('memo').forEach(k=>{
     const v=get(k);
@@ -5148,10 +5026,7 @@ function parseInbodyCsv(text){
       if(!val || val==='-' || val.toLowerCase()==='n/a') return; // no reading for this field
       if(isIgnoredIbHeader(h)) return; // device id etc. — not useful to keep
       const key=colMap[ci];
-      if(key==='cid'){
-        const m = /([CID])\s*형?/i.exec(val);
-        if(m) entry.cid = m[1].toUpperCase()+'형';
-      } else if(key){ const num=Number(val.replace(/[^0-9.\-]/g,'')); entry[key]= isNaN(num)? val : num; }
+      if(key){ const num=Number(val.replace(/[^0-9.\-]/g,'')); entry[key]= isNaN(num)? val : num; }
       else unmatched.push(`${h.replace(/\(.*?\)/g,'').trim()}: ${val}`);
     });
     if(unmatched.length) entry.memo = unmatched.join(', ');
