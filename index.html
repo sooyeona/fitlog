@@ -516,18 +516,35 @@
   @media (min-width:620px){ .ib-stat-grid{grid-template-columns:repeat(5,minmax(0,1fr));} }
 
   /* 체성분 균형(CID) 한 줄 */
-  .ib-cid{display:flex;align-items:baseline;gap:10px;background:var(--surface);border:1px solid var(--line);
+  .ib-cid{background:var(--surface);border:1px solid var(--line);
     border-radius:var(--radius-md);padding:11px 12px;margin-bottom:18px;}
+  .ib-cid .cid-top{display:flex;align-items:baseline;gap:10px;}
   .ib-cid .k{font-size:11.5px;color:var(--text-faint);}
   .ib-cid .v{margin-left:auto;font-size:14px;}
   .ib-cid .v .g{font-size:12px;color:var(--text-muted);}
   .ib-cid .v.none{color:var(--text-faint);font-size:12.5px;}
   .ib-cid .ch{font-size:11px;color:var(--text-faint);}
+  /* 용지의 근육-지방 막대 그래프 */
+  .cid-chart{margin-top:10px;}
+  .cid-row{display:flex;align-items:center;gap:8px;margin-top:5px;}
+  .cid-row .l{flex:none;width:52px;font-size:11.5px;color:var(--text-muted);}
+  .cid-row .t{position:relative;flex:1;min-width:0;height:13px;background:var(--surface-2);border-radius:3px;overflow:hidden;}
+  .cid-row .t::after{content:"";position:absolute;left:var(--p100);top:0;bottom:0;width:1px;background:var(--text-faint);}
+  .cid-row .t > i{display:block;height:100%;background:var(--text-muted);border-radius:3px 0 0 3px;}
+  .cid-row .p{flex:none;width:40px;text-align:right;font-family:var(--font-mono);font-size:11.5px;color:var(--text);}
+  .cid-row .p small{font-size:9.5px;color:var(--text-faint);}
+  .cid-foot{margin-top:7px;font-size:10.5px;color:var(--text-faint);}
+  .cid-foot.nodata{margin-top:8px;}
 
-  .ib-chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:12px;margin-bottom:26px;}
-  .ib-chart-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:16px 16px 8px;position:relative;}
+  .ib-chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:8px;margin-bottom:20px;}
+  /* 측정일 줄 */
+  .ib-when{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-faint);margin-bottom:8px;}
+  .ib-latest{margin-left:auto;border:1px solid var(--line);background:transparent;color:var(--text-muted);
+    border-radius:var(--radius-sm);padding:3px 8px;font-size:11px;cursor:pointer;font-family:inherit;}
+  .ib-chart-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:10px 12px 5px;position:relative;}
+  .ib-chart-card .ch-head{display:flex;align-items:baseline;gap:8px;margin-bottom:2px;}
   .ib-chart-card .ch-title{font-size:12.5px;font-weight:700;color:var(--text-muted);}
-  .ib-chart-card .ch-value{font-family:var(--font-mono);font-size:19px;font-weight:600;margin:2px 0 8px;}
+  .ib-chart-card .ch-value{margin-left:auto;font-family:var(--font-mono);font-size:15px;font-weight:600;}
   .ib-chart-card svg{width:100%;height:auto;overflow:visible;}
   .ib-chart-card .ch-empty{font-size:12px;color:var(--text-faint);padding:20px 0;text-align:center;}
   .ib-tooltip{position:absolute;pointer-events:none;background:var(--text);color:var(--bg);font-size:11px;font-family:var(--font-mono);padding:4px 8px;border-radius:6px;transform:translate(-50%,-130%);white-space:nowrap;opacity:0;transition:opacity .1s;z-index:5;}
@@ -2107,7 +2124,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-11-03 인바디확장2';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-11-03 인바디그래프';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
@@ -4531,6 +4548,7 @@ const IB_FIELDS = [
   // ---- 기본 ----
   {key:'weight',       label:'체중',           unit:'kg',    dec:1, group:'basic', form:true, hist:true, aliases:['체중','weight','bodyweight']},
   {key:'bmi',          label:'BMI',            unit:'kg/㎡', dec:1, group:'basic', form:true, hist:true, aliases:['bmi','체질량지수']},
+  {key:'height',       label:'신장',           unit:'cm',    dec:1, group:'basic', form:true, aliases:['신장','키','height']},
   {key:'bmr',          label:'기초대사량',      unit:'kcal',  dec:0, group:'basic', form:true, hist:true, short:'기초대사', aliases:['기초대사량','basalmetabolicrate','bmr']},
   {key:'score',        label:'인바디 점수',     unit:'점',    dec:0, group:'basic', form:true, hist:true, short:'점수', aliases:['인바디점수','inbodyscore','점수','score']},
   // ---- 근육 · 지방 ----
@@ -4543,6 +4561,11 @@ const IB_FIELDS = [
   {key:'abdFatRatio',  label:'복부지방률',      unit:'',      dec:2, group:'muscleFat', form:true, hist:true, short:'복부지방률', aliases:['복부지방률','whr','waisthipratio']},
   {key:'waist',        label:'허리둘레',        unit:'cm',    dec:1, group:'muscleFat', aliases:['허리둘레','waistcircumference','waist']},
   {key:'smi',          label:'SMI (골격근지수)',unit:'kg/㎡', dec:2, group:'muscleFat', aliases:['smi','골격근지수']},
+  // ---- 용지의 막대 그래프 (표준값 대비 %) ----
+  // 이 셋을 한 번만 적어두면 표준값을 역산해서 다른 측정일 그래프까지 정확해진다
+  {key:'weightPct',    label:'표준 대비 체중',      unit:'%', dec:0, group:'muscleFat',  aliases:['체중백분율','표준체중대비','weightpercent']},
+  {key:'smmPct',       label:'표준 대비 골격근량',  unit:'%', dec:0, group:'muscleFat',  aliases:['골격근량백분율','표준골격근량대비','smmpercent']},
+  {key:'fatPct',       label:'표준 대비 체지방량',  unit:'%', dec:0, group:'muscleFat',  aliases:['체지방량백분율','표준체지방량대비','bfmpercent']},
   // ---- 체수분 ----
   {key:'tbw',          label:'체수분 (총 수분량)', unit:'L', dec:1, group:'water', form:true, hist:true, short:'체수분', aliases:['체수분','수분량','totalbodywater','tbw']},
   {key:'icw',          label:'세포내수분',      unit:'L',     dec:1, group:'water', form:true, aliases:['세포내수분','intracellularwater','icw']},
@@ -4592,13 +4615,17 @@ function inbodyEntries(){
     .map(l=>({date:l.date, ...l.inbody}))
     .sort((a,b)=> a.date<b.date ? 1 : (a.date>b.date? -1 : 0));
 }
-function statTile(label,val,unit,delta){
+function statTile(label,val,unit,delta,dec){
+  // 22 / 22.0 이 섞이지 않게 항목별 자릿수로 맞춘다
+  const txt = (typeof val==='number' && dec!=null) ? val.toFixed(dec) : (val??'—');
   return `<div class="ib-stat-tile"><div class="label">${label}</div>
-    <div class="value">${val??'—'}${val!=null?`<small> ${unit}</small>`:''}</div>
+    <div class="value">${txt}${val!=null?`<small> ${unit}</small>`:''}</div>
     <div class="delta">${delta||'&nbsp;'}</div></div>`;
 }
-function deltaStr(entriesDesc,key,decimals){
-  const latest=entriesDesc[0], prev=entriesDesc[1];
+function deltaStr(entriesDesc,key,decimals,idx){
+  const i = idx||0;
+  const latest=entriesDesc[i], prev=entriesDesc[i+1];
+  if(!latest) return '';
   if(!prev || latest[key]==null || prev[key]==null) return '';
   const d = latest[key]-prev[key];
   const dec = decimals!=null ? decimals : 1;
@@ -4606,14 +4633,35 @@ function deltaStr(entriesDesc,key,decimals){
   return (d>0?'▲':'▼')+Math.abs(d).toFixed(dec);
 }
 // 체성분 균형(CID) 한 줄. 인바디 용지에 적힌 체형을 그대로 골라 두는 값이다.
-function cidRowHtml(latest, prev){
+function cidRowHtml(latest, prev, std){
   const v = latest.cid;
   const changed = v && prev && prev.cid && prev.cid !== v;
+  const rows = [
+    ['체중',     ibPct(latest, std, 'weight'),              latest.weight,      'kg'],
+    ['골격근량', ibPct(latest, std, 'smm'),                 latest.smm,         'kg'],
+    ['체지방량', ibPct(latest, std, 'fat', 'bodyFatMass'),  latest.bodyFatMass, 'kg'],
+  ];
+  const drawable = rows.every(r=>r[1]>0);
+  // 가로 축: 40% ~ 170%, 100% 자리에 기준선
+  const LO = 40, HI = 170;
+  const pos = p => Math.max(0, Math.min(100, (Math.min(Math.max(p,LO),HI)-LO)/(HI-LO)*100));
   return `<div class="ib-cid">
-    <span class="k">체성분 균형 (CID)</span>
-    ${v ? `<span class="v">${v}<span class="g"> · ${CID_LABEL[v]||''}</span></span>${
-            changed ? `<span class="ch">이전 ${prev.cid}</span>` : ''}`
-        : `<span class="v none">기록 없음</span>`}
+    <div class="cid-top">
+      <span class="k">체성분 균형 (CID)</span>
+      ${v ? `<span class="v">${v}<span class="g"> · ${CID_LABEL[v]||''}</span></span>${
+              changed ? `<span class="ch">이전 ${prev.cid}</span>` : ''}`
+          : `<span class="v none">기록 없음</span>`}
+    </div>
+    ${drawable ? `<div class="cid-chart" style="--p100:${pos(100)}%">
+      ${rows.map(([lab,pct,val,unit])=>`
+        <div class="cid-row">
+          <span class="l">${lab}</span>
+          <span class="t"><i style="width:${pos(pct)}%"></i></span>
+          <span class="p">${Math.round(pct)}<small>%</small></span>
+        </div>`).join('')}
+      <div class="cid-foot">세로선 = 표준 100%${
+        std && std.src==='est' ? ` · 신장 ${std.height.toFixed(1)}cm 기준` : ''}</div>
+    </div>` : `<div class="cid-foot nodata">체중·골격근량·체지방량이 있어야 그려져요</div>`}
   </div>`;
 }
 function renderInbodyTab(){
@@ -4627,23 +4675,9 @@ function renderInbodyTab(){
     body.querySelector('#ibEmptyAddBtn').addEventListener('click', ()=>openInbodyEntry());
     return;
   }
-  const latest = entriesDesc[0];
-  const [ly,lm,ld] = latest.date.split('-');
+  if(ibSelDate && !entriesDesc.some(e=>e.date===ibSelDate)) ibSelDate = null;
   body.innerHTML = `
-    <div style="font-size:12px;color:var(--text-faint);margin-bottom:8px">최근 측정 · ${ly}.${lm}.${ld}</div>
-    <div class="ib-stat-grid">
-      ${statTile('체중', latest.weight, 'kg', deltaStr(entriesDesc,'weight',1))}
-      ${statTile('골격근량', latest.smm, 'kg', deltaStr(entriesDesc,'smm',1))}
-      ${statTile('체지방량', latest.bodyFatMass, 'kg', deltaStr(entriesDesc,'bodyFatMass',1))}
-      ${statTile('체지방률', latest.bodyFatPct, '%', deltaStr(entriesDesc,'bodyFatPct',1))}
-      ${statTile('체수분', latest.tbw, 'L', deltaStr(entriesDesc,'tbw',1))}
-      ${statTile('단백질량', latest.protein, 'kg', deltaStr(entriesDesc,'protein',2))}
-      ${statTile('복부지방률', latest.abdFatRatio, '', deltaStr(entriesDesc,'abdFatRatio',2))}
-      ${statTile('내장지방레벨', latest.visceral, 'Lv', deltaStr(entriesDesc,'visceral',0))}
-      ${statTile('기초대사량', latest.bmr, 'kcal', deltaStr(entriesDesc,'bmr',0))}
-      ${statTile('인바디점수', latest.score, '점', deltaStr(entriesDesc,'score',0))}
-    </div>
-    ${cidRowHtml(latest, entriesDesc[1])}
+    <div id="ibTopStats"></div>
     <div class="ib-chart-grid">
       <div class="ib-chart-card" id="chartWeight"></div>
       <div class="ib-chart-card" id="chartSmm"></div>
@@ -4657,13 +4691,56 @@ function renderInbodyTab(){
     </div>
     <div class="ib-hist" id="ibHistTable"></div>
   `;
-  const asc = [...entriesDesc].reverse();
-  drawTrendChart(document.getElementById('chartWeight'), asc, 'weight', {title:'체중 추이', unit:'kg', decimals:1});
-  drawTrendChart(document.getElementById('chartSmm'), asc, 'smm', {title:'골격근량 추이', unit:'kg', decimals:1});
-  drawTrendChart(document.getElementById('chartFat'), asc, 'bodyFatPct', {title:'체지방률 추이', unit:'%', decimals:1});
-  drawTrendChart(document.getElementById('chartTbw'), asc, 'tbw', {title:'체수분 추이', unit:'L', decimals:1});
-  drawTrendChart(document.getElementById('chartProtein'), asc, 'protein', {title:'단백질 추이', unit:'kg', decimals:2});
+  renderIbTopStats(entriesDesc);
+  drawIbCharts(entriesDesc);
   renderIbHistTable(entriesDesc);
+}
+
+/* 위쪽 스탯 묶음 — 추이 그래프에서 날짜를 누르면 이 부분만 다시 그린다 */
+let ibSelDate = null;                       // null 이면 가장 최근 측정
+function ibSelIndex(entriesDesc){
+  const i = ibSelDate ? entriesDesc.findIndex(e=>e.date===ibSelDate) : 0;
+  return i < 0 ? 0 : i;
+}
+function renderIbTopStats(entriesDesc){
+  const box = document.getElementById('ibTopStats');
+  if(!box) return;
+  const idx = ibSelIndex(entriesDesc);
+  const cur = entriesDesc[idx];
+  const [ly,lm,ld] = cur.date.split('-');
+  box.innerHTML = `
+    <div class="ib-when">${ly}.${lm}.${ld} 측정${idx===0 ? ' · 최근' : ` · ${idx+1}번째 최근`}${
+      idx!==0 ? `<button class="ib-latest" id="ibToLatest">최근으로</button>` : ''}</div>
+    <div class="ib-stat-grid">
+      ${statTile('체중', cur.weight, 'kg', deltaStr(entriesDesc,'weight',1,idx), 1)}
+      ${statTile('골격근량', cur.smm, 'kg', deltaStr(entriesDesc,'smm',1,idx), 1)}
+      ${statTile('체지방량', cur.bodyFatMass, 'kg', deltaStr(entriesDesc,'bodyFatMass',1,idx), 1)}
+      ${statTile('체지방률', cur.bodyFatPct, '%', deltaStr(entriesDesc,'bodyFatPct',1,idx), 1)}
+      ${statTile('체수분', cur.tbw, 'L', deltaStr(entriesDesc,'tbw',1,idx), 1)}
+      ${statTile('단백질량', cur.protein, 'kg', deltaStr(entriesDesc,'protein',2,idx), 2)}
+      ${statTile('복부지방률', cur.abdFatRatio, '', deltaStr(entriesDesc,'abdFatRatio',2,idx), 2)}
+      ${statTile('내장지방레벨', cur.visceral, 'Lv', deltaStr(entriesDesc,'visceral',0,idx), 0)}
+      ${statTile('기초대사량', cur.bmr, 'kcal', deltaStr(entriesDesc,'bmr',0,idx), 0)}
+      ${statTile('인바디점수', cur.score, '점', deltaStr(entriesDesc,'score',0,idx), 0)}
+    </div>
+    ${cidRowHtml(cur, entriesDesc[idx+1], ibStandards(entriesDesc))}`;
+  const bt = document.getElementById('ibToLatest');
+  if(bt) bt.addEventListener('click', ()=>{ ibSelDate = null; renderIbTopStats(entriesDesc); drawIbCharts(entriesDesc); });
+}
+function drawIbCharts(entriesDesc){
+  const asc = [...entriesDesc].reverse();
+  const sel = entriesDesc[ibSelIndex(entriesDesc)].date;
+  const pick = date => {
+    ibSelDate = date;
+    renderIbTopStats(entriesDesc);
+    drawIbCharts(entriesDesc);
+  };
+  const o = (title, unit, decimals) => ({title, unit, decimals, sel, onPick:pick});
+  drawTrendChart(document.getElementById('chartWeight'), asc, 'weight', o('체중 추이','kg',1));
+  drawTrendChart(document.getElementById('chartSmm'), asc, 'smm', o('골격근량 추이','kg',1));
+  drawTrendChart(document.getElementById('chartFat'), asc, 'bodyFatPct', o('체지방률 추이','%',1));
+  drawTrendChart(document.getElementById('chartTbw'), asc, 'tbw', o('체수분 추이','L',1));
+  drawTrendChart(document.getElementById('chartProtein'), asc, 'protein', o('단백질 추이','kg',2));
 }
 function renderIbHistTable(entriesDesc){
   const head = `<div class="ib-hist-row head"><span>날짜</span>${
@@ -4776,11 +4853,13 @@ document.getElementById('ibDetailOverlay').addEventListener('click', e=>{ if(e.t
 
 function drawTrendChart(container, ascEntries, key, opts){
   const pts = ascEntries.filter(e=>typeof e[key]==='number');
-  container.innerHTML = `<div class="ch-title">${opts.title}</div>`;
+  // 제목과 값을 한 줄에 놓고 그림 높이를 절반으로 — 세로를 덜 먹는다
+  const selPt = opts.sel ? pts.find(p=>p.date===opts.sel) : null;
+  const shown = selPt ? selPt[key] : (pts.length ? pts[pts.length-1][key] : null);
+  container.innerHTML = `<div class="ch-head"><span class="ch-title">${opts.title}</span>${
+    shown!=null ? `<span class="ch-value">${shown.toFixed(opts.decimals)}<small> ${opts.unit}</small></span>` : ''}</div>`;
   if(!pts.length){ container.innerHTML += `<div class="ch-empty">기록 없음</div>`; return; }
-  const last = pts[pts.length-1][key];
-  container.innerHTML += `<div class="ch-value">${last.toFixed(opts.decimals)}<small> ${opts.unit}</small></div>`;
-  const W=240,H=84,PAD=10;
+  const W=240,H=44,PAD=10;
   const NS='http://www.w3.org/2000/svg';
   const svg=document.createElementNS(NS,'svg');
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
@@ -4789,7 +4868,7 @@ function drawTrendChart(container, ascEntries, key, opts){
 
   if(pts.length===1){
     const c=document.createElementNS(NS,'circle');
-    c.setAttribute('cx',W/2); c.setAttribute('cy',H/2); c.setAttribute('r',5);
+    c.setAttribute('cx',W/2); c.setAttribute('cy',H/2); c.setAttribute('r',4);
     c.setAttribute('fill','var(--inbody)'); c.setAttribute('stroke','var(--surface)'); c.setAttribute('stroke-width','2');
     svg.appendChild(c);
     return;
@@ -4800,15 +4879,15 @@ function drawTrendChart(container, ascEntries, key, opts){
   const pad=(max-min)*0.15; min-=pad; max+=pad;
   const coords = pts.map((p,i)=>({
     x: PAD + (i/(pts.length-1))*(W-PAD*2),
-    y: H-8 - ((p[key]-min)/(max-min))*(H-16),
+    y: H-6 - ((p[key]-min)/(max-min))*(H-12),
     date:p.date, val:p[key]
   }));
   const base=document.createElementNS(NS,'line');
-  base.setAttribute('x1',PAD); base.setAttribute('x2',W-PAD); base.setAttribute('y1',H-8); base.setAttribute('y2',H-8);
+  base.setAttribute('x1',PAD); base.setAttribute('x2',W-PAD); base.setAttribute('y1',H-6); base.setAttribute('y2',H-6);
   base.setAttribute('stroke','var(--line)'); base.setAttribute('stroke-width','1');
   svg.appendChild(base);
 
-  const areaPath = `M${coords[0].x},${H-8} ` + coords.map(c=>`L${c.x},${c.y}`).join(' ') + ` L${coords[coords.length-1].x},${H-8} Z`;
+  const areaPath = `M${coords[0].x},${H-6} ` + coords.map(c=>`L${c.x},${c.y}`).join(' ') + ` L${coords[coords.length-1].x},${H-6} Z`;
   const area=document.createElementNS(NS,'path');
   area.setAttribute('d',areaPath); area.setAttribute('fill','var(--inbody)'); area.setAttribute('opacity','.12'); area.setAttribute('stroke','none');
   svg.appendChild(area);
@@ -4819,17 +4898,18 @@ function drawTrendChart(container, ascEntries, key, opts){
   line.setAttribute('stroke-width','2'); line.setAttribute('stroke-linejoin','round'); line.setAttribute('stroke-linecap','round');
   svg.appendChild(line);
 
-  const endC=coords[coords.length-1];
+  // 고른 날짜(없으면 마지막)에 점을 찍는다
+  const endC = (opts.sel && coords.find(c=>c.date===opts.sel)) || coords[coords.length-1];
   const endDot=document.createElementNS(NS,'circle');
-  endDot.setAttribute('cx',endC.x); endDot.setAttribute('cy',endC.y); endDot.setAttribute('r',5);
+  endDot.setAttribute('cx',endC.x); endDot.setAttribute('cy',endC.y); endDot.setAttribute('r',4);
   endDot.setAttribute('fill','var(--inbody)'); endDot.setAttribute('stroke','var(--surface)'); endDot.setAttribute('stroke-width','2');
   svg.appendChild(endDot);
 
   const cross=document.createElementNS(NS,'line');
-  cross.setAttribute('y1',4); cross.setAttribute('y2',H-8); cross.setAttribute('stroke','var(--text-faint)'); cross.setAttribute('stroke-width','1'); cross.setAttribute('opacity','0');
+  cross.setAttribute('y1',3); cross.setAttribute('y2',H-6); cross.setAttribute('stroke','var(--text-faint)'); cross.setAttribute('stroke-width','1'); cross.setAttribute('opacity','0');
   svg.appendChild(cross);
   const hoverDot=document.createElementNS(NS,'circle');
-  hoverDot.setAttribute('r',5); hoverDot.setAttribute('fill','var(--inbody)'); hoverDot.setAttribute('stroke','var(--surface)'); hoverDot.setAttribute('stroke-width','2'); hoverDot.setAttribute('opacity','0');
+  hoverDot.setAttribute('r',4); hoverDot.setAttribute('fill','var(--inbody)'); hoverDot.setAttribute('stroke','var(--surface)'); hoverDot.setAttribute('stroke-width','2'); hoverDot.setAttribute('opacity','0');
   svg.appendChild(hoverDot);
 
   const tip=document.createElement('div');
@@ -4852,10 +4932,54 @@ function drawTrendChart(container, ascEntries, key, opts){
   svg.addEventListener('mouseleave', ()=>{
     cross.setAttribute('opacity','0'); hoverDot.setAttribute('opacity','0'); tip.classList.remove('show');
   });
+  // 그래프의 점을 누르면 위쪽 스탯이 그 날짜로 바뀐다
+  if(typeof opts.onPick === 'function'){
+    svg.style.cursor = 'pointer';
+    svg.addEventListener('click', ev=>{
+      const rect = svg.getBoundingClientRect();
+      const relX = (ev.clientX-rect.left)/rect.width*W;
+      let nearest=coords[0], nd=Infinity;
+      coords.forEach(c=>{ const d=Math.abs(c.x-relX); if(d<nd){nd=d; nearest=c;} });
+      opts.onPick(nearest.date);
+    });
+  }
 }
 
 // ---- add / edit single entry ----
 let ibEntryDate = null;
+/* 막대 그래프는 '표준값 대비 %' 라서 표준값이 필요하다. 사용자가 따로 적는 일이 없도록
+   가진 값에서 알아서 구한다.
+   키: 기록된 신장 → 없으면 BMI 와 체중으로 역산(BMI = 체중/키(m)²) → 그래도 없으면 기본값.
+   표준값: 표준체중 = BMI 21 × 키(m)² (여성), 표준체지방량 = 표준체중 × 23%,
+          표준골격근량 = 제지방량 × 0.55.
+   CSV 에 용지의 % 가 들어 있으면 그쪽이 더 정확하므로 그걸로 역산해서 쓴다. */
+const IB_DEFAULT_HEIGHT = 159.7;
+function ibHeight(entriesDesc){
+  const rec = (entriesDesc.find(e=>e.height>0)||{}).height;
+  if(rec>0) return {cm:rec, src:'rec'};
+  const e = entriesDesc.find(x=>x.bmi>0 && x.weight>0);
+  if(e) return {cm: Math.sqrt(e.weight/e.bmi)*100, src:'bmi'};
+  return {cm: IB_DEFAULT_HEIGHT, src:'def'};
+}
+function ibStandards(entriesDesc){
+  for(const e of entriesDesc){
+    if(e.weightPct>0 && e.smmPct>0 && e.fatPct>0 && e.weight>0 && e.smm>0 && e.bodyFatMass>0){
+      return {src:'sheet', weight:e.weight/e.weightPct*100, smm:e.smm/e.smmPct*100, fat:e.bodyFatMass/e.fatPct*100};
+    }
+  }
+  const h = ibHeight(entriesDesc);
+  const m = h.cm/100, w = 21*m*m, fat = w*0.23;
+  return {src:'est', height:h.cm, weight:w, smm:(w-fat)*0.55, fat};
+}
+function ibPct(e, std, key, stdKey){
+  const direct = e[key+'Pct'];
+  if(direct>0) return direct;
+  if(!std || !(e[stdKey!==undefined?stdKey:key]>0)) return null;
+  const v = e[stdKey!==undefined?stdKey:key];
+  const base = key==='weight' ? std.weight : (key==='smm' ? std.smm : std.fat);
+  return base>0 ? v/base*100 : null;
+}
+
 // 인바디 체형 판정 — 용지의 막대 세 개(체중·골격근량·체지방량) 모양으로 정해진다
 const CID_LABEL = {'C형':'허약형', 'I형':'표준형', 'D형':'강인형'};
 function ibFieldsFormHtml(ib){
