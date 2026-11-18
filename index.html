@@ -135,7 +135,7 @@
   *{box-sizing:border-box;}
   [hidden]{display:none !important;}
   /* 어떤 이유로든 가로로 넘치더라도 화면이 옆으로 밀리지 않게 막는다 */
-  html,body{max-width:100%;overflow-x:hidden;}
+  html,body{max-width:100%;overflow-x:hidden;overscroll-behavior-x:contain;}
   .app{overflow-x:clip;}
   .tabs{max-width:100%;overflow-x:auto;}
   @media (max-width:420px){
@@ -172,6 +172,11 @@
 
   .view{display:none;}
   .view.active{display:block;}
+  .view.slide-prev{animation:daySlidePrev .18s ease;}
+  .view.slide-next{animation:daySlideNext .18s ease;}
+  @media (prefers-reduced-motion:reduce){
+    .view.slide-prev,.view.slide-next{animation:none;}
+  }
 
   /* ---------- calendar ---------- */
   .cal-head{display:flex;align-items:center;justify-content:space-between;margin:22px 0 14px;}
@@ -599,6 +604,18 @@
   .rt-item .steps{font-size:12.5px;color:var(--text-muted);line-height:1.7;margin-top:8px;white-space:pre-wrap;}
   .rt-item .warn{font-size:12px;color:var(--danger);margin-top:6px;}
   .rt-item select{margin-top:8px;}
+  /* 항목을 눌러 펼치면 그 자리에서 고친다 */
+  .rt-item.tap{cursor:pointer;}
+  .rt-item.tap:hover{border-color:var(--text-faint);}
+  .rt-item .chev{margin-left:auto;color:var(--text-faint);font-size:15px;}
+  .rt-item.open{border-color:var(--accent);}
+  .rt-lab{display:block;font-size:11.5px;color:var(--text-muted);margin:12px 0 5px;}
+  .rti-set{display:grid;grid-template-columns:46px 1fr auto 1fr auto;align-items:center;gap:6px;margin-bottom:6px;}
+  .rti-set .n{font-size:12px;color:var(--text-faint);font-family:var(--font-mono);}
+  .rti-set .x{font-size:11px;color:var(--text-faint);text-align:center;}
+  .rti-set input{padding:7px 8px;font-size:13px;text-align:center;font-family:var(--font-mono);padding-right:22px;}
+  .rti-set .del{width:22px;height:22px;border-radius:50%;border:none;background:transparent;color:var(--text-faint);cursor:pointer;font-size:10px;}
+  .rt-warn-edit{font-size:12px;color:var(--danger);margin:0 0 10px;line-height:1.6;}
   .rt-back{border:none;background:transparent;color:var(--text-muted);font-family:inherit;
     font-size:13px;cursor:pointer;padding:4px 0;margin-bottom:10px;}
 
@@ -775,7 +792,7 @@
   /* 자동 확대는 viewport 의 maximum-scale=1 / user-scalable=no 로 막는다.
      글자 크기를 16px 로 올리면 좁은 화면에서 레이아웃이 깨져서 그 방법은 안 쓴다. */
   /* 확대된 채로 남아 가로 스크롤이 생기는 것 방지 */
-  html,body{max-width:100%;overflow-x:hidden;}
+  html,body{max-width:100%;overflow-x:hidden;overscroll-behavior-x:contain;}
 
 
   /* ---- 실제 동작 이미지(GIF) 스테이지 ---- */
@@ -2103,7 +2120,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-11-03 CID제거';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-11-18 탭스와이프';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
@@ -3864,36 +3881,17 @@ function renderPickerRoutinePane(){
       <div style="font-family:var(--font-display);font-size:22px">${r.name}</div>
       <div style="font-size:12px;color:var(--text-faint);margin:2px 0 12px">${r.date} · ${routineSummary(r)}</div>
       ${(r.notes && r.notes.length) ? `<div class="pt-empty" style="padding:12px 14px;margin-bottom:14px">${r.notes.join('\n').replace(/</g,'&lt;').split('\n').join('<br>')}</div>` : ''}
-      ${r.items.map((it,i)=>{
-        const ex = it.exId ? getEx(it.exId) : null;
-        return `<div class="rt-item">
-          <div class="hd"><span class="nm">${it.rawName}</span><span class="sum">${itemSummary(it)}</span></div>
-          ${ex ? `<div style="font-size:12px;color:var(--text-faint);margin-top:4px">→ 도감의 <b>${ex.name}</b>에 연결됨</div>`
-               : `<div class="warn">도감에서 못 찾은 운동이에요. 아래에서 골라주세요.</div>`}
-          <select data-rtmap="${i}">
-            <option value="">${ex? '연결 바꾸기…' : '운동 고르기…'}</option>
-            ${allExercises().map(e=>`<option value="${e.id}" ${e.id===it.exId?'selected':''}>${e.name}</option>`).join('')}
-          </select>
-          ${it.steps.length? `<div class="steps">${it.steps.map((x,j)=>`${j+1}. ${x}`).join('\n').replace(/</g,'&lt;')}</div>`:''}
-          ${it.notes.length? `<div class="steps" style="color:var(--text-faint)">${it.notes.join('\n').replace(/</g,'&lt;')}</div>`:''}
-        </div>`;
-      }).join('')}
+      ${r.items.map((it,i)=> i===rtItemIdx ? rtItemEditHtml(i) : rtItemViewHtml(it,i)).join('')}
       <div class="pt-actions">
         <button class="primary-btn" id="rtApply">이 루틴으로 오늘 기록 채우기</button>
-        <button class="ghost-btn" id="rtEdit">수정</button>
+        <button class="ghost-btn" id="rtCopy">복사해서 고치기</button>
+        <button class="ghost-btn" id="rtEdit">원문 다시 붙여넣기</button>
         <button class="ghost-btn" id="rtDel" style="border-color:var(--danger);color:var(--danger);flex:0 0 auto;min-width:0;padding:0 14px">삭제</button>
       </div>`;
-    pane.querySelector('#rtBack').addEventListener('click', ()=>{ routineView=null; renderPickerRoutinePane(); });
-    pane.querySelectorAll('[data-rtmap]').forEach(sel=>{
-      sel.addEventListener('change', async ()=>{
-        const i = Number(sel.dataset.rtmap);
-        const cur = routineById(routineView);
-        cur.items[i].exId = sel.value || null;
-        await saveRoutine({...cur});
-        renderPickerRoutinePane();
-      });
-    });
+    pane.querySelector('#rtBack').addEventListener('click', ()=>{ routineView=null; rtItemIdx=null; renderPickerRoutinePane(); });
+    wireRtItem(pane);
     pane.querySelector('#rtApply').addEventListener('click', ()=>applyRoutineToDay(r));
+    pane.querySelector('#rtCopy').addEventListener('click', ()=>copyRoutine(r));
     pane.querySelector('#rtEdit').addEventListener('click', ()=>openRoutineEditor(r));
     pane.querySelector('#rtDel').addEventListener('click', async ()=>{
       await deleteRoutine(r.id); routineView=null; renderPickerRoutinePane(); showToast('루틴을 삭제했어요');
@@ -3912,6 +3910,117 @@ function renderPickerRoutinePane(){
     routineView = b.dataset.rtopen; renderPickerRoutinePane();
   }));
   pane.querySelector('#rtNew').addEventListener('click', ()=>openRoutineEditor(null));
+}
+
+/* ---- 루틴 항목 하나 — 눌러서 펼치고 그 자리에서 고친다 ---- */
+let rtItemIdx = null;      // 펼쳐 놓은 항목 번호
+let rtItemDraft = null;    // 저장 전 사본
+const esc = t => String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+
+function rtItemViewHtml(it, i){
+  const ex = it.exId ? getEx(it.exId) : null;
+  return `<div class="rt-item tap" data-rtitem="${i}">
+    <div class="hd"><span class="nm">${esc(it.rawName)}</span><span class="sum">${itemSummary(it)}</span><span class="chev">›</span></div>
+    ${ex ? `<div style="font-size:12px;color:var(--text-faint);margin-top:4px">→ 도감의 <b>${esc(ex.name)}</b>에 연결됨</div>`
+         : `<div class="warn">도감에서 못 찾은 운동이에요. 눌러서 골라주세요.</div>`}
+    ${it.steps.length? `<div class="steps">${it.steps.map((x,j)=>`${j+1}. ${esc(x)}`).join('\n')}</div>`:''}
+    ${it.notes.length? `<div class="steps" style="color:var(--text-faint)">${it.notes.map(esc).join('\n')}</div>`:''}
+  </div>`;
+}
+function rtItemEditHtml(i){
+  const d = rtItemDraft;
+  return `<div class="rt-item open" data-rtedit="${i}">
+    <div class="field-row"><label>운동 이름</label><input type="text" id="rtiName" value="${esc(d.rawName)}"></div>
+    <label class="rt-lab">도감 연결</label>
+    <select id="rtiEx">
+      <option value="">연결 안 함</option>
+      ${allExercises().map(e=>`<option value="${e.id}"${e.id===d.exId?' selected':''}>${esc(e.name)}</option>`).join('')}
+    </select>
+    <label class="rt-lab">세트</label>
+    ${d.sets.length ? d.sets.map((x,j)=>`
+      <div class="rti-set">
+        <span class="n">${j+1}세트</span>
+        <span class="set-f"><input type="text" inputmode="numeric" class="rti-r" data-j="${j}" placeholder="회" value="${esc(x.reps)}"><i class="set-unit">회</i></span>
+        <span class="x">×</span>
+        <span class="set-f"><input type="text" inputmode="decimal" class="rti-w" data-j="${j}" placeholder="kg" value="${esc(x.weight)}"><i class="set-unit">kg</i></span>
+        <button class="del" data-rtiset-del="${j}" aria-label="세트 삭제">✕</button>
+      </div>`).join('') : `<div class="sum-empty" style="margin-bottom:6px">세트 없음</div>`}
+    <button class="set-add-btn" id="rtiAdd">+ 세트 추가</button>
+    <label class="rt-lab">설명 (한 줄에 하나씩)</label>
+    <textarea id="rtiSteps" rows="4">${esc(d.steps.join('\n'))}</textarea>
+    <label class="rt-lab">메모</label>
+    <textarea id="rtiNotes" rows="2">${esc(d.notes.join('\n'))}</textarea>
+    <div class="pt-actions">
+      <button class="primary-btn" id="rtiSave">저장</button>
+      <button class="ghost-btn" id="rtiCancel">취소</button>
+      <button class="ghost-btn" id="rtiDel" style="border-color:var(--danger);color:var(--danger);flex:0 0 auto;min-width:0;padding:0 14px">항목 삭제</button>
+    </div>
+  </div>`;
+}
+// 다시 그리기 전에 입력칸 값을 사본에 담아 둔다 (안 그러면 적던 게 날아간다)
+function syncRtDraft(pane){
+  if(!rtItemDraft) return;
+  const g = id => pane.querySelector('#'+id);
+  if(g('rtiName')) rtItemDraft.rawName = g('rtiName').value;
+  if(g('rtiEx'))   rtItemDraft.exId = g('rtiEx').value || null;
+  if(g('rtiSteps'))rtItemDraft.steps = g('rtiSteps').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  if(g('rtiNotes'))rtItemDraft.notes = g('rtiNotes').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  pane.querySelectorAll('.rti-r').forEach(el=>{ const j=Number(el.dataset.j); if(rtItemDraft.sets[j]) rtItemDraft.sets[j].reps = el.value.trim(); });
+  pane.querySelectorAll('.rti-w').forEach(el=>{ const j=Number(el.dataset.j); if(rtItemDraft.sets[j]) rtItemDraft.sets[j].weight = el.value.trim(); });
+}
+function wireRtItem(pane){
+  pane.querySelectorAll('[data-rtitem]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const r = routineById(routineView);
+      rtItemIdx = Number(el.dataset.rtitem);
+      rtItemDraft = JSON.parse(JSON.stringify(r.items[rtItemIdx]));
+      rtItemDraft.sets = rtItemDraft.sets || [];
+      rtItemDraft.steps = rtItemDraft.steps || [];
+      rtItemDraft.notes = rtItemDraft.notes || [];
+      renderPickerRoutinePane();
+    });
+  });
+  const add = pane.querySelector('#rtiAdd');
+  if(!add) return;
+  add.addEventListener('click', ()=>{ syncRtDraft(pane); rtItemDraft.sets.push({reps:'', weight:''}); renderPickerRoutinePane(); });
+  pane.querySelectorAll('[data-rtiset-del]').forEach(b=>b.addEventListener('click', ()=>{
+    syncRtDraft(pane); rtItemDraft.sets.splice(Number(b.dataset.rtisetDel),1); renderPickerRoutinePane();
+  }));
+  pane.querySelector('#rtiCancel').addEventListener('click', ()=>{ rtItemIdx=null; rtItemDraft=null; renderPickerRoutinePane(); });
+  pane.querySelector('#rtiSave').addEventListener('click', async ()=>{
+    syncRtDraft(pane);
+    const r = routineById(routineView);
+    if(!rtItemDraft.rawName.trim()){ showToast('운동 이름을 적어주세요'); return; }
+    r.items[rtItemIdx] = rtItemDraft;
+    r.itemsEdited = true;          // 원문 다시 붙여넣기로 덮어쓸 때 경고하려고 표시해 둔다
+    r.updatedAt = new Date().toISOString();
+    await saveRoutine({...r});
+    rtItemIdx = null; rtItemDraft = null;
+    renderPickerRoutinePane();
+    showToast('항목을 저장했어요');
+  });
+  pane.querySelector('#rtiDel').addEventListener('click', async ()=>{
+    const r = routineById(routineView);
+    r.items.splice(rtItemIdx,1);
+    r.itemsEdited = true;
+    r.updatedAt = new Date().toISOString();
+    await saveRoutine({...r});
+    rtItemIdx = null; rtItemDraft = null;
+    renderPickerRoutinePane();
+    showToast('항목을 지웠어요');
+  });
+}
+/* ---- 루틴 복사 — 원본은 그대로 두고 복사본을 고친다 ---- */
+async function copyRoutine(r){
+  const copy = JSON.parse(JSON.stringify(r));
+  copy.id = 'rt-'+Date.now()+'-'+Math.random().toString(36).slice(2,5);
+  copy.name = (r.name||'루틴') + ' (복사본)';
+  copy.date = todayStr();
+  copy.updatedAt = new Date().toISOString();
+  await saveRoutine(copy);
+  routineView = copy.id; rtItemIdx = null; rtItemDraft = null;
+  renderPickerRoutinePane();
+  showToast('복사했어요 — 이 복사본을 고치면 원본은 그대로예요');
 }
 
 /* ---- 루틴을 그날 운동 기록으로 옮기기 ---- */
@@ -3948,6 +4057,7 @@ function openRoutineEditor(existing){
   const body = document.getElementById('routineBody');
   document.getElementById('routineTitle').textContent = existing ? '선생님 루틴 수정' : '선생님 루틴 등록';
   body.innerHTML = `
+    ${existing && existing.itemsEdited ? `<p class="rt-warn-edit">이 루틴은 항목을 직접 고친 적이 있어요.<br>여기서 저장하면 아래 원문대로 다시 만들어져서 고친 내용이 사라져요.</p>` : ''}
     <div class="field-row"><label>받은 날짜</label><input type="date" id="rtDate" value="${existing? existing.date : todayStr()}"></div>
     <div class="field-row" style="margin-top:10px"><label>루틴 이름</label><input type="text" id="rtName" placeholder="예: 개인운동 상체 루틴" value="${existing? existing.name.replace(/"/g,'&quot;') : ''}"></div>
     <h4 style="margin:18px 0 6px;font-size:14px">받은 내용 그대로 붙여넣기</h4>
@@ -4003,7 +4113,7 @@ function openRoutineEditor(existing){
 }
 function closeRoutineEditor(){ document.getElementById('routineOverlay').classList.remove('open'); }
 function openRoutineList(){
-  routineView = null;
+  routineView = null; rtItemIdx = null; rtItemDraft = null;
   document.getElementById('routineListOverlay').classList.add('open');
   renderPickerRoutinePane();
 }
@@ -5328,6 +5438,76 @@ function switchTab(view){
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>switchTab(btn.dataset.view));
 });
+
+/* 본문을 좌우로 밀면 옆 탭으로.
+   - 손가락(터치·펜)일 때만. 마우스 드래그는 글자 선택이라 건드리지 않는다.
+   - 시트가 하나라도 열려 있으면 그쪽이 우선이다 (시트에는 날짜 넘기기 스와이프가 따로 있다).
+   - 입력칸·버튼·그래프, 그리고 가로로 스크롤되는 칸(사진줄·인바디 표·탭 줄)에서
+     시작한 동작은 그냥 둔다. */
+(function(){
+  // 화면 어디서 밀어도 되게 문서 전체에 건다 (본문이 짧으면 빈 아래쪽은 main 밖이라 안 먹는다)
+  const host = document;
+  /* 가로 제스처가 따로 필요한 칸(사진줄·인바디 표·탭 줄·그래프)과 글자를 고르는 칸만 비켜 간다.
+     버튼·링크 위에서도 밀 수 있게 두고, 대신 넘긴 직후의 click 한 번을 삼킨다
+     (안 그러면 운동 도감처럼 화면 대부분이 버튼인 탭에서는 스와이프가 아예 안 먹는다). */
+  const SKIP = 'input,textarea,select,svg,.photo-strip,.ib-hist,.tabs,[data-draghandle]';
+  let swallowClick = 0;
+  document.addEventListener('click', e=>{
+    if(!swallowClick || Date.now() > swallowClick) return;
+    swallowClick = 0;
+    e.stopPropagation(); e.preventDefault();
+  }, true);
+  let x0 = null, y0 = null, dir = null, top0 = 0;
+
+  const order = ()=>Array.from(document.querySelectorAll('.tab-btn')).map(b=>b.dataset.view);
+  const go = delta => {
+    const tabs = order();
+    const cur = document.querySelector('.tab-btn.active');
+    const i = tabs.indexOf(cur && cur.dataset.view);
+    const next = i + delta;
+    if(i < 0 || next < 0 || next >= tabs.length) return;      // 양 끝에서는 넘어가지 않는다
+    switchTab(tabs[next]);
+    const view = document.getElementById('view-'+tabs[next]);
+    if(view){
+      view.classList.remove('slide-prev','slide-next');
+      void view.offsetWidth;                                   // 애니메이션을 다시 돌리려면 한 번 끊어야 한다
+      view.classList.add(delta < 0 ? 'slide-prev' : 'slide-next');
+    }
+    window.scrollTo(0, 0);
+  };
+
+  let dx = 0, dy = 0;
+  /* 포인터 이벤트가 아니라 터치 이벤트를 쓴다.
+     body 에 overflow-x:hidden 이 걸려 있어서, 가로로 미는 순간 브라우저가 스크롤로 보고
+     pointerdown 직후 pointercancel 을 쏴 버린다(= pointermove 가 아예 안 온다).
+     touchmove 는 스크롤 중에도 계속 와서 방향을 잴 수 있다. 화면은 못 막게 passive 로 둔다. */
+  host.addEventListener('touchstart', e=>{
+    x0 = null;
+    if(e.touches.length !== 1) return;                          // 두 손가락(확대 등)은 건드리지 않는다
+    if(document.querySelector('.overlay.open')) return;
+    if(e.target.closest && e.target.closest(SKIP)) return;
+    const t = e.touches[0];
+    x0 = t.clientX; y0 = t.clientY; dir = null; top0 = window.scrollY; dx = dy = 0;
+  }, {passive:true});
+  host.addEventListener('touchmove', e=>{
+    if(x0 == null || e.touches.length !== 1) return;
+    const t = e.touches[0];
+    dx = t.clientX - x0; dy = t.clientY - y0;
+    if(!dir && Math.hypot(dx, dy) > 10) dir = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+  }, {passive:true});
+  const commit = ()=>{
+    if(x0 == null) return;
+    x0 = null;
+    const hor = dir === 'h'; dir = null;
+    if(!hor) return;
+    if(Math.abs(window.scrollY - top0) > 6) return;            // 실은 세로로 스크롤하던 중이었다
+    if(Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    swallowClick = Date.now() + 400;                           // 뒤따라오는 click 한 번은 무시
+    go(dx < 0 ? 1 : -1);                                       // 왼쪽으로 밀면 오른쪽 탭
+  };
+  host.addEventListener('touchend', commit, {passive:true});
+  host.addEventListener('touchcancel', commit, {passive:true});
+})();
 document.getElementById('dietAddBtn').addEventListener('click', ()=>openDietDay(todayStr(), true));
 document.getElementById('wkAddBtn').addEventListener('click', ()=>openWorkoutDay(todayStr(), true));
 document.getElementById('dataBtn').addEventListener('click', openDataModal);
