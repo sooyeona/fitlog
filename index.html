@@ -356,6 +356,11 @@
   .wk-dow{font-size:12px;color:var(--text-faint);}
   .wk-kind{font-size:11.5px;}
   .wk-dur{margin-left:auto;font-family:var(--font-mono);font-size:11.5px;color:var(--note-ink);}
+  .wk-import{flex:none;border:1px solid var(--line);background:transparent;color:var(--text-muted);
+    border-radius:var(--radius-sm);padding:3px 8px;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .wk-import:hover{border-color:var(--accent);color:var(--accent);}
+  .wk-head .wk-dur + .wk-import{margin-left:0;}
+  .wk-import.lone{margin-left:auto;}
   .wk-ym{font-size:11.5px;color:var(--text-faint);}
   /* 모아보기 카드 안의 운동 요약은 날짜 시트와 같은 모양(여러 줄)이되 살짝 촘촘하게 */
   .wk-card .sum-ex{margin-bottom:10px;}
@@ -2120,7 +2125,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-11-18 탭스와이프';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-11-18 기록가져오기';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
@@ -5257,6 +5262,7 @@ function renderWorkoutTab(){
           <span class="wk-kind" style="color:${col}">${pt ? 'PT' : '개인운동'}</span>
           ${y === new Date().getFullYear() ? '' : `<span class="wk-ym">${y}</span>`}
           ${w.durationMin ? `<span class="wk-dur">${w.durationMin}분</span>` : ''}
+          ${ds === todayStr() ? '' : `<button class="wk-import${w.durationMin?'':' lone'}" data-wkimport="${ds}">오늘로 가져오기</button>`}
         </div>
         ${(w.exercises||[]).length || w.memo
             ? workoutExsHtml(log)
@@ -5267,11 +5273,48 @@ function renderWorkoutTab(){
         ? `<div class="diet-more"><button class="ghost-btn" id="wkMoreBtn">더 보기 (${days.length - wkShown}일 남음)</button></div>`
         : '');
 
+  feed.querySelectorAll('[data-wkimport]').forEach(btn=>{
+    btn.addEventListener('click', ev=>{ ev.stopPropagation(); importWorkoutFrom(btn.dataset.wkimport); });
+  });
   feed.querySelectorAll('[data-wkday]').forEach(card=>{
     card.addEventListener('click', ()=>openWorkoutDay(card.dataset.wkday, false));
   });
   const more = document.getElementById('wkMoreBtn');
   if(more) more.addEventListener('click', ()=>{ wkShown += WK_PAGE; renderWorkoutTab(); });
+}
+
+/* 지난 날의 운동 기록을 통째로 오늘(또는 지금 열어둔 날짜)로 옮겨 온다.
+   세트의 무게·횟수뿐 아니라 **실패 표시와 사유, 세트 메모, 운동 중 메모**까지 그대로 가져온다.
+   지난번에 뭘 못 했는지 보고 오늘 무게를 정하려는 용도라 그 부분이 핵심이다.
+   붙여넣기만 하고 저장은 사용자가 누른다 (루틴 채우기와 같은 흐름). */
+function importWorkoutFrom(srcDs){
+  const src = normalizeLog(state.logs[srcDs], srcDs);
+  if(!workoutLogged(src)){ showToast('가져올 운동 기록이 없어요'); return; }
+  const pickerEl = document.getElementById('pickerOverlay');
+  const pickerOpen = pickerEl && pickerEl.classList.contains('open');
+  const ds = (pickerOpen && pickerEl.dataset.forDate) || state.draftDate || todayStr();
+  if(ds === srcDs){ showToast('같은 날짜예요'); return; }
+  if(pickerOpen) closePicker();
+  if(!state.draft || state.draftDate !== ds) openDay(ds);   // 보고 있던 탭은 그대로 둔다
+  state.sectionEdit.workout = true;                 // 가져온 내용을 바로 펼쳐서 보여준다
+  const cur = getLog(ds);
+  const copied = (src.workout.exercises||[]).map(e=>{
+    const c = JSON.parse(JSON.stringify(e));
+    delete c.memoOpen;                              // 편집 중에만 쓰는 임시 값
+    (c.warmupSets||[]).forEach(x=>delete x.memoOpen);
+    (c.workSets||[]).forEach(x=>delete x.memoOpen);
+    return c;
+  });
+  const keep = (cur.workout.exercises||[]).filter(e=>!copied.some(c=>c.id===e.id));
+  queueSave(ds, {workout:{
+    ...cur.workout,
+    type: cur.workout.type==='none' ? src.workout.type : cur.workout.type,
+    durationMin: cur.workout.durationMin || src.workout.durationMin,
+    memo: cur.workout.memo || src.workout.memo,
+    exercises: [...keep, ...copied],
+  }}, {refresh:true});
+  const [, mo, d] = srcDs.split('-');
+  showToast(`${Number(mo)}월 ${Number(d)}일 기록을 가져왔어요 · 저장을 눌러주세요`);
 }
 
 // 운동 탭에서 하루 기록 시트를 연다. edit 이면 운동 칸을 펼친 채로.
