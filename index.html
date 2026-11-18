@@ -741,17 +741,17 @@
   .ex-set-thumb{width:46px;height:46px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#161C18;}
   .ex-set-thumb svg{width:70px;height:70px;flex:none;}
   .ex-set-noicon{font-size:10px;font-weight:700;color:#cfd6ca;}
-  .ex-set-titlewrap{flex:1;min-width:0;}
-  .ex-set-name{display:block;font-size:14px;font-weight:600;cursor:pointer;}
-  .ex-set-name:hover{color:var(--accent);}
+  /* 이름 줄 전체가 접고 펴는 자리 — 손가락으로 누르기 쉽게 위아래 여백을 넉넉히 준다 */
+  .ex-set-titlewrap{flex:1;min-width:0;cursor:pointer;padding:6px 0;margin:-6px 0;-webkit-tap-highlight-color:transparent;}
+  .ex-set-name{display:block;font-size:14px;font-weight:600;}
   .ex-set-muscle{display:block;font-size:11px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .ex-set-remove{flex:none;width:26px;height:26px;border-radius:50%;border:none;background:var(--surface-2);color:var(--text-faint);cursor:pointer;font-size:11px;}
+  .ex-set-remove{flex:none;width:28px;height:28px;margin-left:6px;border-radius:50%;border:none;background:var(--surface-2);color:var(--text-faint);cursor:pointer;font-size:11px;}
   .ex-set-remove:hover{color:var(--danger);}
   .ex-set-nameline{display:flex;align-items:center;gap:4px;min-width:0;}
   .ex-set-nameline .ex-set-name{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .ex-set-min{flex:none;font-family:var(--font-mono);font-size:12px;font-weight:400;color:var(--note-ink);}
-  .ex-fold{flex:none;width:22px;height:22px;border:none;background:transparent;color:var(--text-faint);
-    font-size:11px;line-height:1;cursor:pointer;font-family:inherit;transition:transform .15s;}
+  .ex-fold{flex:none;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;
+    color:var(--text-faint);font-size:11px;line-height:1;transition:transform .15s;}
   .ex-set-card.collapsed .ex-fold{transform:rotate(-90deg);}
   .ex-set-card.collapsed .ex-set-body{display:none;}
   .ex-set-card.collapsed .ex-set-muscle{color:var(--text-muted);}
@@ -2056,6 +2056,8 @@ function normalizeSet(x){
 }
 // 저장된 기록을 현재 스키마로 맞춘다. 예전 버전이 쓴 문서(workout.exerciseIds)나
 // 필드가 빠진 문서를 열어도 화면이 깨지지 않게 하기 위한 이관/보정 단계.
+let exUidSeq = 0;
+function newExUid(){ return 'x' + Date.now().toString(36) + (exUidSeq++).toString(36) + Math.random().toString(36).slice(2,5); }
 function normalizeLog(raw, date){
   const base = emptyLog(date || (raw && raw.date));
   if(!raw || typeof raw!=='object') return base;
@@ -2067,6 +2069,9 @@ function normalizeLog(raw, date){
   }
   exercises = exercises.filter(e=>e && e.id).map(e=>({
     id: e.id,
+    // 같은 운동을 하루에 두 번 넣을 수 있어야 해서(루틴 가져오기 등) 칸마다 고유 번호를 둔다.
+    // 예전 기록에는 없으므로 여기서 채워 준다. 화면의 data-* 는 전부 이 uid 로 가리킨다.
+    uid: e.uid || newExUid(),
     mode: e.mode==='pt' ? 'pt' : 'mine',      // 선생님 운동법대로 / 내 방식대로
     ptPlanId: e.ptPlanId || null,             // 따라한 선생님 운동법
     note: e.note || '',                       // 운동 중 메모
@@ -2125,7 +2130,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-11-18 기록가져오기';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-11-18 중복추가';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
@@ -3518,43 +3523,45 @@ function renderExerciseCards(log){
     const ex = getEx(entry.id);
     if(!ex) return '';
     const color = PARTS[ex.part].color;
-    const collapsed = !!state.cardFold[entry.id];
+    const collapsed = !!state.cardFold[entry.uid];
     const warmup = entry.warmupSets||[];
     const work = entry.workSets||[];
     return `
-    <div class="ex-set-card${collapsed?' collapsed':''}" data-exid="${entry.id}">
+    <div class="ex-set-card${collapsed?' collapsed':''}" data-exid="${entry.uid}">
       <div class="ex-set-head">
-        <button class="ex-drag" data-draghandle="${entry.id}" aria-label="순서 바꾸기">⠿</button>
+        <button class="ex-drag" data-draghandle="${entry.uid}" aria-label="순서 바꾸기">⠿</button>
         <div class="ex-set-thumb" style="background:${color}22">${exThumbHtml(ex, color, 'ex-set-noicon')}</div>
-        <div class="ex-set-titlewrap">
+        <!-- 이름 줄 전체가 접고 펴는 자리다 (예전엔 이름을 누르면 도감이 열렸는데,
+             접기 버튼이 작아서 옆의 삭제(✕)를 잘못 누르는 일이 잦았다) -->
+        <div class="ex-set-titlewrap" data-foldex="${entry.uid}" role="button" aria-label="${collapsed?'펼치기':'접기'}">
           <span class="ex-set-nameline">
-            <span class="ex-set-name" data-detail="${entry.id}">${ex.name}</span>
+            <span class="ex-set-name">${ex.name}</span>
             ${(ex.custom && entry.minutes) ? `<span class="ex-set-min">${entry.minutes}분</span>` : ''}
-            <button class="ex-fold" data-foldex="${entry.id}" aria-label="${collapsed?'펼치기':'접기'}">▾</button>
+            <span class="ex-fold">▾</span>
           </span>
           <span class="ex-set-muscle">${collapsed ? (setSummaryText(entry) || `${ex.equip} · ${ex.muscle}`) : `${ex.equip} · ${ex.muscle}`}</span>
         </div>
-        <button class="ex-set-remove" data-removeex="${entry.id}" aria-label="운동 삭제">✕</button>
+        <button class="ex-set-remove" data-removeex="${entry.uid}" aria-label="운동 삭제">✕</button>
       </div>
       <div class="ex-set-body">
-      <div class="mode-seg" data-modeseg="${entry.id}">
+      <div class="mode-seg" data-modeseg="${entry.uid}">
         <button data-mode="mine" class="${entry.mode!=='pt'?'on':''}">내 방식대로</button>
         <button data-mode="pt" class="${entry.mode==='pt'?'on':''}">선생님 운동법</button>
       </div>
       ${ptHintHtml(entry)}
       ${warmup.length? `<div class="set-group-label">웜업</div>
-      <div class="set-rows">${warmup.map((s,i)=>setRow(entry.id,'warmupSets',i,s,'W')).join('')}</div>` : ''}
-      <button class="set-add-btn" data-addset="${entry.id}" data-kind="warmupSets">+ 웜업 세트 추가</button>
+      <div class="set-rows">${warmup.map((s,i)=>setRow(entry.uid,'warmupSets',i,s,'W')).join('')}</div>` : ''}
+      <button class="set-add-btn" data-addset="${entry.uid}" data-kind="warmupSets">+ 웜업 세트 추가</button>
       <div class="set-group-label">세트 <span style="font-weight:500;color:var(--text-faint)">· ⋯ 를 누르면 실패·메모·삭제</span></div>
-      <div class="set-rows">${work.map((s,i)=>setRow(entry.id,'workSets',i,s,i+1)).join('')}</div>
-      <button class="set-add-btn" data-addset="${entry.id}" data-kind="workSets">+ 세트 추가</button>
+      <div class="set-rows">${work.map((s,i)=>setRow(entry.uid,'workSets',i,s,i+1)).join('')}</div>
+      <button class="set-add-btn" data-addset="${entry.uid}" data-kind="workSets">+ 세트 추가</button>
       ${ex.custom ? `<div class="field-row" style="margin-top:10px">
         <label>이 운동 시간</label>
-        <input type="number" min="0" class="ex-minutes" data-minex="${entry.id}" placeholder="분" value="${entry.minutes||''}">
+        <input type="number" min="0" class="ex-minutes" data-minex="${entry.uid}" placeholder="분" value="${entry.minutes||''}">
       </div>` : ''}
       <div class="ex-note-row">
         <label>운동 중 메모 — 뭐가 잘 됐고 뭐가 힘들었는지</label>
-        <input type="text" class="ex-note" data-noteex="${entry.id}" placeholder="예) 마지막 세트 팔꿈치 아파서 무게 낮춤" value="${(entry.note||'').replace(/"/g,'&quot;')}">
+        <input type="text" class="ex-note" data-noteex="${entry.uid}" placeholder="예) 마지막 세트 팔꿈치 아파서 무게 낮춤" value="${(entry.note||'').replace(/"/g,'&quot;')}">
       </div>
       </div>
     </div>`;
@@ -3582,7 +3589,7 @@ function ptHintHtml(entry){
       <button class="apply" data-openpt="${entry.id}">입력하러 가기</button></div>`;
   return `<div class="pt-hint">
       <span><b>${plan.date}</b> · ${ptPlanSummary(plan) || '설명만'}</span>
-      <button class="apply" data-applypt="${entry.id}" data-planid="${plan.id}">이대로 세트 채우기</button>
+      <button class="apply" data-applypt="${entry.uid}" data-ex="${entry.id}" data-planid="${plan.id}">이대로 세트 채우기</button>
       <button class="apply" data-openpt="${entry.id}">자세히</button>
     </div>${plan.method? `<div class="pt-method" style="font-size:12.5px;margin:0 0 8px">${plan.method.replace(/</g,'&lt;')}</div>`:''}`;
 }
@@ -3735,23 +3742,20 @@ function wireCardReorder(ds, body){
   });
 }
 
-function mutateExercise(ds, exId, fn){
+function mutateExercise(ds, uid, fn){
   const cur = getLog(ds);
   const list = cur.workout.exercises.map(e=>{
-    if(e.id!==exId) return e;
+    if(e.uid!==uid) return e;
     const copy = {...e, warmupSets:[...(e.warmupSets||[])], workSets:[...(e.workSets||[])]};
     return fn(copy);
   });
   queueSave(ds, {workout:{...cur.workout, exercises:list}});
 }
 function wireExerciseCards(ds, body){
-  body.querySelectorAll('[data-detail]').forEach(el=>{
-    el.addEventListener('click', ()=>openExerciseDetail(el.dataset.detail));
-  });
   body.querySelectorAll('[data-removeex]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const cur = getLog(ds);
-      const list = cur.workout.exercises.filter(e=>e.id!==btn.dataset.removeex);
+      const list = cur.workout.exercises.filter(e=>e.uid!==btn.dataset.removeex);
       queueSave(ds, {workout:{...cur.workout, exercises:list}}, {refresh:true});
     });
   });
@@ -3816,10 +3820,10 @@ function wireExerciseCards(ds, body){
   });
   body.querySelectorAll('[data-applypt]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      const exId = btn.dataset.applypt;
-      const plan = ptPlanById(exId, btn.dataset.planid);
+      const uid = btn.dataset.applypt;
+      const plan = ptPlanById(btn.dataset.ex, btn.dataset.planid);
       if(!plan) return;
-      mutateExercise(ds, exId, ex=>{
+      mutateExercise(ds, uid, ex=>{
         ex.ptPlanId = plan.id;
         ex.workSets = plan.sets.length ? plan.sets.map(x=>({reps:x.reps||'', weight:x.weight||'', failed:false, failReason:''})) : ex.workSets;
         return ex;
@@ -3855,9 +3859,13 @@ document.getElementById('pickerSearch').addEventListener('input', e=>renderPicke
 document.getElementById('pickerDone').addEventListener('click', ()=>{
   const ds = document.getElementById('pickerOverlay').dataset.forDate;
   const cur = getLog(ds);
-  const existing = Object.fromEntries(cur.workout.exercises.map(e=>[e.id,e]));
-  const list = [...state.pickerSelection].map(id => existing[id] || {id, mode:'mine', ptPlanId:null, note:'', warmupSets:[], workSets:[emptySet()]});
-  queueSave(ds, {workout:{...cur.workout, exercises:list}}, {refresh:true});
+  // 이미 있는 칸은 그대로 두고(같은 운동이 두 칸 있어도 둘 다 살린다),
+  // 새로 고른 것만 뒤에 덧붙인다.
+  const keep = cur.workout.exercises.filter(e=>state.pickerSelection.has(e.id));
+  const have = new Set(keep.map(e=>e.id));
+  const added = [...state.pickerSelection].filter(id=>!have.has(id))
+    .map(id => ({id, uid:newExUid(), mode:'mine', ptPlanId:null, note:'', warmupSets:[], workSets:[emptySet()]}));
+  queueSave(ds, {workout:{...cur.workout, exercises:[...keep, ...added]}}, {refresh:true});
   closePicker();
 });
 
@@ -4040,20 +4048,17 @@ function applyRoutineToDay(r){
   document.getElementById('routineListOverlay').classList.remove('open');
   if(!state.draft || state.draftDate!==ds){ switchTab('calendar'); openDay(ds); }
   const cur = getLog(ds);
-  const existing = Object.fromEntries(cur.workout.exercises.map(e=>[e.id,e]));
-  const list = mapped.map(it=>{
-    const prev = existing[it.exId] || {};
-    return {
-      id: it.exId, mode:'pt', ptPlanId:null, routineId:r.id, note: prev.note||'',
-      warmupSets: prev.warmupSets || [],
-      workSets: it.sets.length ? it.sets.map(x=>({reps:x.reps||'', weight:x.weight||'', failed:false, failReason:''}))
-                               : [emptySet()],
-    };
-  });
-  const keep = cur.workout.exercises.filter(e=>!mapped.some(it=>it.exId===e.id));
+  const list = mapped.map(it=>({
+    id: it.exId, uid: newExUid(), mode:'pt', ptPlanId:null, routineId:r.id, note:'',
+    warmupSets: [],
+    workSets: it.sets.length ? it.sets.map(x=>({reps:x.reps||'', weight:x.weight||'', failed:false, failReason:'', memo:''}))
+                             : [emptySet()],
+  }));
+  // 오늘 이미 적어둔 기록은 그대로 두고 **아래에 덧붙인다**
+  // (예전엔 같은 운동을 갈아끼워서, 손으로 적어둔 세트가 루틴 값으로 덮였다)
   queueSave(ds, {workout:{...cur.workout,
     type: cur.workout.type==='none' ? 'personal' : cur.workout.type,
-    exercises:[...keep, ...list]}}, {refresh:true});
+    exercises:[...cur.workout.exercises, ...list]}}, {refresh:true});
   showToast(`${mapped.length}개 운동을 채웠어요 · 저장을 눌러주세요`);
 }
 
@@ -4618,7 +4623,7 @@ document.getElementById('eaSave').addEventListener('click', async ()=>{
     queueSave(dsx, {workout:{...cur.workout,
       type: cur.workout.type==='none' ? 'personal' : cur.workout.type,
       exercises:[...cur.workout.exercises,
-        {id, mode:'mine', note:'', minutes:'', warmupSets:[], workSets:[emptySet()]}]}}, {refresh:true});
+        {id, uid:newExUid(), mode:'mine', note:'', minutes:'', warmupSets:[], workSets:[emptySet()]}]}}, {refresh:true});
     exAddForDate = null;
   }
   renderLibrary();
@@ -5305,13 +5310,14 @@ function importWorkoutFrom(srcDs){
     (c.workSets||[]).forEach(x=>delete x.memoOpen);
     return c;
   });
-  const keep = (cur.workout.exercises||[]).filter(e=>!copied.some(c=>c.id===e.id));
+  copied.forEach(c=>{ c.uid = newExUid(); });     // 새 칸으로 들어간다
   queueSave(ds, {workout:{
     ...cur.workout,
     type: cur.workout.type==='none' ? src.workout.type : cur.workout.type,
     durationMin: cur.workout.durationMin || src.workout.durationMin,
     memo: cur.workout.memo || src.workout.memo,
-    exercises: [...keep, ...copied],
+    // 오늘 적어둔 건 절대 건드리지 않고 **아래에 덧붙인다** (같은 운동이어도 따로 한 칸)
+    exercises: [...(cur.workout.exercises||[]), ...copied],
   }}, {refresh:true});
   const [, mo, d] = srcDs.split('-');
   showToast(`${Number(mo)}월 ${Number(d)}일 기록을 가져왔어요 · 저장을 눌러주세요`);
