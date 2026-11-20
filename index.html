@@ -297,7 +297,10 @@
   .sum-dur{font-family:var(--font-mono);font-size:12.5px;color:var(--note-ink);}
   .sum-ex{margin-bottom:12px;}
   .sum-ex + .sum-ex{border-top:1px solid var(--line);padding-top:11px;}
-  .sum-ex-name{font-size:14px;font-weight:700;margin-bottom:5px;}
+  .sum-ex-name{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;font-size:14px;font-weight:700;margin-bottom:5px;}
+  .ex-import{flex:none;margin-left:auto;border:1px solid var(--line);background:transparent;color:var(--text-muted);
+    border-radius:var(--radius-sm);padding:3px 8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .ex-import:hover{border-color:var(--accent);color:var(--accent);}
   .sum-tag{font-size:11px;font-weight:400;color:var(--text-faint);vertical-align:1px;}
   .sum-sets{display:flex;flex-direction:column;gap:2px;}
   /* 메모가 길어도 '1세트 12회 × 20kg' 은 한 줄에 붙어 있어야 한다 → 칸을 세 개로 나눈다 */
@@ -3053,9 +3056,12 @@ function workoutSummaryHtml(log){
 }
 // 운동 목록 부분만 — 운동 모아보기 탭도 이걸 그대로 쓴다
 // (세트별 실패 사유·세트 메모·운동 중 메모·전체 메모가 다 들어 있다)
-function workoutExsHtml(log){
+/* opts.importFrom 에 날짜를 주면 운동마다 '가져오기' 버튼이 붙는다.
+   운동 탭에서만 켜고, 날짜 시트 요약에서는 끈다(자기 날짜로 가져올 일은 없다). */
+function workoutExsHtml(log, opts){
+  const impFrom = opts && opts.importFrom;
   const w = log.workout;
-  const exs = (w.exercises||[]).map(en=>{
+  const exs = (w.exercises||[]).map((en, exIdx)=>{
     const ex = getEx(en.id);
     if(!ex) return '';
     const rows = []
@@ -3063,7 +3069,8 @@ function workoutExsHtml(log){
       .concat((en.workSets||[]).map((x,i)=>({n:(i+1)+'세트', x})))
       .filter(r=> r.x.reps!=='' || r.x.weight!=='' || r.x.failed || r.x.memo);
     return `<div class="sum-ex">
-      <div class="sum-ex-name">${ex.name}${en.minutes? ` <span class="ex-set-min">${en.minutes}분</span>`:''}${en.mode==='pt'? ` <span class="sum-tag">선생님</span>`:''}</div>
+      <div class="sum-ex-name">${ex.name}${en.minutes? ` <span class="ex-set-min">${en.minutes}분</span>`:''}${en.mode==='pt'? ` <span class="sum-tag">선생님</span>`:''}${
+        impFrom ? `<button class="ex-import" data-eximport="${exIdx}" data-exday="${impFrom}">가져오기</button>` : ''}</div>
       ${rows.length ? `<div class="sum-sets">${rows.map(r=>
         `<div class="sum-set${r.x.failed?' failed':''}"><span class="n">${r.n}</span><span class="v">${setLineText(r.x)}</span><span class="sx">${
           r.x.failed ? `<span class="fx">실패${r.x.failReason? ' · '+r.x.failReason.replace(/</g,'&lt;') : ''}</span>` : ''}${
@@ -3563,7 +3570,7 @@ function renderDaySheet(ds){
   body.querySelectorAll('[data-photoidx]').forEach(el=>{
     el.addEventListener('click', ()=>openPhotoViewer(sortedPhotos(getLog(ds)).filter(ph=>ph.src), Number(el.dataset.photoidx)));
   });
-  wireExPhotoView(body, uid=>(getLog(ds).workout.exercises||[]).find(e=>e.uid===uid));
+  wireExPhotoView(body);
   const waterResetEl = body.querySelector('#waterReset');
   if(waterResetEl) waterResetEl.addEventListener('click', e=>{
     e.preventDefault();
@@ -3849,15 +3856,14 @@ function mutateExercise(ds, uid, fn){
   queueSave(ds, {workout:{...cur.workout, exercises:list}});
 }
 /* 운동 칸 사진 줄을 눌러 크게 보기 — 편집 화면·요약·운동 탭이 같이 쓴다.
-   getLog 이 없는 자리(운동 탭)도 있어서 기록을 찾는 방법을 넘겨받는다. */
-function wireExPhotoView(root, findEntry){
+   기록을 다시 찾지 않고 **화면에 이미 그려진 그림**을 그대로 띄운다. */
+function wireExPhotoView(root){
   root.querySelectorAll('[data-exphotos]').forEach(strip=>{
+    const list = [...strip.querySelectorAll('img')].map(im=>({src: im.src}));
     strip.querySelectorAll('[data-exphotoidx]').forEach(el=>{
       el.addEventListener('click', ev=>{
         if(ev.target.closest('.photo-del')) return;
         ev.stopPropagation();
-        const en = findEntry(strip.dataset.exphotos, strip);
-        const list = exPhotos(en).filter(ph=>ph.src);
         if(list.length) openPhotoViewer(list, Number(el.dataset.exphotoidx));
       });
     });
@@ -3875,7 +3881,7 @@ function wireExerciseCards(ds, body){
       renderDaySheet(ds);
     });
   });
-  wireExPhotoView(body, uid=>(getLog(ds).workout.exercises||[]).find(e=>e.uid===uid));
+  wireExPhotoView(body);
   body.querySelectorAll('[data-removeex]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const cur = getLog(ds);
@@ -5406,7 +5412,7 @@ function renderWorkoutTab(){
           ${ds === todayStr() ? '' : `<button class="wk-import${w.durationMin?'':' lone'}" data-wkimport="${ds}">오늘로 가져오기</button>`}
         </div>
         ${(w.exercises||[]).length || w.memo
-            ? workoutExsHtml(log)
+            ? workoutExsHtml(log, {importFrom: ds === todayStr() ? null : ds})
             : `<div class="wk-none">세부 기록 없음</div>`}
       </div>`;
     }).join('')}</div>`
@@ -5414,11 +5420,12 @@ function renderWorkoutTab(){
         ? `<div class="diet-more"><button class="ghost-btn" id="wkMoreBtn">더 보기 (${days.length - wkShown}일 남음)</button></div>`
         : '');
 
-  wireExPhotoView(feed, (uid, strip)=>{
-    const card = strip.closest('[data-wkday]');
-    if(!card) return null;
-    const log = normalizeLog(state.logs[card.dataset.wkday], card.dataset.wkday);
-    return (log.workout.exercises||[]).find(e=>e.uid===uid);
+  wireExPhotoView(feed);
+  feed.querySelectorAll('[data-eximport]').forEach(btn=>{
+    btn.addEventListener('click', ev=>{
+      ev.stopPropagation();                       // 카드 열기와 겹치지 않게
+      importWorkoutFrom(btn.dataset.exday, Number(btn.dataset.eximport));
+    });
   });
   feed.querySelectorAll('[data-wkimport]').forEach(btn=>{
     btn.addEventListener('click', ev=>{ ev.stopPropagation(); importWorkoutFrom(btn.dataset.wkimport); });
@@ -5434,7 +5441,8 @@ function renderWorkoutTab(){
    세트의 무게·횟수뿐 아니라 **실패 표시와 사유, 세트 메모, 운동 중 메모**까지 그대로 가져온다.
    지난번에 뭘 못 했는지 보고 오늘 무게를 정하려는 용도라 그 부분이 핵심이다.
    붙여넣기만 하고 저장은 사용자가 누른다 (루틴 채우기와 같은 흐름). */
-function importWorkoutFrom(srcDs){
+/* onlyIdx 를 주면 그 운동 한 칸만 가져온다 (몇 번째 운동인지로 가리킨다) */
+function importWorkoutFrom(srcDs, onlyIdx){
   const src = normalizeLog(state.logs[srcDs], srcDs);
   if(!workoutLogged(src)){ showToast('가져올 운동 기록이 없어요'); return; }
   const pickerEl = document.getElementById('pickerOverlay');
@@ -5445,7 +5453,10 @@ function importWorkoutFrom(srcDs){
   if(!state.draft || state.draftDate !== ds) openDay(ds);   // 보고 있던 탭은 그대로 둔다
   state.sectionEdit.workout = true;                 // 가져온 내용을 바로 펼쳐서 보여준다
   const cur = getLog(ds);
-  const copied = (src.workout.exercises||[]).map(e=>{
+  const all = src.workout.exercises||[];
+  const picked = Number.isInteger(onlyIdx) ? [all[onlyIdx]].filter(Boolean) : all;
+  if(!picked.length){ showToast('가져올 운동을 찾지 못했어요'); return; }
+  const copied = picked.map(e=>{
     const c = JSON.parse(JSON.stringify(e));
     delete c.memoOpen;                              // 편집 중에만 쓰는 임시 값
     (c.warmupSets||[]).forEach(x=>delete x.memoOpen);
@@ -5462,7 +5473,12 @@ function importWorkoutFrom(srcDs){
     exercises: [...(cur.workout.exercises||[]), ...copied],
   }}, {refresh:true});
   const [, mo, d] = srcDs.split('-');
-  showToast(`${Number(mo)}월 ${Number(d)}일 기록을 가져왔어요 · 저장을 눌러주세요`);
+  if(Number.isInteger(onlyIdx)){
+    const nm = getEx(copied[0].id);
+    showToast(`${nm ? nm.name : '운동'} 가져왔어요 · 저장을 눌러주세요`);
+  }else{
+    showToast(`${Number(mo)}월 ${Number(d)}일 기록을 가져왔어요 · 저장을 눌러주세요`);
+  }
 }
 
 // 운동 탭에서 하루 기록 시트를 연다. edit 이면 운동 칸을 펼친 채로.
