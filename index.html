@@ -38,6 +38,7 @@
     --supp:#D9A70B;          /* supplements — 노랑 */
     --inbody:#D4342C;        /* InBody — 빨강 */
     --danger:#C1587A;        /* 실패·삭제 표시 (영양제 색과 분리) */
+    --period:#C4506F;        /* 생리 — 달력 칸 아래 띠 (점이 아니라 띠라서 분홍이어도 안 헷갈린다) */
 
     --p-chest:var(--personal);
     --p-back:var(--water);
@@ -90,6 +91,7 @@
       --supp:#F5C53D;
       --inbody:#FF6B60;
       --danger:#E28098;
+      --period:#F08BA6;
       --day-tint:.3;
       --brand:#F5A3B4;
       --note-ink:#84AEFF;
@@ -121,6 +123,7 @@
     --supp:#F5C53D;
     --inbody:#FF6B60;
     --danger:#E28098;
+    --period:#F08BA6;
     --day-tint:.3;
     --brand:#F5A3B4;
     --note-ink:#84AEFF;
@@ -191,6 +194,11 @@
   .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;}
   /* min-width:0 이 없으면 칸 안의 점·시간 글자가 칸을 밀어내서
      7칸 그리드가 화면 밖으로 넘어간다(달력이 잘려 보이던 원인). */
+  /* 칸 맨 아래 띠 — 생리는 진하게, 몸 상태가 안 좋은 날은 옅게.
+     점·틴트·물 글자와 자리가 겹치지 않는다. */
+  .day-cell.pd::after{content:"";position:absolute;left:6px;right:6px;bottom:4px;height:3px;
+    border-radius:2px;background:var(--period);z-index:1;}
+  .day-cell.pd-soft::after{opacity:.4;}
   .day-cell{position:relative;aspect-ratio:1/0.92;border-radius:var(--radius-md);border:1px solid var(--line);background:var(--surface);padding:8px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;transition:border-color .12s,transform .08s;min-width:0;overflow:hidden;}
   .day-cell:hover{border-color:var(--text-faint);}
   .day-cell:active{transform:scale(.97);}
@@ -231,6 +239,7 @@
   .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:20px;font-size:12px;color:var(--text-muted);}
   .legend span{display:inline-flex;align-items:center;gap:6px;}
   .legend .dot{width:8px;height:8px;}
+  .legend .band{width:14px;height:3px;border-radius:2px;flex:none;}
   .legend .cellsw{width:12px;height:12px;border-radius:4px;flex:none;opacity:.45;}
 
   /* PT 회차권 현황 — 범례 아래 */
@@ -376,6 +385,19 @@
   .wk-card .sum-ex-name{margin-bottom:4px;}
   .wk-card .sum-note{margin-top:4px;}
   .wk-none{font-size:12.5px;color:var(--text-faint);}
+
+  /* 생리 · 몸 상태 */
+  .pd-sum{font-size:13px;color:var(--text-muted);}
+  .pd-sum .pd-note{color:var(--note-ink);}
+  .pd-start{width:100%;border-color:var(--period);color:var(--period);}
+  .pd-on{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;}
+  .pd-on b{color:var(--period);}
+  .pd-auto{font-size:11.5px;color:var(--text-faint);}
+  .pd-btns{display:flex;gap:6px;margin-left:auto;}
+  .pd-btn{padding:6px 10px;font-size:12px;}
+  .pd-del{border-color:var(--line);color:var(--text-faint);}
+  .pd-cond{margin-top:12px;}
+  .pd-lab{display:block;font-size:11.5px;color:var(--text-muted);margin-bottom:5px;}
 
   .segmented{display:flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:2px;}
   .segmented button{flex:1;border:none;background:transparent;padding:8px 6px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;}
@@ -898,6 +920,7 @@
         <span><i class="dot" style="background:var(--diet)"></i>식단</span>
         <span><i class="dot" style="background:var(--supp)"></i>영양제</span>
         <span><i class="dot" style="background:var(--inbody)"></i>인바디 (날짜 옆)</span>
+        <span><i class="band" style="background:var(--period)"></i>생리 (옅으면 몸 상태 나쁨)</span>
       </div>
 
       <div class="pt-pass" id="ptPassBar" hidden></div>
@@ -2014,6 +2037,7 @@ const state = {
   favorites:new Set(DEFAULT_FAVS), // 즐겨찾기 = '내가 자주 하는 운동' (사용자가 넣고 뺄 수 있음)
   ptPlans:{},        // 운동 id -> [선생님 운동법 기록]
   ptRoutines:[],     // 선생님이 보내준 루틴 묶음
+  periods:[],        // 생리 기간 [{id, start, end}] — end 가 없으면 7일로 자동 종료
   suppOrder:[],      // 영양제 칩 순서 (직접 끌어서 바꾼 순서)
   ptPass:null,       // 끊어둔 PT 회차권 {total, start} — 다시 등록하면 통째로 갈아끼운다
   sectionEdit:{},    // 하루 기록에서 펼쳐서 편집 중인 구역 (기본은 요약 보기)
@@ -2105,6 +2129,9 @@ function normalizeLog(raw, date){
     protein: {g: Number(raw.protein && raw.protein.g) || 0},
     supplementsTaken: Array.isArray(raw.supplementsTaken) ? raw.supplementsTaken : [],
     inbody: (raw.inbody && typeof raw.inbody==='object') ? raw.inbody : null,
+    // 그날 몸 상태 (생리와 별개 — 생리 전 컨디션 난조도 남길 수 있게)
+    condition: {level: (raw.condition && raw.condition.level) || '',
+                note:  (raw.condition && raw.condition.note)  || ''},
   };
 }
 function getLog(date){
@@ -2148,7 +2175,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-11-19 운동사진';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-11-24 생리기록';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
@@ -2249,6 +2276,7 @@ function lsSave(){
     exImages: state.exImages,
     ptPlans: state.ptPlans,
     ptRoutines: state.ptRoutines,
+    periods: state.periods,
     suppOrder: state.suppOrder,
     ptPass: state.ptPass,
     favorites: [...state.favorites],
@@ -2296,6 +2324,7 @@ async function initDb(){
     state.exImages = (saved.exImages && typeof saved.exImages==='object')? saved.exImages : {};
     state.ptPlans = (saved.ptPlans && typeof saved.ptPlans==='object')? saved.ptPlans : {};
     state.ptRoutines = Array.isArray(saved.ptRoutines)? saved.ptRoutines : [];
+    state.periods = Array.isArray(saved.periods)? saved.periods : [];
     state.suppOrder = Array.isArray(saved.suppOrder)? saved.suppOrder : [];
     await attachPhotos();
     // 예전 백업에는 ptPass 가 없다 — 없으면 그냥 등록 안 한 상태로 둔다
@@ -2355,7 +2384,7 @@ function exportData(){
   const payload = {
     v:1, logs: state.logs, supplements: state.supplements,
     customExercises: state.customExercises, exImages: state.exImages,
-    ptPlans: state.ptPlans, ptRoutines: state.ptRoutines,
+    ptPlans: state.ptPlans, ptRoutines: state.ptRoutines, periods: state.periods,
     suppOrder: state.suppOrder, ptPass: state.ptPass,
     favorites: [...state.favorites], savedAt: new Date().toISOString(),
   };
@@ -2420,7 +2449,7 @@ function importData(text, mode){
   if(!data || typeof data!=='object' || !data.logs){ showToast('수딩FIT 백업 파일이 아니에요'); return false; }
   if(mode==='replace'){
     state.logs = {}; state.supplements = []; state.customExercises = [];
-    state.exImages = {}; state.ptPlans = {}; state.ptRoutines = [];
+    state.exImages = {}; state.ptPlans = {}; state.ptRoutines = []; state.periods = [];
     state.favorites = new Set(); state.ptPass = null;
   }
   Object.entries(data.logs||{}).forEach(([d,l])=>{ state.logs[d] = normalizeLog(l, d); });
@@ -2429,6 +2458,7 @@ function importData(text, mode){
   Object.assign(state.exImages, data.exImages||{});
   Object.assign(state.ptPlans, data.ptPlans||{});
   (data.ptRoutines||[]).forEach(r=>{ if(r && r.id && !state.ptRoutines.some(x=>x.id===r.id)) state.ptRoutines.push(r); });
+  (data.periods||[]).forEach(x=>{ if(x && x.start && !state.periods.some(y=>y.start===x.start)) state.periods.push(x); });
   if(Array.isArray(data.suppOrder) && data.suppOrder.length) state.suppOrder = data.suppOrder;
   // 예전 백업에는 없는 항목이라, 있을 때만 덮어쓴다
   if(data.ptPass && data.ptPass.total && data.ptPass.start)
@@ -2711,8 +2741,11 @@ function renderCalendar(){
     const log = state.logs[ds];
     // 운동한 날은 테두리 색으로 표시한다 (개인운동=주황, PT=보라)
     const wType = workoutLogged(log) ? log.workout.type : null;
+    const inPeriod = !!periodOf(ds);
+    const badDay = !inPeriod && log && log.condition && log.condition.level === 'bad';
     cell.className='day-cell'+(c.outside?' outside':'')+(ds===todayS?' today':'')
       +(wType==='pt' ? ' w-pt' : (wType ? ' w-personal' : ''))
+      +(inPeriod ? ' pd' : (badDay ? ' pd pd-soft' : ''))
       +(ds===state.selectedDate?' selected':'');
     // 칸이 좁아서 점은 3개까지만 찍고 나머지는 +N 으로 줄인다.
     const marks = [];
@@ -2735,7 +2768,9 @@ function renderCalendar(){
     const dots = shown.map(m=>`<i class="dot" style="background:${m.c}"></i>`).join('')
       + (rest > 0 ? `<span class="dot-more">+${rest}</span>` : '');
     cell.title = [(wType==='pt'?'PT':(wType?'개인운동':null)), ...marks.map(m=>m.t),
-                  (log && log.inbody) ? '인바디' : null].filter(Boolean).join(' · ');
+                  (log && log.inbody) ? '인바디' : null,
+                  inPeriod ? `생리 ${periodDayNo(ds)}일째` : (badDay ? '몸 상태 안 좋음' : null)
+                 ].filter(Boolean).join(' · ');
     // 인바디는 날짜 오른쪽 끝에 따로 찍는다 (측정한 날은 드물어서 한눈에 보이는 게 낫다)
     const ibDot = (log && log.inbody) ? `<i class="ib-mark" title="인바디"></i>` : '';
     cell.innerHTML = `<span class="day-top"><span class="day-num">${c.d}</span>${ibDot}</span>`
@@ -3020,11 +3055,53 @@ function hasDietContent(log){
   return !!(d && ((d.breakfast&&d.breakfast.text) || (d.lunch&&d.lunch.text) ||
     (d.dinner&&d.dinner.text) || (d.snacks||[]).some(x=>x&&x.text) || (d.photos||[]).length));
 }
+/* =========================================================
+   생리 · 몸 상태
+   - 생리는 '기간'이라 날짜 기록이 아니라 state.periods 에 따로 둔다
+     ({start, end}; end 가 없으면 시작일 포함 7일로 자동 종료)
+   - 몸 상태는 날짜마다 (생리 전에 몸이 안 좋은 날도 남길 수 있게)
+   ========================================================= */
+const PERIOD_DAYS = 7;
+const COND_LABEL = {good:'좋음', ok:'보통', bad:'안 좋음'};
+function addDaysStr(ds, n){
+  const [y,mo,d] = ds.split('-').map(Number);
+  return fmtDate(new Date(y, mo-1, d + n));
+}
+function dayGap(a, b){                       // b - a (일)
+  const [y1,m1,d1] = a.split('-').map(Number), [y2,m2,d2] = b.split('-').map(Number);
+  return Math.round((Date.UTC(y2,m2-1,d2) - Date.UTC(y1,m1-1,d1)) / 86400000);
+}
+function periodEndOf(p){ return p.end || addDaysStr(p.start, PERIOD_DAYS - 1); }
+function periodOf(ds){ return (state.periods||[]).find(p => ds >= p.start && ds <= periodEndOf(p)) || null; }
+function periodDayNo(ds){ const p = periodOf(ds); return p ? dayGap(p.start, ds) + 1 : 0; }
+function savePeriods(){ lsSave(); renderCalendar(); }
+function startPeriod(ds){
+  if(periodOf(ds)) return;
+  state.periods = [...(state.periods||[]), {id:'pd-'+Date.now(), start:ds, end:null}];
+  savePeriods();
+}
+function endPeriodAt(ds){
+  const p = periodOf(ds);
+  if(!p) return;
+  p.end = ds;                                 // 누른 날까지로 줄인다
+  savePeriods();
+}
+function reopenPeriod(ds){                    // 종료를 잘못 눌렀을 때
+  const p = (state.periods||[]).find(x => ds >= x.start && ds <= periodEndOf(x)) || null;
+  if(p){ p.end = null; savePeriods(); }
+}
+function removePeriod(ds){
+  const p = periodOf(ds);
+  if(!p) return;
+  state.periods = (state.periods||[]).filter(x => x !== p);
+  savePeriods();
+}
+
 function isEditing(key, hasContent){
   const v = state.sectionEdit[key];
   if(v !== undefined) return v;
   // 영양제·단백질은 항상 접힌 상태로 시작한다 (한 줄이면 충분한 정보라서)
-  if(key==='supp' || key==='protein' || key==='ptpass') return false;
+  if(key==='supp' || key==='protein' || key==='ptpass' || key==='period') return false;
   return !hasContent;                        // 나머지는 내용이 없으면 바로 편집 상태
 }
 function sectionHeadAlwaysHtml(color, title, key, editing){
@@ -3309,6 +3386,47 @@ function supplementSummaryHtml(log){
 }
 
 // PT 회차권 한 줄 요약 (접혀 있을 때)
+/* 접힘 한 줄 요약 + 펼친 입력 폼 (날짜 시트 맨 아래) */
+function periodSummaryHtml(ds, log){
+  const no = periodDayNo(ds);
+  const lv = log.condition && log.condition.level;
+  const note = (log.condition && log.condition.note) || '';
+  const bits = [];
+  if(no) bits.push(`<span style="color:var(--period)">생리 ${no}일째</span>`);
+  if(lv) bits.push(`몸 상태 ${COND_LABEL[lv]}`);
+  if(note) bits.push(`<span class="pd-note">${note.replace(/</g,'&lt;')}</span>`);
+  return `<div class="pd-sum">${bits.length ? bits.join(' · ') : '기록 없음'}</div>`;
+}
+function periodSectionHtml(ds, log){
+  const p = periodOf(ds);
+  const no = periodDayNo(ds);
+  const lv = (log.condition && log.condition.level) || '';
+  const note = (log.condition && log.condition.note) || '';
+  const [, mo, d] = p ? p.start.split('-') : [];
+  const auto = p && !p.end;
+  return `
+    ${p ? `<div class="pd-on">
+        <span><b>${Number(mo)}월 ${Number(d)}일 시작</b> · ${no}일째${
+          auto ? ` <span class="pd-auto">(${PERIOD_DAYS}일 뒤 자동 종료)</span>` : ` · ${Number(periodEndOf(p).split('-')[2])}일 종료`}</span>
+        <div class="pd-btns">
+          ${auto ? `<button class="ghost-btn pd-btn" data-pdend="1">오늘 종료</button>`
+                 : `<button class="ghost-btn pd-btn" data-pdreopen="1">종료 취소</button>`}
+          <button class="ghost-btn pd-btn pd-del" data-pddel="1">기록 삭제</button>
+        </div>
+      </div>`
+      : `<button class="ghost-btn pd-start" data-pdstart="1">생리 시작</button>`}
+    <div class="pd-cond">
+      <span class="pd-lab">몸 상태</span>
+      <div class="chip-row">
+        ${Object.entries(COND_LABEL).map(([k,lab])=>
+          `<button class="chip${lv===k?' on':''}" data-cond="${k}">${lab}</button>`).join('')}
+      </div>
+    </div>
+    <div class="ex-note-row" style="margin-top:10px">
+      <label><span>특이사항 — 기분·몸 상태</span></label>
+      <input type="text" class="ex-note" id="condNote" placeholder="예) 아랫배가 묵직하고 몸이 무거움" value="${note.replace(/"/g,'&quot;')}">
+    </div>`;
+}
 function ptPassSummaryHtml(){
   const info = ptPassLabel();
   if(!info) return `<div class="pt-pass-now empty">아직 등록한 PT 회차권이 없어요.</div>`;
@@ -3357,12 +3475,14 @@ function renderDaySheet(ds){
   const wEdit = isEditing('workout', wHas), dEdit = isEditing('diet', dHas);
   const sEdit = isEditing('supp', sHas), pEdit = isEditing('protein', log.protein.g>0);
   const ppEdit = isEditing('ptpass', false);
+  const pdEdit = isEditing('period', false);
   // 편집 중이면 그 상태를 붙잡아 둔다 — 운동을 추가해 내용이 생겼다고 도중에 접히면 안 된다
   if(wEdit) state.sectionEdit.workout = true;
   if(dEdit) state.sectionEdit.diet = true;
   if(sEdit) state.sectionEdit.supp = true;
   if(pEdit) state.sectionEdit.protein = true;
   if(ppEdit) state.sectionEdit.ptpass = true;
+  if(pdEdit) state.sectionEdit.period = true;
 
   body.innerHTML = `
     <div class="section">
@@ -3454,6 +3574,11 @@ function renderDaySheet(ds){
     </div>
 
     <div class="section">
+      ${sectionHeadAlwaysHtml('var(--period)','생리 · 몸 상태','period', pdEdit)}
+      ${pdEdit ? periodSectionHtml(ds, log) : periodSummaryHtml(ds, log)}
+    </div>
+
+    <div class="section">
       <div class="section-head"><i class="dot" style="background:var(--inbody)"></i><h4>인바디</h4></div>
       <div style="font-size:13px;color:var(--text-muted)">
         ${log.inbody ? `체중 ${log.inbody.weight??'—'}kg · 체지방률 ${log.inbody.bodyFatPct??'—'}% · 인바디점수 ${log.inbody.score??'—'}점` : '이 날 측정한 인바디 기록이 없어요.'}
@@ -3465,6 +3590,25 @@ function renderDaySheet(ds){
     </div>
   `;
 
+  // 생리 · 몸 상태
+  const pdWire = (sel, fn)=>{ const el = body.querySelector(sel); if(el) el.addEventListener('click', fn); };
+  pdWire('[data-pdstart]', ()=>{ startPeriod(ds); renderDaySheet(ds); showToast('생리 시작일로 기록했어요'); });
+  pdWire('[data-pdend]',   ()=>{ endPeriodAt(ds); renderDaySheet(ds); });
+  pdWire('[data-pdreopen]',()=>{ reopenPeriod(ds); renderDaySheet(ds); });
+  pdWire('[data-pddel]',   ()=>{ removePeriod(ds); renderDaySheet(ds); showToast('생리 기록을 지웠어요'); });
+  body.querySelectorAll('[data-cond]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const cur = getLog(ds).condition || {level:'', note:''};
+      const lv = cur.level === btn.dataset.cond ? '' : btn.dataset.cond;   // 다시 누르면 해제
+      queueSave(ds, {condition:{...cur, level:lv}}, {refresh:true});
+    });
+  });
+  const condNote = body.querySelector('#condNote');
+  if(condNote) condNote.addEventListener('input', e=>{
+    const cur = getLog(ds).condition || {level:'', note:''};
+    queueSave(ds, {condition:{...cur, note:e.target.value}});
+  });
+
   // 구역 펼치기 / 접기
   body.querySelectorAll('[data-secedit]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
@@ -3472,7 +3616,7 @@ function renderDaySheet(ds){
       const has = k==='workout' ? hasWorkoutContent(log)
                 : k==='diet'    ? hasDietContent(log)
                 : k==='protein' ? log.protein.g > 0
-                : k==='ptpass'  ? false
+                : k==='ptpass' || k==='period' ? false
                 : (log.supplementsTaken||[]).length > 0;
       state.sectionEdit[k] = !isEditing(k, has);
       renderDaySheet(ds);
