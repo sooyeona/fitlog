@@ -304,6 +304,10 @@
   .sum-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
   .sum-kind{font-size:12.5px;}
   .sum-dur{font-family:var(--font-mono);font-size:12.5px;color:var(--note-ink);}
+  /* 운동 머리의 그날 컨디션 (보기 상태에만) */
+  .sum-cond{font-size:12.5px;color:var(--text-muted);}
+  .sum-cond.pd,.sum-cond.bad{color:var(--period);}
+  .wk-head .sum-cond{font-size:11.5px;}
   .sum-ex{margin-bottom:12px;}
   .sum-ex + .sum-ex{border-top:1px solid var(--line);padding-top:11px;}
   .sum-ex-name{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;font-size:14px;font-weight:700;margin-bottom:5px;}
@@ -2175,7 +2179,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-11-24 생리기록';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-11-24 컨디션표기';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
@@ -3124,10 +3128,21 @@ function setLineText(x){
           : (/^\d+(\.\d+)?$/.test(String(x.reps)) ? x.reps+'회' : String(x.reps));
   return [r, w].filter(Boolean).join(' × ') || '—';
 }
-function workoutSummaryHtml(log){
+/* 그날 컨디션을 운동 기록 머리에 같이 보여준다 (생리면 며칠째인지도).
+   저장 후 '보기' 상태에만 그린다 — 입력 중에는 안 붙는다. */
+function condChipsHtml(ds, log){
+  const out = [];
+  const no = ds ? periodDayNo(ds) : 0;
+  if(no) out.push(`<span class="sum-cond pd">생리 ${no}일째</span>`);
+  const lv = log && log.condition && log.condition.level;
+  if(lv) out.push(`<span class="sum-cond${lv==='bad'?' bad':''}">컨디션 ${COND_LABEL[lv]}</span>`);
+  return out.join('');
+}
+function workoutSummaryHtml(log, ds){
   const w = log.workout;
   const kind = w.type==='pt' ? 'PT' : '개인운동';
   const head = `<div class="sum-top"><span class="sum-kind" style="color:${w.type==='pt'?'var(--pt)':'var(--personal)'}">${kind}</span>${
+    condChipsHtml(ds, log)}${
     w.durationMin ? `<span class="sum-dur">${w.durationMin}분</span>` : ''}</div>`;
   return head + workoutExsHtml(log);
 }
@@ -3487,7 +3502,7 @@ function renderDaySheet(ds){
   body.innerHTML = `
     <div class="section">
       ${sectionHeadHtml('var(--personal)','운동','workout', wHas, wEdit)}
-      ${!wEdit ? workoutSummaryHtml(log) : `
+      ${!wEdit ? workoutSummaryHtml(log, ds) : `
       <div class="segmented" id="wtSeg">
         <button data-v="none" class="${log.workout.type==='none'?'active':''}">안 함</button>
         <button data-v="personal" class="${log.workout.type==='personal'?'active':''}">개인운동</button>
@@ -5551,6 +5566,7 @@ function renderWorkoutTab(){
           <span class="wk-date">${mo}월 ${d}일</span>
           <span class="wk-dow">(${dow})</span>
           <span class="wk-kind" style="color:${col}">${pt ? 'PT' : '개인운동'}</span>
+          ${condChipsHtml(ds, log)}
           ${y === new Date().getFullYear() ? '' : `<span class="wk-ym">${y}</span>`}
           ${w.durationMin ? `<span class="wk-dur">${w.durationMin}분</span>` : ''}
           ${ds === todayStr() ? '' : `<button class="wk-import${w.durationMin?'':' lone'}" data-wkimport="${ds}">오늘로 가져오기</button>`}
