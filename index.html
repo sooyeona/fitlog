@@ -304,10 +304,21 @@
   .sum-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
   .sum-kind{font-size:12.5px;}
   .sum-dur{font-family:var(--font-mono);font-size:12.5px;color:var(--note-ink);}
-  /* 운동 머리의 그날 컨디션 (보기 상태에만) */
+  /* 운동 머리의 그날 컨디션 (보기 상태에만) — 누르면 특이사항 쪽지가 뜬다 */
   .sum-cond{font-size:12.5px;color:var(--text-muted);}
   .sum-cond.pd,.sum-cond.bad{color:var(--period);}
   .wk-head .sum-cond{font-size:11.5px;}
+  .cond-wrap{display:inline-flex;align-items:baseline;gap:7px;cursor:pointer;
+    border-bottom:1px dotted var(--text-faint);padding-bottom:1px;}
+  /* 컨디션 쪽지 */
+  .cond-pop{position:fixed;z-index:200;max-width:260px;background:var(--surface);
+    border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-2);padding:11px 13px;}
+  .cond-pop .cp-line{font-size:13px;margin-bottom:5px;}
+  .cond-pop .cp-line:last-child{margin-bottom:0;}
+  .cond-pop .cp-pd{color:var(--period);}
+  .cond-pop .cp-sub{font-size:12px;color:var(--text-faint);}
+  .cond-pop .cp-note{font-size:13px;color:var(--note-ink);line-height:1.45;}
+  .cond-pop .cp-none{font-size:12.5px;color:var(--text-faint);}
   .sum-ex{margin-bottom:12px;}
   .sum-ex + .sum-ex{border-top:1px solid var(--line);padding-top:11px;}
   .sum-ex-name{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;font-size:14px;font-weight:700;margin-bottom:5px;}
@@ -2179,7 +2190,7 @@ const LS_KEY = 'fitlog.v1';
    "저장했어요" 가 떠도 실제로는 아무것도 안 남는다(기록이 사라진 것처럼 보임).
    그래서 사진 알맹이는 용량이 훨씬 큰 IndexedDB 에 따로 두고,
    localStorage 에는 글자 기록만 남긴다. */
-const APP_BUILD = '2026-11-24 컨디션표기';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
+const APP_BUILD = '2026-11-24 컨디션쪽지';   // 이 화면이 언제 만든 파일인지 (⇅ 에서 확인)
 const IDB_NAME = 'fitlog', IDB_STORE = 'photos';
 let _idb = null;
 /* 창고에 확실히 들어간 사진 id.
@@ -3136,8 +3147,56 @@ function condChipsHtml(ds, log){
   if(no) out.push(`<span class="sum-cond pd">생리 ${no}일째</span>`);
   const lv = log && log.condition && log.condition.level;
   if(lv) out.push(`<span class="sum-cond${lv==='bad'?' bad':''}">컨디션 ${COND_LABEL[lv]}</span>`);
-  return out.join('');
+  if(!out.length) return '';
+  // 누르면 그날 특이사항(기분·몸 상태 메모)을 쪽지로 띄운다
+  return `<span class="cond-wrap" data-condpop="${ds}" role="button" title="자세히">${out.join('')}</span>`;
 }
+/* 컨디션 쪽지 — 생리 시작일·종료, 몸 상태, 특이사항 메모 */
+function condPopHtml(ds){
+  const log = getLog(ds);
+  const p = periodOf(ds), no = periodDayNo(ds);
+  const lv = log.condition && log.condition.level;
+  const note = (log.condition && log.condition.note) || '';
+  const rows = [];
+  if(p){
+    const [, mo, d] = p.start.split('-');
+    rows.push(`<div class="cp-line cp-pd">생리 ${no}일째</div>`
+      + `<div class="cp-line cp-sub">${Number(mo)}월 ${Number(d)}일 시작 · ${
+          p.end ? `${Number(p.end.split('-')[1])}월 ${Number(p.end.split('-')[2])}일 종료`
+                : `${PERIOD_DAYS}일 뒤 자동 종료`}</div>`);
+  }
+  if(lv) rows.push(`<div class="cp-line${lv==='bad'?' cp-pd':''}">컨디션 ${COND_LABEL[lv]}</div>`);
+  if(note) rows.push(`<div class="cp-line cp-note">${note.replace(/</g,'&lt;')}</div>`);
+  else rows.push(`<div class="cp-line cp-none">적어둔 특이사항 없음</div>`);
+  return rows.join('');
+}
+function closeCondPop(){ document.querySelectorAll('.cond-pop,.cond-pop-back').forEach(el=>el.remove()); }
+function openCondPop(ds, el){
+  closeCondPop();
+  const back = document.createElement('div');
+  back.className = 'set-menu-back cond-pop-back';
+  const pop = document.createElement('div');
+  pop.className = 'cond-pop';
+  pop.innerHTML = condPopHtml(ds);
+  document.body.appendChild(back);
+  document.body.appendChild(pop);
+  const r = el.getBoundingClientRect();
+  const pw = pop.offsetWidth, ph = pop.offsetHeight;
+  let left = Math.min(r.left, window.innerWidth - pw - 10);
+  let top  = r.bottom + 6;
+  if(top + ph > window.innerHeight - 10) top = Math.max(10, r.top - ph - 6);
+  pop.style.left = Math.max(10, left) + 'px';
+  pop.style.top  = top + 'px';
+  back.addEventListener('click', closeCondPop);
+  pop.addEventListener('click', closeCondPop);
+}
+/* 캡처 단계에서 잡는다 — 운동 탭 카드(누르면 그날이 열림)보다 먼저 가로채야 한다 */
+document.addEventListener('click', e=>{
+  const t = e.target.closest && e.target.closest('[data-condpop]');
+  if(!t) return;
+  e.stopPropagation(); e.preventDefault();
+  openCondPop(t.dataset.condpop, t);
+}, true);
 function workoutSummaryHtml(log, ds){
   const w = log.workout;
   const kind = w.type==='pt' ? 'PT' : '개인운동';
